@@ -8,9 +8,11 @@
 # the game. It then stores these records in an array called trends. The         # 
 # toString method prints all of these records on their own line.                #                              
 #################################################################################
+import sys
+sys.path.append('..')
+from helpers.filter_functions import *
+from objects.Record import Record
 import pandas as pd
-from helpers import filter_functions
-from objects import Record
 
 class SpreadTrends:
 
@@ -73,7 +75,7 @@ class SpreadTrends:
         identifiers = named_df.description
 
         filter_dict = {'Spread Push?': 'N', 'Neutral Venue?': 'N'}
-        df_clean = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        df_clean = filter_dataframe_by_values(df, filter_dict)
 
         away_covers = (df_clean['Away Cover?'] == 'Y').sum()
         away_not_covers = (df_clean['Away Cover?'] == 'N').sum()
@@ -91,9 +93,9 @@ class SpreadTrends:
         identifiers = named_df.description
 
         filter_dict = {'PK?': 'N'}
-        df_no_pk = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        df_no_pk = filter_dataframe_by_values(df, filter_dict)
         filter_dict = {'Spread Push?': 'N', 'PK?': 'N'}
-        df_clean = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        df_clean = filter_dataframe_by_values(df, filter_dict)
 
         favored_covers = (df_clean['Favored Cover?'] == 'Y').sum()
         favored_not_covers = (df_clean['Favored Cover?'] == 'N').sum()
@@ -107,9 +109,9 @@ class SpreadTrends:
         identifiers = named_df.description
 
         filter_dict = {'PK?': 'N'}
-        df_no_pk = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        df_no_pk = filter_dataframe_by_values(df, filter_dict)
         filter_dict = {'Spread Push?': 'N', 'PK?': 'N'}
-        df_clean = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        df_clean = filter_dataframe_by_values(df, filter_dict)
 
         not_favored_covers = (df_clean['Not Favored Cover?'] == 'Y').sum()
         not_favored_not_covers = (df_clean['Not Favored Cover?'] == 'N').sum()
@@ -127,9 +129,9 @@ class SpreadTrends:
         identifiers = named_df.description
 
         filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Home Favored?': 'Y'}
-        home_favored_df = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        home_favored_df = filter_dataframe_by_values(df, filter_dict)
         filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Home Favored?': 'Y', 'Spread Push?': 'N'}
-        home_favored_df_clean = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        home_favored_df_clean = filter_dataframe_by_values(df, filter_dict)
 
         home_favored_covers = (home_favored_df_clean['Home Favored Cover?'] == 'Y').sum()
         home_favored_not_covers = (home_favored_df_clean['Home Favored Cover?'] == 'N').sum()
@@ -143,9 +145,9 @@ class SpreadTrends:
         identifiers = named_df.description
 
         filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Away Not Favored?': 'Y'}
-        away_not_favored_df = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        away_not_favored_df = filter_dataframe_by_values(df, filter_dict)
         filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Away Not Favored?': 'Y', 'Spread Push?': 'N'}
-        away_not_favored_df_clean = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        away_not_favored_df_clean = filter_dataframe_by_values(df, filter_dict)
 
         away_not_favored_covers = (away_not_favored_df_clean['Away Not Favored Cover?'] == 'Y').sum()
         away_not_favored_not_covers = (away_not_favored_df_clean['Away Not Favored Cover?'] == 'N').sum()
@@ -159,9 +161,9 @@ class SpreadTrends:
         identifiers = named_df.description
 
         filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Away Favored?': 'Y'}
-        away_favored_df = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        away_favored_df = filter_dataframe_by_values(df, filter_dict)
         filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Away Favored?': 'Y', 'Spread Push?': 'N'}
-        away_favored_df_clean = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        away_favored_df_clean = filter_dataframe_by_values(df, filter_dict)
 
         away_favored_covers = (away_favored_df_clean['Away Favored Cover?'] == 'Y').sum()
         away_favored_not_covers = (away_favored_df_clean['Away Favored Cover?'] == 'N').sum()
@@ -175,9 +177,9 @@ class SpreadTrends:
         identifiers = named_df.description
 
         filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Home Not Favored?': 'Y'}
-        home_not_favored_df = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        home_not_favored_df = filter_dataframe_by_values(df, filter_dict)
         filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Home Not Favored?': 'Y', 'Spread Push?': 'N'}
-        home_not_favored_df_clean = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        home_not_favored_df_clean = filter_dataframe_by_values(df, filter_dict)
 
         home_not_favored_covers = (home_not_favored_df_clean['Home Not Favored Cover?'] == 'Y').sum()
         home_not_favored_not_covers = (home_not_favored_df_clean['Home Not Favored Cover?'] == 'N').sum()

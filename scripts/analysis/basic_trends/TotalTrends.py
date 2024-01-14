@@ -6,9 +6,11 @@
 # stores these records in an array called trends. The toString method prints    #
 # all of these records on their own line.                                       #                              
 #################################################################################
+import sys
+sys.path.append('..')
+from helpers.filter_functions import *
+from objects.Record import Record
 import pandas as pd
-from helpers import filter_functions
-from objects import Record
 
 class TotalTrends:
 
@@ -33,7 +35,7 @@ class TotalTrends:
         identifiers = named_df.description
 
         filter_dict = {'Total Push?': 'N'}
-        df_clean = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        df_clean = filter_dataframe_by_values(df, filter_dict)
 
         over_hits = (df_clean['Over Hit?'] == 'Y').sum()
         over_misses = (df_clean['Over Hit?'] == 'N').sum()
@@ -47,7 +49,7 @@ class TotalTrends:
         identifiers = named_df.description
 
         filter_dict = {'Total Push?': 'N'}
-        df_clean = filter_functions.filter_dataframe_by_values(df, filter_dict)
+        df_clean = filter_dataframe_by_values(df, filter_dict)
 
         under_hits = (df_clean['Under Hit?'] == 'Y').sum()
         under_misses = (df_clean['Under Hit?'] == 'N').sum()
