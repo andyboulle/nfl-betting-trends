@@ -6,7 +6,15 @@
 # possible combinations up to and including these betting info options and      #
 # creates dataframes matching the criteria of these combinations. Then it uses  #
 # BasicTrends to find all basic trends for the combination dataframes.          #  
-# The toString method prints all of these records on their own line.            #                       
+# The toString method prints all of these records on their own line.            #    
+#                                                                               #
+# Examples:                                                                     #
+# - games where the moneyline for the underdog is +200 or higher                #
+# - games where the spread is 7                                                 #
+# - games where the total is 56.5 or lower                                      #
+# - games where the moneyline for the favorite is -200 or lower and the total   #
+#   is 49.5 or lower                                                            #
+# - games where the spread is 3.0 or more and the total is 52.0 or lower        #          
 #################################################################################
 from analysis.basic_trends.BasicTrends import BasicTrends
 from analysis.objects.NamedDataframe import NamedDataframe
