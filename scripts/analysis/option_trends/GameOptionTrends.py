@@ -5,8 +5,16 @@
 # combinations of information about the given game. It then gets all possible   #
 # combinations of including and not including these game info options and       #
 # creates dataframes matching the criteria of these combinations. Then it uses  #
-# BasicTrendsFinder to find all basic trends for the combination dataframes.    #  
-# The toString method prints all of these records on their own line.            #                       
+# BasicTrends to find all basic trends for the combination dataframes. The      #  
+# toString method prints all of these records on their own line.                #  
+#                                                                               #
+# Examples:                                                                     #
+# - games where the day of the week is Sunday and the month is 10               #
+# - games where the day of the week is Sunday and it is the regular season      #
+# - games where the day of the week is Sunday and it is the regular season and  #
+#   it is a divisional game                                                     # 
+# - games where the month is 10 and it is the regular season and it is a        # 
+#   divisional game                                                             #
 #################################################################################
 from analysis.basic_trends.BasicTrends import BasicTrends
 from analysis.objects.NamedDataframe import NamedDataframe
