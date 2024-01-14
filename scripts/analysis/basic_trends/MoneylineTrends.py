@@ -8,10 +8,8 @@
 # game. It then stores these records in an array called trends. The toString    # 
 # method prints all of these records on their own line.                         #                              
 #################################################################################
-import sys
-sys.path.append('..')
-from helpers.filter_functions import *
-from objects.Record import Record
+from analysis.helpers.filter_functions import *
+from analysis.objects.Record import Record
 import pandas as pd
 
 class MoneylineTrends:

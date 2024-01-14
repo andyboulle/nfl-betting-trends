@@ -1,14 +1,14 @@
 #################################################################################
-# TotalTrends.py                                                                #
+# BasicTrends.py                                                                #
 #                                                                               #
 # This file uses the MoneylineTrends, SpreadTrends, and TotalTrends file to     #
 # calculate all the basic trend records for moneylines, spreads, and totals. It #
 # runs all 3 of those files and runs them for the given game. The toString      #
 # method puts all these trends into an array and prints them on their own line. #                              
 #################################################################################
-from MoneylineTrends import MoneylineTrends
-from SpreadTrends import SpreadTrends
-from TotalTrends import TotalTrends
+from analysis.basic_trends.MoneylineTrends import MoneylineTrends
+from analysis.basic_trends.SpreadTrends import SpreadTrends
+from analysis.basic_trends.TotalTrends import TotalTrends
 import pandas as pd
 
 class BasicTrends:
