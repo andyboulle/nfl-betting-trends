@@ -16,8 +16,6 @@
 #   the day of the week is Sunday and it is a divisional game                   #
 # - games where the total is 43.5 and the day of the week is Sunday and it is a # 
 #   divisional game                                                             #
-#                                                                               #
-# TODO: Add comments explaining functions                                       #
 #################################################################################
 from analysis.option_trends.GameOptionTrends import GameOptionTrends
 from analysis.option_trends.BettingOptionTrends import BettingOptionTrends
@@ -33,8 +31,8 @@ class IntegratedOptionTrends:
 
     game = None
 
-    single_option_finder = None
-    many_option_finder = None
+    game_option_finder = None
+    betting_option_finder = None
 
     favorite_ml = None
     underdog_ml = None
@@ -52,22 +50,22 @@ class IntegratedOptionTrends:
         self.named_df = named_df
         self.df = named_df.df
         self.game = game
-        self.many_option_finder = BettingOptionTrends(named_df, game)
-        self.favorite_ml = self.many_option_finder.favorite_moneyline
-        self.underdog_ml = self.many_option_finder.underdog_moneyline
-        self.spread = self.many_option_finder.spread
-        self.total = self.many_option_finder.total
+        self.betting_option_finder = BettingOptionTrends(named_df, game)
+        self.favorite_ml = self.betting_option_finder.favorite_moneyline
+        self.underdog_ml = self.betting_option_finder.underdog_moneyline
+        self.spread = self.betting_option_finder.spread
+        self.total = self.betting_option_finder.total
         self.trends = self.get_all_trends()
 
     def get_moneyline_combo_dataframes(self):
         moneyline_combo_dfs = []
 
-        moneyline_dataframes = self.many_option_finder.get_moneyline_dataframes(self.df, self.favorite_ml, self.underdog_ml)
+        moneyline_dataframes = self.betting_option_finder.get_moneyline_dataframes(self.df, self.favorite_ml, self.underdog_ml)
 
         for df in moneyline_dataframes:
             moneyline_string = df.description
-            single_options = GameOptionTrends(df, self.game)
-            trends = single_options.get_option_combination_dataframes()
+            game_options = GameOptionTrends(df, self.game)
+            trends = game_options.get_option_combination_dataframes()
 
             for trend in trends:
                 option_string = trend.description[(trend.description.find('in games where') + 13):].strip()
@@ -89,12 +87,12 @@ class IntegratedOptionTrends:
     def get_spread_combo_dataframes(self):
         spread_combo_dfs = []
 
-        spread_dataframes = self.many_option_finder.get_spread_dataframes(self.df, self.spread)
+        spread_dataframes = self.betting_option_finder.get_spread_dataframes(self.df, self.spread)
 
         for df in spread_dataframes:
             spread_string = df.description
-            single_options = GameOptionTrends(df, self.game)
-            trends = single_options.get_option_combination_dataframes()
+            game_options = GameOptionTrends(df, self.game)
+            trends = game_options.get_option_combination_dataframes()
 
             for trend in trends:
                 option_string = trend.description[(trend.description.find('in games where') + 13):].strip()
@@ -116,12 +114,12 @@ class IntegratedOptionTrends:
     def get_total_combo_dataframes(self):
         total_combo_dfs = []
 
-        total_dataframes = self.many_option_finder.get_total_dataframes(self.df, self.total)
+        total_dataframes = self.betting_option_finder.get_total_dataframes(self.df, self.total)
 
         for df in total_dataframes:
             total_string = df.description
-            single_options = GameOptionTrends(df, self.game)
-            trends = single_options.get_option_combination_dataframes()
+            game_options = GameOptionTrends(df, self.game)
+            trends = game_options.get_option_combination_dataframes()
 
             for trend in trends:
                 option_string = trend.description[(trend.description.find('in games where') + 13):].strip()
@@ -143,12 +141,12 @@ class IntegratedOptionTrends:
     def get_moneyline_and_total_combo_dataframes(self):
         moneyline_and_total_combo_dfs = []
 
-        moneyline_and_total_dataframes = self.many_option_finder.get_moneyline_and_total_dataframes(self.df, self.favorite_ml, self.underdog_ml, self.total)
+        moneyline_and_total_dataframes = self.betting_option_finder.get_moneyline_and_total_dataframes(self.df, self.favorite_ml, self.underdog_ml, self.total)
 
         for df in moneyline_and_total_dataframes:
             moneyline_and_total_string = df.description
-            single_options = GameOptionTrends(df, self.game)
-            trends = single_options.get_option_combination_dataframes()
+            game_options = GameOptionTrends(df, self.game)
+            trends = game_options.get_option_combination_dataframes()
 
             for trend in trends:
                 option_string = trend.description[(trend.description.find('in games where') + 13):].strip()
@@ -170,12 +168,12 @@ class IntegratedOptionTrends:
     def get_spread_and_total_combo_dataframes(self):
         spread_and_total_combo_dfs = []
 
-        spread_and_total_dataframes = self.many_option_finder.get_spread_and_total_dataframes(self.df, self.spread, self.total)
+        spread_and_total_dataframes = self.betting_option_finder.get_spread_and_total_dataframes(self.df, self.spread, self.total)
 
         for df in spread_and_total_dataframes:
             spread_and_total_string = df.description
-            single_options = GameOptionTrends(df, self.game)
-            trends = single_options.get_option_combination_dataframes()
+            game_options = GameOptionTrends(df, self.game)
+            trends = game_options.get_option_combination_dataframes()
 
             for trend in trends:
                 option_string = trend.description[(trend.description.find('in games where') + 13):].strip()
