@@ -21,7 +21,6 @@ from analysis.objects.NamedDataframe import NamedDataframe
 from analysis.helpers.filter_functions import *
 import pandas as pd
 from itertools import combinations
-from datetime import datetime
 
 class GameOptionTrends:
 

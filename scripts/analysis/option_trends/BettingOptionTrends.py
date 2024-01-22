@@ -20,7 +20,6 @@ from analysis.basic_trends.BasicTrends import BasicTrends
 from analysis.objects.NamedDataframe import NamedDataframe
 from analysis.helpers.filter_functions import *
 import pandas as pd
-from datetime import datetime
 
 class BettingOptionTrends:
     

@@ -22,7 +22,6 @@ from analysis.basic_trends.BasicTrends import BasicTrends
 from analysis.objects.NamedDataframe import NamedDataframe
 from analysis.objects.Game import Game
 import pandas as pd
-from datetime import datetime
 
 class YearlyOptionTrends:
     
@@ -37,14 +36,28 @@ class YearlyOptionTrends:
 
     trends = None
 
-    def __init__(self, named_df, game):
+    def __init__(self, named_df, game, got=None, bot=None, iot=None):
         self.named_df = named_df
         self.df = named_df.df
         self.game = game
-        self.game_option_finder = GameOptionTrends(named_df, game)
-        self.betting_option_finder = BettingOptionTrends(named_df, game)
-        self.integrated_option_finder = IntegratedOptionTrends(named_df, game)
+
+        if got is not None:
+            self.game_option_finder = got
+        else:
+            self.game_option_finder = GameOptionTrends(named_df, game)
+
+        if bot is not None:
+            self.betting_option_finder = bot
+        else:
+            self.betting_option_finder = BettingOptionTrends(named_df, game)
+
+        if iot is not None:
+            self.integrated_option_finder = iot
+        else:
+            self.integrated_option_finder = IntegratedOptionTrends(named_df, game)
+
         self.trends = self.get_all_trends()
+
 
 
     # RETURNS AN ARRAY OF NAMED DATAFRAMES
@@ -131,7 +144,7 @@ class YearlyOptionTrends:
     
     def get_all_trends(self):
         all_trends = []
-        
+
         game_option_trends = self.get_game_option_year_trends()
         betting_option_trends = self.get_betting_option_year_trends()
         integrated_option_trends = self.get_integrated_option_year_trends()
