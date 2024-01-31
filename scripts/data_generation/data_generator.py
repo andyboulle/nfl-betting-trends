@@ -19,7 +19,7 @@ excel_file_name = 'datafiles/excel/nfl.xlsx'
 csv_file_name = 'datafiles/csv/nfl.csv'
 csv_folder_path = 'datafiles/csv'
 
-# Create datafiles/csv folder
+# Create datafiles/csv folder if it does not already exist
 if not os.path.exists(csv_folder_path):
     os.makedirs(csv_folder_path)
 
