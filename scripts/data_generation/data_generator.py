@@ -13,9 +13,15 @@ from datetime import datetime
 import data_cleaner
 import column_editor
 import time
+import os
 
 excel_file_name = 'datafiles/excel/nfl.xlsx'
 csv_file_name = 'datafiles/csv/nfl.csv'
+csv_folder_path = 'datafiles/csv'
+
+# Create datafiles/csv folder
+if not os.path.exists(csv_folder_path):
+    os.makedirs(csv_folder_path)
 
 # Start measuring the total time
 total_start_time = time.time()
