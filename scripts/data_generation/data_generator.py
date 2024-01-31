@@ -14,8 +14,8 @@ import data_cleaner
 import column_editor
 import time
 
-excel_file_name = '../../../datafiles/excel/nfl.xlsx'
-csv_file_name = '../../../datafiles/csv/nfl.csv'
+excel_file_name = 'datafiles/excel/nfl.xlsx'
+csv_file_name = 'datafiles/csv/nfl.csv'
 
 # Start measuring the total time
 total_start_time = time.time()
@@ -38,7 +38,7 @@ column_editing_time = time.time() - start_time
 
 # Save dataframe with edited columns to CSV
 start_time = time.time()
-df.to_csv('../../../datafiles/csv/analysis_data.csv', index=False)
+df.to_csv('datafiles/csv/analysis_data.csv', index=False)
 save_to_csv_time = time.time() - start_time
 
 # Calculate total time
