@@ -13,12 +13,20 @@ To use the NFL Trends Analyzer, follow these steps:
    git clone https://github.com/andyboulle/NFLTrendsAnalyzer.git
    cd NFLTrendsAnalyzer
 ```
-## Usage
-
-The primary input for the Trends Analyzer is game information provided through the `Game` class. Example usage:
-```python
-from analysis.objects.Game import Game
+2. Install requirements:
+```bash
+   pip install -r requirements.txt
 ```
+## Usage
+1. Run `data_generator.py` to generate necessary datafiles:
+```bash
+   python scripts/data_generation/data_generator.py
+```
+2. Run `playground.py` to write trends:
+```bash
+   python scripts/playground.py
+```
+All customization will be done in the `playground.py` file. This is where you give the details of the game you want to analyze as well as set what trends you want to write.
 ## Game Class
 
 The `Game` class is a fundamental component of the NFL Trends Analyzer, serving as the primary means to input information for analysis. Instances of this class represent individual NFL games and encapsulate various parameters associated with those games.
@@ -38,12 +46,39 @@ The `Game` class is a fundamental component of the NFL Trends Analyzer, serving 
 ### Example Usage
 
 ```python
-from trends_analyzer import Game
+from analysis.objects.Game import Game
 
 # Example Game
 game = Game('2023-2024', '2023-10-29', 'Washington Commanders', 'Philadelphia Eagles', 265, -330, 7, -7, 43.5)
 ```
 Instances of the Game class serve as the foundation for generating trends related to both game information and betting information within the NFL Trends Analyzer.
+## Basic Trends
+
+Basic Trends in the NFL trends analyzer are all the most basic categories of trends with no more specific filter applied to the search criteria. These trends are as follows:
+### Moneyline Trends
+- Home Team Record Straight Up
+- Away Team Record Straight Up
+- Favorite Record Straight Up
+- Underdog Record Straight Up
+- Home Favorite/Away Favorite Record Straight Up
+- Home Underdog/Away Underdog Record Straight Up
+
+### Spread Trends
+- Home team Record ATS (Against the Spread)
+- Away Team Record ATS
+- Favored Record ATS
+- Not Favored Record ATS
+- Home Favored/Away Favored Record ATS
+- Home Not Favored/Away Not Favored Record ATS
+
+### Total Trends
+- Overs Record
+- Unders Record
+
+These Basic Trends are the foundation of all the more complicated, specific, and filtered trends that will be discussed later. The given Game object will be used as the filter. For each unique aspect of the game (month, day, divisions, spread, moneyline, total, etc) the NFL Trend Analyzer will tell you the record for every single one of these basic trends with the filtered specifics attached (see examples below). The Game object passed will also determine things like whether the basic trends will use Home Favorite/Away Underdog or Away Favorite/Home Underdog, as well as Home Favored/Away Not Favored or Away Favored/Home Not Favored. 
+
+**Note:** The words "favorite" and "underdog" are used when talking about moneylines and the words "favored" and "not favored" are used when talking about spreads.
+
 ## Option Trends
 
 Option Trends in the NFL Trends Analyzer refer to comprehensive analyses that consider various combinations of options, providing valuable insights into team performance based on different criteria. These trends are instrumental in understanding patterns, tendencies, and statistical outcomes across a spectrum of factors. The major categories of Option Trends include:
