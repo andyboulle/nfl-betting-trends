@@ -26,7 +26,7 @@ To use the NFL Trends Analyzer, follow these steps:
 ```bash
    python scripts/playground.py
 ```
-All customization will be done in the `playground.py` file. This is where you give the details of the game you want to analyze as well as set what trends you want to write.
+All customization will be done in the `playground.py` file. This is where you give the details of the game you want to analyze as well as set what trends you want to write. It will write the created trends to the `output.txt` file.
 ## Game Class
 
 The `Game` class is a fundamental component of the NFL Trends Analyzer, serving as the primary means to input information for analysis. Instances of this class represent individual NFL games and encapsulate various parameters associated with those games.
