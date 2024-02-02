@@ -16,8 +16,8 @@ To use the NFL Trends Analyzer, follow these steps:
 2. Create a virtual environment:
 ```bash
    python -m venv .venv
-   source .venv/bin/activate       # macOS/Linux
-          .venv/Scripts/activate   # Windows
+   source .venv/bin/activate   # macOS/Linux
+   .venv/Scripts/activate      # Windows
 ``` 
 3. Install requirements:
 ```bash
