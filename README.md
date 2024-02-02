@@ -13,7 +13,13 @@ To use the NFL Trends Analyzer, follow these steps:
    git clone https://github.com/andyboulle/NFLTrendsAnalyzer.git
    cd NFLTrendsAnalyzer
 ```
-2. Install requirements:
+2. Create a virtual environment:
+```bash
+   python -m venv .venv
+   source .venv/bin/activate       # macOS/Linux
+          .venv/Scripts/activate   # Windows
+``` 
+3. Install requirements:
 ```bash
    pip install -r requirements.txt
 ```
