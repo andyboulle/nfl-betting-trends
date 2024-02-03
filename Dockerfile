@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "scripts/data_generation/data_generator.py", ";", "python", "scripts/playground.py"]
+CMD ["python", "src/data_generation/data_generator.py", ";", "python", "src/playground.py"]
