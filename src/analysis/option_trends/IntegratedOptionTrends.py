@@ -17,11 +17,11 @@
 # - games where the total is 43.5 and the day of the week is Sunday and it is a # 
 #   divisional game                                                             #
 #################################################################################
-from analysis.option_trends.GameOptionTrends import GameOptionTrends
-from analysis.option_trends.BettingOptionTrends import BettingOptionTrends
-from analysis.basic_trends.BasicTrends import BasicTrends
-from analysis.objects.Game import Game
-from analysis.objects.NamedDataframe import NamedDataframe
+from src.analysis.option_trends.GameOptionTrends import GameOptionTrends
+from src.analysis.option_trends.BettingOptionTrends import BettingOptionTrends
+from src.analysis.basic_trends.BasicTrends import BasicTrends
+from src.analysis.objects.Game import Game
+from src.analysis.objects.NamedDataframe import NamedDataframe
 import pandas as pd
 
 class IntegratedOptionTrends:

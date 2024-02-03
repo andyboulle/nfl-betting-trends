@@ -6,9 +6,9 @@
 # runs all 3 of those files and runs them for the given game. The toString      #
 # method puts all these trends into an array and prints them on their own line. #                              
 #################################################################################
-from analysis.basic_trends.MoneylineTrends import MoneylineTrends
-from analysis.basic_trends.SpreadTrends import SpreadTrends
-from analysis.basic_trends.TotalTrends import TotalTrends
+from src.analysis.basic_trends.MoneylineTrends import MoneylineTrends
+from src.analysis.basic_trends.SpreadTrends import SpreadTrends
+from src.analysis.basic_trends.TotalTrends import TotalTrends
 import pandas as pd
 
 class BasicTrends:

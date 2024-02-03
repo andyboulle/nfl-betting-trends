@@ -52,7 +52,7 @@ The `Game` class is a fundamental component of the NFL Trends Analyzer, serving 
 ### Example Usage
 
 ```python
-from analysis.objects.Game import Game
+from src.analysis.objects.Game import Game
 
 # Example Game
 game = Game('2023-2024', '2023-10-29', 'Washington Commanders', 'Philadelphia Eagles', 265, -330, 7, -7, 43.5)
