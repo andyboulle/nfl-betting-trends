@@ -1,12 +1,12 @@
 import time
-from analysis.objects.Game import Game
-from analysis.objects.NamedDataframe import NamedDataframe
-from analysis.basic_trends.BasicTrends import BasicTrends
-from analysis.option_trends.GameOptionTrends import GameOptionTrends
-from analysis.option_trends.BettingOptionTrends import BettingOptionTrends
-from analysis.option_trends.IntegratedOptionTrends import IntegratedOptionTrends
-from analysis.option_trends.YearlyOptionTrends import YearlyOptionTrends
-from analysis.option_trends.AllOptionTrends import AllOptionTrends
+from src.analysis.objects.Game import Game
+from src.analysis.objects.NamedDataframe import NamedDataframe
+from src.analysis.basic_trends.BasicTrends import BasicTrends
+from src.analysis.option_trends.GameOptionTrends import GameOptionTrends
+from src.analysis.option_trends.BettingOptionTrends import BettingOptionTrends
+from src.analysis.option_trends.IntegratedOptionTrends import IntegratedOptionTrends
+from src.analysis.option_trends.YearlyOptionTrends import YearlyOptionTrends
+from src.analysis.option_trends.AllOptionTrends import AllOptionTrends
 import pandas as pd
 
 start_time = time.time()
