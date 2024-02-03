@@ -26,11 +26,11 @@ To use the NFL Trends Analyzer, follow these steps:
 ## Usage
 1. Run `data_generator.py` to generate necessary datafiles:
 ```bash
-   python scripts/data_generation/data_generator.py
+   python src/data_generation/data_generator.py
 ```
 2. Run `playground.py` to write trends:
 ```bash
-   python scripts/playground.py
+   python src/playground.py
 ```
 All customization will be done in the `playground.py` file. This is where you give the details of the game you want to analyze as well as set what trends you want to write. It will write the created trends to the `output.txt` file.
 ## Game Class
