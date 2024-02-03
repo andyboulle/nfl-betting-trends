@@ -280,6 +280,7 @@ def create_moneyline_result_columns(df):
 # Line Open
 # PK?
 def create_line_columns(df):
+    df['Away Line Open'] = df['Home Line Open'] * -1
     df['Line Open'] = df[['Home Line Open', 'Away Line Open']].max(axis=1)
     df['PK?'] = None
 
