@@ -16,9 +16,9 @@
 #   is 49.5 or lower                                                            #
 # - games where the spread is 3.0 or more and the total is 52.0 or lower        #          
 #################################################################################
-from analysis.basic_trends.BasicTrends import BasicTrends
-from analysis.objects.NamedDataframe import NamedDataframe
-from analysis.helpers.filter_functions import *
+from src.analysis.basic_trends.BasicTrends import BasicTrends
+from src.analysis.objects.NamedDataframe import NamedDataframe
+from src.analysis.helpers.filter_functions import *
 import pandas as pd
 
 class BettingOptionTrends:

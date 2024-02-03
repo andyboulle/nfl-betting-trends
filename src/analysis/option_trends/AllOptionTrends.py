@@ -8,13 +8,13 @@
 # trends based on key words or phrases. The toString method prints all of these #
 # records on their own line.                                                    #
 #################################################################################
-from analysis.option_trends.GameOptionTrends import GameOptionTrends
-from analysis.option_trends.BettingOptionTrends import BettingOptionTrends
-from analysis.option_trends.IntegratedOptionTrends import IntegratedOptionTrends
-from analysis.option_trends.YearlyOptionTrends import YearlyOptionTrends
-from analysis.basic_trends.BasicTrends import BasicTrends
-from analysis.objects.NamedDataframe import NamedDataframe
-from analysis.objects.Game import Game
+from src.analysis.option_trends.GameOptionTrends import GameOptionTrends
+from src.analysis.option_trends.BettingOptionTrends import BettingOptionTrends
+from src.analysis.option_trends.IntegratedOptionTrends import IntegratedOptionTrends
+from src.analysis.option_trends.YearlyOptionTrends import YearlyOptionTrends
+from src.analysis.basic_trends.BasicTrends import BasicTrends
+from src.analysis.objects.NamedDataframe import NamedDataframe
+from src.analysis.objects.Game import Game
 import pandas as pd
 from datetime import datetime
 

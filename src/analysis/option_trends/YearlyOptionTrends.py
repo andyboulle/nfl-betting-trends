@@ -15,12 +15,12 @@
 # - games where the total is 43.5 and the day of the week is Sunday and it is a # 
 #   divisional game since the 2023-2024 season                                  #
 #################################################################################
-from analysis.option_trends.GameOptionTrends import GameOptionTrends
-from analysis.option_trends.BettingOptionTrends import BettingOptionTrends
-from analysis.option_trends.IntegratedOptionTrends import IntegratedOptionTrends
-from analysis.basic_trends.BasicTrends import BasicTrends
-from analysis.objects.NamedDataframe import NamedDataframe
-from analysis.objects.Game import Game
+from src.analysis.option_trends.GameOptionTrends import GameOptionTrends
+from src.analysis.option_trends.BettingOptionTrends import BettingOptionTrends
+from src.analysis.option_trends.IntegratedOptionTrends import IntegratedOptionTrends
+from src.analysis.basic_trends.BasicTrends import BasicTrends
+from src.analysis.objects.NamedDataframe import NamedDataframe
+from src.analysis.objects.Game import Game
 import pandas as pd
 
 class YearlyOptionTrends:

@@ -6,8 +6,8 @@
 # stores these records in an array called trends. The toString method prints    #
 # all of these records on their own line.                                       #                              
 #################################################################################
-from analysis.helpers.filter_functions import *
-from analysis.objects.Record import Record
+from src.analysis.helpers.filter_functions import *
+from src.analysis.objects.Record import Record
 import pandas as pd
 
 class TotalTrends:

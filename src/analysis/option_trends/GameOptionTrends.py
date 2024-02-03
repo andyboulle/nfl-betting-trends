@@ -16,9 +16,9 @@
 # - games where the month is 10 and it is the regular season and it is a        # 
 #   divisional game                                                             #
 #################################################################################
-from analysis.basic_trends.BasicTrends import BasicTrends
-from analysis.objects.NamedDataframe import NamedDataframe
-from analysis.helpers.filter_functions import *
+from src.analysis.basic_trends.BasicTrends import BasicTrends
+from src.analysis.objects.NamedDataframe import NamedDataframe
+from src.analysis.helpers.filter_functions import *
 import pandas as pd
 from itertools import combinations
 
