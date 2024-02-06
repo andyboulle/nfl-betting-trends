@@ -1,0 +1,23 @@
+name: Run unit tests
+
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  data-gen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+      - uses: actions/checkout@v4
+      - name: build analysis_data.csv
+        run: python src/data_generation/data_generator.py 
+        shell: bash
+      - name: run data generation tests
+        run: python -m unittest tests/data_generation/data_generation_tests.py
+        shell: bash
