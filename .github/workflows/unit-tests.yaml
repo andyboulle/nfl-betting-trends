@@ -13,10 +13,21 @@ jobs:
   data-gen:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: build analysis_data.csv
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up python virtual environment
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build analysis_data.csv
         run: python src/data_generation/data_generator.py 
         shell: bash
+
       - name: run data generation tests
         run: python -m unittest tests/data_generation/data_generation_tests.py
         shell: bash
