@@ -165,54 +165,52 @@ def create_game_result_columns(df):
 
     return df
 
-
 # Create the following columns:
-# Home Moneyline Odds
-# Away Moneyline Odds
-def create_moneyline_odds_columns(df):
-    df['Home Moneyline Open'] = df['Home Odds Open'].apply(lambda odds: decimal_to_american(odds) if not pd.isna(odds) else odds)
-    df['Away Moneyline Open'] = df['Away Odds Open'].apply(lambda odds: decimal_to_american(odds) if not pd.isna(odds) else odds)
+# Spread
+# Home Spread
+# Away Spread
+# PK?
+def create_spread_columns(df):
+    df['Home Spread'] = df['Home Line Open']
+    df['Away Spread'] = df['Home Spread'] * -1
+    df['Spread'] = df[['Home Spread', 'Away Spread']].max(axis=1)
+    df['PK?'] = None
+
+    for index, row in df.iterrows():
+        spread = row['Home Spread']
+        if spread == 0.0:
+            df.loc[index, 'PK?'] = 'Y'
+        else:
+            df.loc[index, 'PK?'] = 'N'
     return df
 
-
 # Create the following columns:
-# Equal Moneyline
 # Home Favorite?
 # Home Underdog?
 # Away Favorite?
 # Away Underdog?
-# Favorite Moneyline
-# Underdog Moneyline
 def create_favorite_underdog_columns(df):
     for index, row in df.iterrows():
-        home_ml = int(row['Home Moneyline Open'][1:]) if '+' in row['Home Moneyline Open'] else int(row['Home Moneyline Open'])
-        away_ml = int(row['Away Moneyline Open'][1:]) if '+' in row['Away Moneyline Open'] else int(row['Away Moneyline Open'])
-        if home_ml == away_ml:
-            df.loc[index, 'Equal Moneyline?'] = 'Y'
+        home_spread = row['Home Spread']
+        away_spread = row['Away Spread']
+        pk = row['PK?']
+        if pk == 'Y':
             df.loc[index, 'Home Favorite?'] = 'N'
             df.loc[index, 'Home Underdog?'] = 'N'
             df.loc[index, 'Away Favorite?'] = 'N'
             df.loc[index, 'Away Underdog?'] = 'N'
-            df.loc[index, 'Favorite Moneyline'] = row['Home Moneyline Open']
-            df.loc[index, 'Underdog Moneyline'] = row['Home Moneyline Open']
         else:
-            df.loc[index, 'Equal Moneyline?'] = 'N'
-            if home_ml < away_ml:
+            if home_spread < away_spread:
                 df.loc[index, 'Home Favorite?'] = 'Y'
                 df.loc[index, 'Home Underdog?'] = 'N'
                 df.loc[index, 'Away Favorite?'] = 'N'
                 df.loc[index, 'Away Underdog?'] = 'Y'
-                df.loc[index, 'Favorite Moneyline'] = row['Home Moneyline Open']
-                df.loc[index, 'Underdog Moneyline'] = row['Away Moneyline Open']
             else:
                 df.loc[index, 'Home Favorite?'] = 'N'
                 df.loc[index, 'Home Underdog?'] = 'Y'
                 df.loc[index, 'Away Favorite?'] = 'Y'
                 df.loc[index, 'Away Underdog?'] = 'N'
-                df.loc[index, 'Favorite Moneyline'] = row['Away Moneyline Open']
-                df.loc[index, 'Underdog Moneyline'] = row['Home Moneyline Open']
     return df
-
 
 # Create the following columns:
 # Favorite Win?
@@ -228,7 +226,7 @@ def create_moneyline_result_columns(df):
         winner = row['Winner']
         tie = row['Tie?']
         # If there is a tie or no favorite/underdog, then everything is No
-        if tie == True or row['Equal Moneyline?'] == 'NEITHER':
+        if tie == True or row['PK?'] == 'Y':
             df.loc[index, 'Favorite Win?'] = 'N'
             df.loc[index, 'Underdog Win?'] = 'N'
             df.loc[index, 'Home Favorite Win?'] = 'N'
@@ -275,136 +273,87 @@ def create_moneyline_result_columns(df):
                     df.loc[index, 'Away Underdog Win?'] = 'Y'
     return df
 
-
-# Create the following columns:
-# Line Open
-# PK?
-def create_line_columns(df):
-    df['Away Line Open'] = df['Home Line Open'] * -1
-    df['Line Open'] = df[['Home Line Open', 'Away Line Open']].max(axis=1)
-    df['PK?'] = None
-
-    for index, row in df.iterrows():
-        line = row['Home Line Open']
-        if line == 0:
-            df.loc[index, 'PK?'] = 'Y'
-        else:
-            df.loc[index, 'PK?'] = 'N'
-    return df
-
-
-# Create the following columns:
-# Home Favored?
-# Home Not Facored?
-# Away Favored?
-# Away Not Favored?
-def create_favored_not_favored_columns(df):
-    df['Home Favored?'] = None
-    df['Home Not Favored?'] = None
-    df['Away Favored?'] = None
-    df['Away Not Favored?'] = None
-
-    for index, row in df.iterrows():
-        home_line = row['Home Line Open']
-        if row['PK?'] == True:
-            df.loc[index, 'Home Favored?'] = 'N'
-            df.loc[index, 'Home Not Favored?'] = 'N'
-            df.loc[index, 'Away Favored?'] = 'N'
-            df.loc[index, 'Away Not Favored?'] = 'N'
-        else:
-            if home_line < 0:
-                df.loc[index, 'Home Favored?'] = 'Y'
-                df.loc[index, 'Home Not Favored?'] = 'N'
-                df.loc[index, 'Away Favored?'] = 'N'
-                df.loc[index, 'Away Not Favored?'] = 'Y'
-            else:
-                df.loc[index, 'Home Favored?'] = 'N'
-                df.loc[index, 'Home Not Favored?'] = 'Y'
-                df.loc[index, 'Away Favored?'] = 'Y'
-                df.loc[index, 'Away Not Favored?'] = 'N'
-    return df
-
 # Create the following columns:
 # Spread Push?
-# Home Cover?
-# Away Cover?
-# Favored Cover?
-# Not Favored Cover?
-# Home Favored Cover?
-# Home Not Favored Cover?
-# Away Favored Cover?
-# Away Not Favored Cover?
+# Home Team Cover?
+# Away Team Cover?
+# Favorite Cover?
+# Underdog Cover?
+# Home Favorite Cover?
+# Home Underdog Cover?
+# Away Favorite Cover?
+# Away Underdog Cover?
 def create_spread_result_columns(df):
     df['Spread Push?'] = None
-    df['Home Cover?'] = None
-    df['Away Cover?'] = None
-    df['Favored Cover?'] = None
-    df['Not Favored Cover?'] = None
-    df['Home Favored Cover?'] = None
-    df['Home Not Favored Cover?'] = None
-    df['Away Favored Cover?'] = None
-    df['Away Not Favored Cover?'] = None
+    df['Home Team Cover?'] = None
+    df['Away Team Cover?'] = None
+    df['Favorite Cover?'] = None
+    df['Underdog Cover?'] = None
+    df['Home Favorite Cover?'] = None
+    df['Home Underdog Cover?'] = None
+    df['Away Favorite Cover?'] = None
+    df['Away Underdog Cover?'] = None
 
     for index, row in df.iterrows():
-        home_line = row['Home Line Open']
-        away_line = row['Away Line Open']
+        home_spread = row['Home Spread']
+        away_spread = row['Away Spread']
         home_result = row['Home Spread Result']
         away_result = row['Away Spread Result']
 
         # Line pushed
-        if home_line == home_result:
+        if home_spread == home_result:
             df.loc[index, 'Spread Push?'] = 'Y'
-            df.loc[index, 'Home Cover?'] = 'N'
-            df.loc[index, 'Away Cover?'] = 'N'
-            df.loc[index, 'Favored Cover?'] = 'N'
-            df.loc[index, 'Not Favored Cover?'] = 'N'
-            df.loc[index, 'Home Favored Cover?'] = 'N'
-            df.loc[index, 'Home Not Favored Cover?'] = 'N'
-            df.loc[index, 'Away Favored Cover?'] = 'N'
-            df.loc[index, 'Away Not Favored Cover?'] = 'N'
+            df.loc[index, 'Home Team Cover?'] = 'N'
+            df.loc[index, 'Away Team Cover?'] = 'N'
+            df.loc[index, 'Favorite Cover?'] = 'N'
+            df.loc[index, 'Underdog Cover?'] = 'N'
+            df.loc[index, 'Home Favorite Cover?'] = 'N'
+            df.loc[index, 'Home Underdog Cover?'] = 'N'
+            df.loc[index, 'Away Favorite Cover?'] = 'N'
+            df.loc[index, 'Away Underdog Cover?'] = 'N'
         # Spread did not push
         else:
             df.loc[index, 'Spread Push?'] = 'N'
             # Home team covers spread
-            if home_result <= home_line:
-                df.loc[index, 'Home Cover?'] = 'Y'
-                df.loc[index, 'Away Cover?'] = 'N'
+            if home_result <= home_spread:
+                df.loc[index, 'Home Team Cover?'] = 'Y'
+                df.loc[index, 'Away Team Cover?'] = 'N'
                 # Home team was favored
-                if row['Home Favored?'] == 'Y':
-                    df.loc[index, 'Favored Cover?'] = 'Y'
-                    df.loc[index, 'Not Favored Cover?'] = 'N'
-                    df.loc[index, 'Home Favored Cover?'] = 'Y'
-                    df.loc[index, 'Home Not Favored Cover?'] = 'N'
-                    df.loc[index, 'Away Favored Cover?'] = 'N'
-                    df.loc[index, 'Away Not Favored Cover?'] = 'N'
+                if row['Home Favorite?'] == 'Y':
+                    df.loc[index, 'Favorite Cover?'] = 'Y'
+                    df.loc[index, 'Underdog Cover?'] = 'N'
+                    df.loc[index, 'Home Favorite Cover?'] = 'Y'
+                    df.loc[index, 'Home Underdog Cover?'] = 'N'
+                    df.loc[index, 'Away Favorite Cover?'] = 'N'
+                    df.loc[index, 'Away Underdog Cover?'] = 'N'
                 # Home team was not favored
                 else:
-                    df.loc[index, 'Favored Cover?'] = 'N'
-                    df.loc[index, 'Not Favored Cover?'] = 'Y'
-                    df.loc[index, 'Home Favored Cover?'] = 'N'
-                    df.loc[index, 'Home Not Favored Cover?'] = 'Y'
-                    df.loc[index, 'Away Favored Cover?'] = 'N'
-                    df.loc[index, 'Away Not Favored Cover?'] = 'N'
+                    df.loc[index, 'Favorite Cover?'] = 'N'
+                    df.loc[index, 'Underdog Cover?'] = 'Y'
+                    df.loc[index, 'Home Favorite Cover?'] = 'N'
+                    df.loc[index, 'Home Underdog Cover?'] = 'Y'
+                    df.loc[index, 'Away Favorite Cover?'] = 'N'
+                    df.loc[index, 'Away Underdog Cover?'] = 'N'
             # Away team covers spread
             else:
-                df.loc[index, 'Home Cover?'] = 'N'
-                df.loc[index, 'Away Cover?'] = 'Y'
+                df.loc[index, 'Home Team Cover?'] = 'N'
+                df.loc[index, 'Away Team Cover?'] = 'Y'
                 # Away team was favored
-                if row['Away Favored?'] == 'Y':
-                    df.loc[index, 'Favored Cover?'] = 'Y'
-                    df.loc[index, 'Not Favored Cover?'] = 'N'
-                    df.loc[index, 'Home Favored Cover?'] = 'N'
-                    df.loc[index, 'Home Not Favored Cover?'] = 'N'
-                    df.loc[index, 'Away Favored Cover?'] = 'Y'
-                    df.loc[index, 'Away Not Favored Cover?'] = 'N'
+                if row['Away Favorite?'] == 'Y':
+                    df.loc[index, 'Favorite Cover?'] = 'Y'
+                    df.loc[index, 'Underdog Cover?'] = 'N'
+                    df.loc[index, 'Home Favorite Cover?'] = 'N'
+                    df.loc[index, 'Home Underdog Cover?'] = 'N'
+                    df.loc[index, 'Away Favorite Cover?'] = 'Y'
+                    df.loc[index, 'Away Underdog Cover?'] = 'N'
                 # Away team was not favored
                 else:
-                    df.loc[index, 'Favored Cover?'] = 'N'
-                    df.loc[index, 'Not Favored Cover?'] = 'Y'
-                    df.loc[index, 'Home Favored Cover?'] = 'N'
-                    df.loc[index, 'Home Not Favored Cover?'] = 'N'
-                    df.loc[index, 'Away Favored Cover?'] = 'N'
-                    df.loc[index, 'Away Not Favored Cover?'] = 'Y'
+                    df.loc[index, 'Favorite Cover?'] = 'N'
+                    df.loc[index, 'Underdog Cover?'] = 'Y'
+                    df.loc[index, 'Home Favorite Cover?'] = 'N'
+                    df.loc[index, 'Home Underdog Cover?'] = 'N'
+                    df.loc[index, 'Away Favorite Cover?'] = 'N'
+                    df.loc[index, 'Away Underdog Cover?'] = 'Y'
     return df
 
 
@@ -441,16 +390,15 @@ def create_total_result_columns(df):
 # Rearranges columns in desired order
 def reorder_columns(df):
     new_order = [
-        'Season','Date','Day of Week','Month','Day','Year',
-        'Home Team','Home Division','Away Team','Away Division',
-        'Home Score','Away Score','Total Score','Home Spread Result','Away Spread Result','Winner','Loser',
-        'Divisional Game?','Tie?','Overtime?','Playoff Game?','Neutral Venue?',
-        'Home Moneyline Open','Away Moneyline Open','Favorite Moneyline', 'Underdog Moneyline', 'Equal Moneyline?',
-        'Home Favorite?','Home Underdog?','Away Favorite?','Away Underdog?',
-        'Home Team Win?','Away Team Win?','Favorite Win?','Underdog Win?','Home Favorite Win?','Home Underdog Win?','Away Favorite Win?','Away Underdog Win?',
-        'Line Open', 'Home Line Open','Away Line Open','PK?','Home Favored?','Home Not Favored?','Away Favored?','Away Not Favored?', 'Spread Push?',
-        'Home Cover?','Away Cover?','Favored Cover?','Not Favored Cover?','Home Favored Cover?','Home Not Favored Cover?','Away Favored Cover?','Away Not Favored Cover?',
-        'Total Score Open','Total Push?','Over Hit?','Under Hit?'
+        'Season', 'Date', 'Day of Week', 'Month', 'Day', 'Year',
+        'Home Team', 'Home Division', 'Away Team', 'Away Division',
+        'Home Score', 'Away Score', 'Total Score', 'Winner', 'Loser',
+        'Divisional Game?', 'Tie?', 'Overtime?', 'Playoff Game?', 'Neutral Venue?',
+        'Spread', 'Home Spread', 'Away Spread', 'PK?', 'Home Spread Result', 'Away Spread Result', 'Spread Push?',
+        'Home Favorite?', 'Away Underdog?', 'Away Favorite?', 'Home Underdog?',
+        'Home Team Win?', 'Away Team Win?', 'Favorite Win?', 'Underdog Win?', 'Home Favorite Win?', 'Away Underdog Win?', 'Away Favorite Win?', 'Home Underdog Win?',
+        'Home Team Cover?', 'Away Team Cover?', 'Favorite Cover?', 'Underdog Cover?', 'Home Favorite Cover?', 'Away Underdog Cover?', 'Away Favorite Cover?', 'Home Underdog Cover?',
+        'Total Score Open', 'Total Push?', 'Over Hit?', 'Under Hit?'
     ]
     df = df[new_order]
     return df
@@ -462,11 +410,9 @@ def edit_columns(df):
     df = create_division_columns(df)
     df = create_score_result_columns(df)
     df = create_game_result_columns(df)
-    df = create_moneyline_odds_columns(df)
+    df = create_spread_columns(df)
     df = create_favorite_underdog_columns(df)
     df = create_moneyline_result_columns(df)
-    df = create_line_columns(df)
-    df = create_favored_not_favored_columns(df)
     df = create_spread_result_columns(df)
     df = create_total_result_columns(df)
     df = reorder_columns(df)
