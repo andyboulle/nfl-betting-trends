@@ -90,9 +90,9 @@ class MoneylineTrends:
         df = named_df.df
         identifiers = named_df.description
 
-        filter_dict = {'Equal Moneyline?': 'N'}
+        filter_dict = {'PK?': 'N'}
         df_no_equal_moneylines = filter_dataframe_by_values(df, filter_dict)
-        filter_dict = {'Tie?': 'N', 'Equal Moneyline?': 'N'}
+        filter_dict = {'Tie?': 'N', 'PK?': 'N'}
         df_clean = filter_dataframe_by_values(df, filter_dict)
 
         favorite_wins = (df_clean['Favorite Win?'] == 'Y').sum()
@@ -106,9 +106,9 @@ class MoneylineTrends:
         df = named_df.df
         identifiers = named_df.description
 
-        filter_dict = {'Equal Moneyline?': 'N'}
+        filter_dict = {'PK?': 'N'}
         df_no_equal_moneylines = filter_dataframe_by_values(df, filter_dict)
-        filter_dict = {'Tie?': 'N', 'Equal Moneyline?': 'N'}
+        filter_dict = {'Tie?': 'N', 'PK?': 'N'}
         df_clean = filter_dataframe_by_values(df, filter_dict)
 
         underdog_wins = (df_clean['Underdog Win?'] == 'Y').sum()
@@ -126,9 +126,9 @@ class MoneylineTrends:
         df = named_df.df
         identifiers = named_df.description
 
-        filter_dict = {'Neutral Venue?': 'N', 'Equal Moneyline?': 'N', 'Home Favorite?': 'Y'}
+        filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Home Favorite?': 'Y'}
         home_favorites_df = filter_dataframe_by_values(df, filter_dict)
-        filter_dict = {'Neutral Venue?': 'N', 'Equal Moneyline?': 'N', 'Home Favorite?': 'Y', 'Tie?': 'N'}
+        filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Home Favorite?': 'Y', 'Tie?': 'N'}
         home_favorites_df_clean = filter_dataframe_by_values(df, filter_dict)
 
         home_favorite_wins = (home_favorites_df_clean['Home Favorite Win?'] == 'Y').sum()
@@ -142,9 +142,9 @@ class MoneylineTrends:
         df = named_df.df
         identifiers = named_df.description
 
-        filter_dict = {'Neutral Venue?': 'N', 'Equal Moneyline?': 'N', 'Away Underdog?': 'Y'}
+        filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Away Underdog?': 'Y'}
         away_underdogs_df = filter_dataframe_by_values(df, filter_dict)
-        filter_dict = {'Neutral Venue?': 'N', 'Equal Moneyline?': 'N', 'Away Underdog?': 'Y', 'Tie?': 'N'}
+        filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Away Underdog?': 'Y', 'Tie?': 'N'}
         away_underdogs_df_clean = filter_dataframe_by_values(df, filter_dict)
 
         away_underdog_wins = (away_underdogs_df_clean['Away Underdog Win?'] == 'Y').sum()
@@ -158,9 +158,9 @@ class MoneylineTrends:
         df = named_df.df
         identifiers = named_df.description
 
-        filter_dict = {'Neutral Venue?': 'N', 'Equal Moneyline?': 'N', 'Away Favorite?': 'Y'}
+        filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Away Favorite?': 'Y'}
         away_favorites_df = filter_dataframe_by_values(df, filter_dict)
-        filter_dict = {'Neutral Venue?': 'N', 'Equal Moneyline?': 'N', 'Away Favorite?': 'Y', 'Tie?': 'N'}
+        filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Away Favorite?': 'Y', 'Tie?': 'N'}
         away_favorites_df_clean = filter_dataframe_by_values(df, filter_dict)
 
         away_favorite_wins = (away_favorites_df_clean['Away Favorite Win?'] == 'Y').sum()
@@ -174,9 +174,9 @@ class MoneylineTrends:
         df = named_df.df
         identifiers = named_df.description
 
-        filter_dict = {'Neutral Venue?': 'N', 'Equal Moneyline?': 'N', 'Home Underdog?': 'Y'}
+        filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Home Underdog?': 'Y'}
         home_underdogs_df = filter_dataframe_by_values(df, filter_dict)
-        filter_dict = {'Neutral Venue?': 'N', 'Equal Moneyline?': 'N', 'Home Underdog?': 'Y', 'Tie?': 'N'}
+        filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Home Underdog?': 'Y', 'Tie?': 'N'}
         home_underdogs_df_clean = filter_dataframe_by_values(df, filter_dict)
 
         home_underdog_wins = (home_underdogs_df_clean['Home Underdog Win?'] == 'Y').sum()
