@@ -20,7 +20,7 @@ class Record:
         self.wins = wins
         self.losses = losses
         self.pushes = pushes
-        self.win_pct = 0 if wins == 0 else round((100 * wins / (wins + losses + pushes)), 2)
+        self.win_pct = 0 if wins == 0 else round((100 * wins / (wins + losses + (pushes / 2))), 2)
         self.total_games = wins + losses + pushes
 
     def __str__(self):
