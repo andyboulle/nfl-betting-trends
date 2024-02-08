@@ -10,8 +10,8 @@
 # these records on their own line.                                              #
 #                                                                               #
 # Examples:                                                                     #
-# - games where the moneyline for the underdog is +200 or higher and the total  # 
-#   is 47.5 or lower and the month is 10 and it is the regular season           #
+# - games where the spread is 7 and the total is 47.5 or lower and the month is #
+#   10 and it is the regular season                                             #
 # - games where the spread is 2.0 or more and the total is 52.5 or lower and    # 
 #   the day of the week is Sunday and it is a divisional game                   #
 # - games where the total is 43.5 and the day of the week is Sunday and it is a # 
@@ -34,8 +34,6 @@ class IntegratedOptionTrends:
     game_option_finder = None
     betting_option_finder = None
 
-    favorite_ml = None
-    underdog_ml = None
     spread = None
     total = None
 
@@ -51,38 +49,9 @@ class IntegratedOptionTrends:
         self.df = named_df.df
         self.game = game
         self.betting_option_finder = BettingOptionTrends(named_df, game)
-        self.favorite_ml = self.betting_option_finder.favorite_moneyline
-        self.underdog_ml = self.betting_option_finder.underdog_moneyline
         self.spread = self.betting_option_finder.spread
         self.total = self.betting_option_finder.total
         self.trends = self.get_all_trends()
-
-    def get_moneyline_combo_dataframes(self):
-        moneyline_combo_dfs = []
-
-        moneyline_dataframes = self.betting_option_finder.get_moneyline_dataframes(self.df, self.favorite_ml, self.underdog_ml)
-
-        for df in moneyline_dataframes:
-            moneyline_string = df.description
-            game_options = GameOptionTrends(df, self.game)
-            trends = game_options.get_option_combination_dataframes()
-
-            for trend in trends:
-                option_string = trend.description[(trend.description.find('in games where') + 13):].strip()
-                trend.description = f'{moneyline_string}and {option_string} '
-                moneyline_combo_dfs.append(trend)
-
-        return moneyline_combo_dfs
-    
-    def get_moneyline_combo_trends(self):
-        moneyline_combo_trends = []
-        moneyline_combo_dataframes = self.get_moneyline_combo_dataframes()
-
-        for df in moneyline_combo_dataframes:
-            trends = BasicTrends(df, self.game).trends
-            moneyline_combo_trends += trends
-
-        return moneyline_combo_trends
 
     def get_spread_combo_dataframes(self):
         spread_combo_dfs = []
@@ -138,33 +107,6 @@ class IntegratedOptionTrends:
 
         return total_combo_trends
     
-    def get_moneyline_and_total_combo_dataframes(self):
-        moneyline_and_total_combo_dfs = []
-
-        moneyline_and_total_dataframes = self.betting_option_finder.get_moneyline_and_total_dataframes(self.df, self.favorite_ml, self.underdog_ml, self.total)
-
-        for df in moneyline_and_total_dataframes:
-            moneyline_and_total_string = df.description
-            game_options = GameOptionTrends(df, self.game)
-            trends = game_options.get_option_combination_dataframes()
-
-            for trend in trends:
-                option_string = trend.description[(trend.description.find('in games where') + 13):].strip()
-                trend.description = f'{moneyline_and_total_string}and {option_string} '
-                moneyline_and_total_combo_dfs.append(trend)
-
-        return moneyline_and_total_combo_dfs
-    
-    def get_moneyline_and_total_combo_trends(self):
-        moneyline_and_total_combo_trends = []
-        moneyline_and_total_combo_dataframes = self.get_moneyline_and_total_combo_dataframes()
-
-        for df in moneyline_and_total_combo_dataframes:
-            trends = BasicTrends(df, self.game).trends
-            moneyline_and_total_combo_trends += trends
-
-        return moneyline_and_total_combo_trends
-    
     def get_spread_and_total_combo_dataframes(self):
         spread_and_total_combo_dfs = []
 
@@ -193,27 +135,21 @@ class IntegratedOptionTrends:
         return spread_and_total_combo_trends
     
     def get_all_dataframes(self):
-        moneyline_combo_dataframes = self.get_moneyline_combo_dataframes()
         spread_combo_dataframes = self.get_spread_combo_dataframes()
         total_combo_dataframes = self.get_total_combo_dataframes()
-        moneyline_and_total_combo_dataframes = self.get_moneyline_and_total_combo_dataframes()
         spread_and_total_combo_dataframes = self.get_spread_and_total_combo_dataframes()
 
-        return [moneyline_combo_dataframes, spread_combo_dataframes, total_combo_dataframes, moneyline_and_total_combo_dataframes, spread_and_total_combo_dataframes]
+        return [spread_combo_dataframes, total_combo_dataframes, spread_and_total_combo_dataframes]
     
     def get_all_trends(self):
         all_trends = []
 
-        moneyline_trends = self.get_moneyline_combo_trends()
         spread_trends = self.get_spread_combo_trends()
         total_trends = self.get_total_combo_trends()
-        moneyline_and_total_trends = self.get_moneyline_and_total_combo_trends()
         spread_and_total_trends = self.get_spread_and_total_combo_trends()
 
-        all_trends += moneyline_trends
         all_trends += spread_trends
         all_trends += total_trends
-        all_trends += moneyline_and_total_trends
         all_trends += spread_and_total_trends
 
         return all_trends
