@@ -147,8 +147,8 @@ class SpreadTrends:
         filter_dict = {'Neutral Venue?': 'N', 'PK?': 'N', 'Away Underdog?': 'Y', 'Spread Push?': 'N'}
         away_underdog_df_clean = filter_dataframe_by_values(df, filter_dict)
 
-        away_underdog_covers = (away_underdog_df_clean['Away Not Underdog?'] == 'Y').sum()
-        away_underdog_not_covers = (away_underdog_df_clean['Away Not Underdog?'] == 'N').sum()
+        away_underdog_covers = (away_underdog_df_clean['Away Underdog Cover?'] == 'Y').sum()
+        away_underdog_not_covers = (away_underdog_df_clean['Away Underdog Cover?'] == 'N').sum()
         away_underdog_pushes = (away_underdog_df['Spread Push?'] == 'Y').sum()
         away_underdog_covers = Record(f'Away Underdog Record ATS in {identifiers}', away_underdog_covers, away_underdog_not_covers, away_underdog_pushes)
 
