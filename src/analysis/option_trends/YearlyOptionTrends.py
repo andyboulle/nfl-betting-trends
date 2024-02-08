@@ -8,8 +8,8 @@
 # method prints all of these records on their own line.                         #
 #                                                                               #
 # Examples:                                                                     #
-# - games where the moneyline for the underdog is +200 or higher and the total  # 
-#   is 47.5 or lower and the month is 10 and it is the regular season since     #
+# - games where the spread is 2.0 or more and the total is 47.5 or lower and    #
+#   the month is 10 and it is the regular season since                          #
 #   the 2011-2012 season                                                        #
 # - games where the spread is 2.0 or more since the 2007-2008 season            #
 # - games where the total is 43.5 and the day of the week is Sunday and it is a # 

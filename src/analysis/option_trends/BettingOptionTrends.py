@@ -9,11 +9,8 @@
 # The toString method prints all of these records on their own line.            #    
 #                                                                               #
 # Examples:                                                                     #
-# - games where the moneyline for the underdog is +200 or higher                #
 # - games where the spread is 7                                                 #
 # - games where the total is 56.5 or lower                                      #
-# - games where the moneyline for the favorite is -200 or lower and the total   #
-#   is 49.5 or lower                                                            #
 # - games where the spread is 3.0 or more and the total is 52.0 or lower        #          
 #################################################################################
 from src.analysis.basic_trends.BasicTrends import BasicTrends
@@ -27,8 +24,6 @@ class BettingOptionTrends:
     df = None
     
     game = None
-    favorite_moneyline = None
-    underdog_moneyline = None
     spread = None
     total = None
 
@@ -38,76 +33,9 @@ class BettingOptionTrends:
         self.named_df = named_df
         self.df = self.named_df.df
         self.game = game
-        self.favorite_moneyline = game.favorite_moneyline
-        self.underdog_moneyline = game.underdog_moneyline
         self.spread = game.line
         self.total = game.total
         self.trends = self.get_all_trends()
-
-    # This function creates dataframes with the following criteria:
-    #   - The favorite's moneyline is exactly the favorite_ml given
-    #   - The underdogs's moneyline is exactly the underdog_ml given
-    #   - The favorites moneyline is at least -100 or lower up to the given favorite_ml by 100 (-100, -200, -300, etc)
-    #   - The underdog's moneyline is at least +100 or greater up to the given underdog_ml by 100 (+100, +200, +300, etc)
-    def get_moneyline_dataframes(self, df, favorite_ml, underdog_ml):
-        ml_dataframes = []
-
-        # Get rows where favorite moneyline is exactly favorite moneyline passed
-        filtered_ml_df = df[df['Favorite Moneyline'] == favorite_ml]
-        named_ml_df = NamedDataframe(filtered_ml_df, f'games where the favorite moneyline is {favorite_ml} ')
-        ml_dataframes.append(named_ml_df)
-
-        # Get rows where underdog moneyline is exactly underdog moneyline passed    
-        filtered_ml_df = df[df['Underdog Moneyline'] == underdog_ml]
-        underdog_odds_string = str(underdog_ml)
-        if underdog_ml > 0:
-            underdog_odds_string = f'+{underdog_ml}'
-        named_ml_df = NamedDataframe(filtered_ml_df, f'games where the underdog moneyline is {underdog_odds_string} ' )
-        ml_dataframes.append(named_ml_df)
-        
-        # Go through every moneyline from the highest favorite moneyline down to favorite moneyline passed, by -100
-        max_favorite_ml = 100
-        while max_favorite_ml >= favorite_ml:
-            filtered_ml_df = df[df['Favorite Moneyline'] <= max_favorite_ml]
-            
-            named_ml_df = NamedDataframe(filtered_ml_df, f'games where the moneyline for the favorite is {max_favorite_ml} or lower ')
-            ml_dataframes.append(named_ml_df)
-            
-            if max_favorite_ml == 100:
-                max_favorite_ml = -100
-            else:
-                max_favorite_ml -= 100
-
-        # Go through every moneyline from the lowest underdog moneyline up to underdog moneyline passed, by 100
-        min_underdog_ml = -100
-        while min_underdog_ml <= underdog_ml:
-            filtered_ml_df = df[df['Underdog Moneyline'] >= min_underdog_ml]
-
-            underdog_odds_string = str(min_underdog_ml)
-            if min_underdog_ml > 0:
-                underdog_odds_string = f'+{min_underdog_ml}'
-
-            named_ml_df = NamedDataframe(filtered_ml_df, f'games where the moneyline for the underdog is {underdog_odds_string} or higher ')
-            ml_dataframes.append(named_ml_df)
-
-            if min_underdog_ml == -100:
-                min_underdog_ml = 100
-            else:
-                min_underdog_ml += 100
-
-        return ml_dataframes
-    
-    # This function gets the dataframes created in the get_moneyline_dataframes() method
-    # and finds all the generic trends for each of the dataframes and returns a list of those trends
-    def get_moneyline_trends(self):
-        moneyline_trends = []
-        moneyline_dataframes = self.get_moneyline_dataframes(self.df, self.favorite_moneyline, self.underdog_moneyline)
-
-        for df in moneyline_dataframes:
-            trends = BasicTrends(df, self.game).trends
-            moneyline_trends += trends
-        
-        return moneyline_trends
 
     # This function creates dataframes with the following criteria:
     #   - The spread is exactly the spread given
@@ -221,68 +149,28 @@ class BettingOptionTrends:
             spread_and_total_trends += trends
 
         return spread_and_total_trends
-
-    # This function combines the get_moneyline_dataframes() and get_total_dataframes() methods
-    # so it will get all possible moneylines up to the given moneylines for every possible total
-    # up to and down to the given total. It will also get when the spread is exactly the
-    # spread given and the total is exactly the total given
-    def get_moneyline_and_total_dataframes(self, df, favorite_ml, underdog_ml, total):
-        moneyline_and_total_dfs = []
-
-        moneyline_dataframes = self.get_moneyline_dataframes(df, favorite_ml, underdog_ml)
-
-        for moneyline_df in moneyline_dataframes:
-            moneyline_description = moneyline_df.description
-            moneyline_and_total_dataframes = self.get_total_dataframes(moneyline_df.df, total)
-
-            for moneyline_and_total_df in moneyline_and_total_dataframes:
-                total_description = moneyline_and_total_df.description[12:]
-                moneyline_and_total_df.description  = f'{moneyline_description}and {total_description}'
-                moneyline_and_total_dfs.append(moneyline_and_total_df)
-
-        return moneyline_and_total_dfs
-    
-    # This function gets the dataframes created in the get_moneyline_and_total_dataframes() method
-    # and finds all the generic trends for each of the dataframes and returns a list of those trends
-    def get_moneyline_and_total_trends(self):
-        moneyline_and_total_trends = []
-        moneyline_and_total_dataframes = self.get_moneyline_and_total_dataframes(self.df, self.favorite_moneyline, self.underdog_moneyline, self.total)
-
-        for df in moneyline_and_total_dataframes:
-            trends = BasicTrends(df, self.game).trends
-            moneyline_and_total_trends += trends
-
-        return moneyline_and_total_trends
     
     def get_all_dataframes(self):
-        moneyline_dataframes = self.get_moneyline_dataframes(self.df, self.favorite_moneyline, self.underdog_moneyline)
         spread_dataframes = self.get_spread_dataframes(self.df, self.spread)
         total_dataframes = self.get_total_dataframes(self.df, self.total)
-        moneyline_and_total_dataframes = self.get_moneyline_and_total_dataframes(self.df, self.favorite_moneyline, self.underdog_moneyline, self.total)
         spread_and_total_dataframes = self.get_spread_and_total_dataframes(self.df, self.spread, self.total)
 
-        return [moneyline_dataframes, spread_dataframes, total_dataframes, moneyline_and_total_dataframes, spread_and_total_dataframes]
+        return [spread_dataframes, total_dataframes, spread_and_total_dataframes]
 
     # This function gets all the trends calculated in the other methods. It places the following
     # resulting trends into one large trends list:
-    #   - get_moneyline_trends()
     #   - get_spread_trends()
     #   - get_total_trends()
-    #   - get_moneyline_and_total_trends()
     #   - get_spread_and_total_trends()
     def get_all_trends(self):
         all_trends = []
 
-        moneyline_trends = self.get_moneyline_trends()
         spread_trends = self.get_spread_trends()
         total_trends = self.get_total_trends()
-        moneyline_and_total_trends = self.get_moneyline_and_total_trends()
         spread_and_total_trends = self.get_spread_and_total_trends()
 
-        all_trends += moneyline_trends
         all_trends += spread_trends
         all_trends += total_trends
-        all_trends += moneyline_and_total_trends
         all_trends += spread_and_total_trends
 
         return all_trends
