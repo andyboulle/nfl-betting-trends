@@ -33,7 +33,7 @@ class BettingOptionTrends:
         self.named_df = named_df
         self.df = self.named_df.df
         self.game = game
-        self.spread = game.line
+        self.spread = game.spread
         self.total = game.total
         self.trends = self.get_all_trends()
 
