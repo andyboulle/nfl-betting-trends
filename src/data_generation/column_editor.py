@@ -362,13 +362,14 @@ def create_spread_result_columns(df):
 # Over Hit?
 # Under Hit?
 def create_total_result_columns(df):
+    df['Total'] = df['Total Score Open']
     df['Total Push?'] = None
     df['Over Hit?'] = None
     df['Under Hit?'] = None
 
     for index, row in df.iterrows():
         total_score = row['Total Score']
-        total = row['Total Score Open']
+        total = row['Total']
 
         # Total pushed
         if total_score == total:
@@ -398,7 +399,7 @@ def reorder_columns(df):
         'Home Favorite?', 'Away Underdog?', 'Away Favorite?', 'Home Underdog?',
         'Home Team Win?', 'Away Team Win?', 'Favorite Win?', 'Underdog Win?', 'Home Favorite Win?', 'Away Underdog Win?', 'Away Favorite Win?', 'Home Underdog Win?',
         'Home Team Cover?', 'Away Team Cover?', 'Favorite Cover?', 'Underdog Cover?', 'Home Favorite Cover?', 'Away Underdog Cover?', 'Away Favorite Cover?', 'Home Underdog Cover?',
-        'Total Score Open', 'Total Push?', 'Over Hit?', 'Under Hit?'
+        'Total', 'Total Push?', 'Over Hit?', 'Under Hit?'
     ]
     df = df[new_order]
     return df
