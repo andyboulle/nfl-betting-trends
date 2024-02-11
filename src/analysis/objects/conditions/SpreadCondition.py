@@ -3,7 +3,7 @@
 #                                                                               #
 # This object will define the specifics of a condition related to spreads. It   #
 # gives the spread associated with the condition and the relation to the spread #    
-# associated with the condition. Relations can be higher, lower, or equal.      #
+# associated with the condition. Relations can be more, less, or equal.         #
 #################################################################################
 class SpreadCondition:
     

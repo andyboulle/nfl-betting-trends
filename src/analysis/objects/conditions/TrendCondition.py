@@ -30,16 +30,18 @@ class TrendCondition:
         self.season_condition = season_condition
 
     def __str__(self):
-        returner = '{{\n'
+        returner = '{\n'
 
-        returner += 'game_conditions: [\n'
+        returner += '\tgame_conditions: [\n'
         for condition in self.game_conditions:
-            returner += f'{condition},\n'
-        returner += ']\n'
+            returner += f'\t\t{condition},\n'
+        returner += '\t]\n'
 
-        returner += f"spread_condition: {self.spread_condition}\n"
-        returner += f"total_condition: {self.total_condition}\n"
-        returner += f"season_condition: {self.season_condition}\n"
+        returner += f"\tspread_condition: {self.spread_condition}\n"
+        returner += f"\ttotal_condition: {self.total_condition}\n"
+        returner += f"\tseason_condition: {self.season_condition}\n"
+
+        returner += '}\n'
 
         return returner
         

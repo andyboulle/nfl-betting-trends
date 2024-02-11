@@ -3,7 +3,7 @@
 #                                                                               #
 # This object will define the specifics of a condition related to totals. It    #
 # gives the total associated with the condition and the relation to the total   #    
-# associated with the condition. Relations can be higher, lower, or equal.      #
+# associated with the condition. Relations can be more, less or equal.          #
 #################################################################################
 class TotalCondition:
     
