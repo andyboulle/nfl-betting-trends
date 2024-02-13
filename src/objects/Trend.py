@@ -4,11 +4,11 @@
 # This object will provide information about a trend. It takes a TrendCondition #
 # object as a parameter and creates a description for the trend based off it,   #
 # then makes a dictionary of empty records where the key is a string of the     #
-# type of record (home favorite straight up, away ats, over, etc), and the      #
+# type of record (home favorite outright, away ats, over, etc), and the         #
 # value is the record itself. All records in the dictionary are empty, so they  #
 # start with 0 wins, 0 losses, and 0 pushes.                                    #
 #################################################################################
-from src.analysis.objects.Record import Record
+from src.objects.Record import Record
 
 class Trend:
 
@@ -76,14 +76,14 @@ class Trend:
         return description
     
     # This function creates empty records for every record type
-    # (straight up, against the spread, totals)
+    # (outright, against the spread, totals)
     def get_records(self):
         records = {}
         record_categories = [
-            'home straight up', 'away straight up', 'favorite straight up', 'underdog straight up',
-            'home favorite straight up', 'away underdog straight up', 'away favorite straight up', 'home underdog straight up',
-            'home ats', 'away ats', 'favorite ats', 'underdog ats',
-            'home favorite ats', 'away underdog ats', 'away favorite ats', 'home underdog ats',
+            'home_outright', 'away_outright', 'favorite_outright', 'underdog_outright',
+            'home_favorite_outright', 'away_underdog_outright', 'away_favorite_outright', 'home_underdog_outright',
+            'home_ats', 'away_ats', 'favorite_ats', 'underdog_ats',
+            'home_favorite_ats', 'away_underdog_ats', 'away_favorite_ats', 'home_underdog_ats',
             'over', 'under'
         ]
 

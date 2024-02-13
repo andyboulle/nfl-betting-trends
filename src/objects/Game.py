@@ -47,6 +47,7 @@ class Game:
     spread_conditions = None
     total_conditions = None
     season_conditions = None
+    condition_combinations = None
 
     def __init__(self, season, date, home_team, away_team, home_spread, away_spread, total):
         # Game info
