@@ -3,7 +3,7 @@
 __pycache__/
 
 # Ignore virtual environments
-venv/
+.venv/
 
 # Ignore any .DS_Store files
 *.DS_Store
