@@ -1,11 +1,11 @@
 import itertools
 from datetime import datetime
 import src.constants as constants
-from src_temp.analysis.objects.conditions.GameCondition import GameCondition
-from src_temp.analysis.objects.conditions.SpreadCondition import SpreadCondition
-from src_temp.analysis.objects.conditions.TotalCondition import TotalCondition
-from src_temp.analysis.objects.conditions.SeasonCondition import SeasonCondition
-from src_temp.analysis.objects.conditions.TrendCondition import TrendCondition
+from src.objects.conditions.GameCondition import GameCondition
+from src.objects.conditions.SpreadCondition import SpreadCondition
+from src.objects.conditions.TotalCondition import TotalCondition
+from src.objects.conditions.SeasonCondition import SeasonCondition
+from src.objects.conditions.TrendCondition import TrendCondition
 
 class CompletedGame:
 

@@ -11,10 +11,10 @@
 # - Either zero or one Total Condition                                          #
 # - Either zero or one Season Condition                                         #
 #################################################################################
-from src_temp.analysis.objects.conditions.GameCondition import GameCondition
-from src_temp.analysis.objects.conditions.SpreadCondition import SpreadCondition
-from src_temp.analysis.objects.conditions.TotalCondition import TotalCondition
-from src_temp.analysis.objects.conditions.SeasonCondition import SeasonCondition
+from src.objects.conditions.GameCondition import GameCondition
+from src.objects.conditions.SpreadCondition import SpreadCondition
+from src.objects.conditions.TotalCondition import TotalCondition
+from src.objects.conditions.SeasonCondition import SeasonCondition
 
 class TrendCondition:
     
