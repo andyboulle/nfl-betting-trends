@@ -5,7 +5,6 @@ from src.objects.conditions.GameCondition import GameCondition
 from src.objects.conditions.SpreadCondition import SpreadCondition
 from src.objects.conditions.TotalCondition import TotalCondition
 from src.objects.conditions.SeasonCondition import SeasonCondition
-from src.objects.conditions.TrendCondition import TrendCondition
 
 class CompletedGame:
 
@@ -55,7 +54,7 @@ class CompletedGame:
     total_results = None
 
     # Conditions info
-    condition_combinations = None
+    conditions = None
 
     def __init__(self, date, season_phase, home_team, away_team, home_score, away_score, home_spread, total):
         # Game info
@@ -114,11 +113,7 @@ class CompletedGame:
         spread_conditions = self.get_spread_conditions(self.spread)
         total_conditions = self.get_total_conditions(self.total)
         season_conditions = self.get_season_conditions(self.season)
-        self.condition_combinations = self.get_condition_combinations(
-                                        game_conditions, 
-                                        spread_conditions, 
-                                        total_conditions, 
-                                        season_conditions)
+        self.conditions = self.get_conditions(game_conditions, spread_conditions, total_conditions, season_conditions)
 
     def get_division(self, team):
         for division, teams in constants.DIVISIONS.items():
@@ -211,7 +206,7 @@ class CompletedGame:
 
         return season_conditions
 
-    def get_condition_combinations(self, game_conditions, spread_conditions, total_conditions, season_conditions):
+    def get_conditions(self, game_conditions, spread_conditions, total_conditions, season_conditions):
         all_combinations = []
 
         # Iterate over game_combinations
@@ -222,13 +217,7 @@ class CompletedGame:
                 for spread_condition in [None] + spread_conditions:
                     for total_condition in [None] + total_conditions:
                         for season_condition in [None] + season_conditions:
-                            # condition = TrendCondition(
-                            #     game_combination,
-                            #     spread_condition,
-                            #     total_condition,
-                            #     season_condition
-                            # )
-                            condition_description = self.create_description(game_conditions, spread_condition, total_condition, season_condition)
+                            condition_description = self.create_description(game_combination, spread_condition, total_condition, season_condition)
                             all_combinations.append(condition_description)
 
         return all_combinations
@@ -246,21 +235,23 @@ class CompletedGame:
     
     def get_spread_description(self, spread_condition):
         description = ""
-        description += f'\n the spread is {spread_condition.number}'
+        description += f'the spread is {spread_condition.number}'
         if spread_condition.relation == 'less':
             description += ' or less'
         elif spread_condition.relation == 'more':
             description += ' or more'
+        description += ' / '
 
         return description
 
     def get_total_description(self, total_condition):
         description = ""
-        description += f'\n the total is {total_condition.number}'
+        description += f'the total is {total_condition.number}'
         if total_condition.relation == 'less':
             description += ' or less'
         elif total_condition.relation == 'more':
             description += ' or more'
+        description += ' / '
 
         return description
     
@@ -270,22 +261,21 @@ class CompletedGame:
             for game_condition in game_conditions:
                 condition = game_condition.condition
                 value = game_condition.value
-                if condition == 'Season Type':
-                    description += f"\n it is the {'regular season' if value == 'Regular' else 'playoffs'}"
-                elif condition == 'Month':
-                    description += f'\n it is month {value}'
-                elif condition == 'Day':
-                    description += f'\n it is a {value}'
-                elif condition == 'Divisional?':
-                    description += f'\n it is a divisional game'
+                if condition == 'season_phase':
+                    description += f"it is the {'regular season' if value == 'Regular' else 'playoffs'} / "
+                elif condition == 'month':
+                    description += f'it is {value} / '
+                elif condition == 'day':
+                    description += f'it is a {value} / '
+                elif condition == 'divisional_game':
+                    description += f'it is a divisional game / '
 
         return description
     
     def get_season_description(self, season_condition):
-        description = f'\n since the {season_condition.season_since} season'
+        description = f'since the {season_condition.season_since} season / '
         return description
     
-
     def __str__(self):
         returner = ''
         for key, value in vars(self).items():
@@ -303,7 +293,6 @@ class CompletedGame:
             else:
                 returner += f'{value}\n'
         return returner
-
 
     
     
