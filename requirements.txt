@@ -1,4 +1,5 @@
 pandas==2.0.3
 numpy==1.24.3
 openpyxl==3.0.10
-pymongo[srv]
+psycopg2
+sqlalchemy

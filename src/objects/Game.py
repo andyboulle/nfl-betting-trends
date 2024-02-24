@@ -6,19 +6,19 @@ from src.objects.conditions.SpreadCondition import SpreadCondition
 from src.objects.conditions.TotalCondition import TotalCondition
 from src.objects.conditions.SeasonCondition import SeasonCondition
 
-class CompletedGame:
+class Game:
 
     # How the game will be selected from database
-    identifier = None
+    id = None
 
     # Game info
     date = None
-    season = None
-    day_of_week = None
     month = None
     day = None
     year = None
-    season_phase = None
+    season = None
+    day_of_week = None
+    phase = None
 
     # Team info
     home_team = None
@@ -27,12 +27,12 @@ class CompletedGame:
     away_team = None
     away_abbreviation = None
     away_divison = None
-    divisional_game = None
+    divisional = None
 
     # Score info
     home_score = None
     away_score = None
-    total_score = None
+    combined_score = None
     tie = None
     winner = None
     loser = None
@@ -48,10 +48,35 @@ class CompletedGame:
     total = None
     total_push = None
 
-    # Results info
-    win_results = None
-    cover_results = None
-    total_results = None
+    # Home/Away Favorite/Underdog info
+    home_favorite = None
+    away_underdog = None
+    away_favorite = None
+    home_underdog = None
+
+    # Win Results info
+    home_win = None
+    away_win = None
+    favorite_win = None
+    underdog_win = None
+    home_favorite_win = None
+    away_underdog_win = None
+    away_favorite_win = None
+    home_underdog_win = None
+
+    # Cover Results info
+    home_cover = None
+    away_cover = None
+    favorite_cover = None
+    underdog_cover = None
+    home_favorite_cover = None
+    away_underdog_cover = None
+    away_favorite_cover = None
+    home_underdog_cover = None
+
+    # Total Results info
+    over_hit = None
+    under_hit = None
 
     # Conditions info
     conditions = None
@@ -64,7 +89,7 @@ class CompletedGame:
         self.year = date.split('-')[0]
         self.season = f'{self.year}-{int(self.year) + 1}' if int(date.split('-')[1]) > 8 else f'{int(self.year) - 1}-{self.year}'
         self.day_of_week = datetime.strptime(date, '%Y-%m-%d').strftime('%A')
-        self.season_phase = season_phase if season_phase == "Playoffs" else "Regular Season"
+        self.phase = season_phase if season_phase == "Playoffs" else "Regular Season"
 
         # Team info
         self.home_team = home_team if home_team in constants.TEAMS else ValueError(f'{home_team} not a valid team')
@@ -73,12 +98,12 @@ class CompletedGame:
         self.away_team = away_team if away_team in constants.TEAMS else ValueError(f'{away_team} not a valid team')
         self.away_abbreviation = constants.ABBREVIATIONS[away_team]
         self.away_division = self.get_division(away_team)
-        self.divisional_game = self.home_division == self.away_division
+        self.divisional = self.home_division == self.away_division
 
         # Score info
         self.home_score = home_score
         self.away_score = away_score
-        self.total_score = home_score + away_score
+        self.combined_score = home_score + away_score
         self.tie = home_score == away_score
         if self.tie == True:
             self.winner = None
@@ -96,20 +121,43 @@ class CompletedGame:
         self.spread = max(self.home_spread, self.away_spread)
         self.pk = self.spread == 0.0
         self.total = total
-        self.total_push = self.total == self.total_score
+        self.total_push = self.total == self.combined_score
 
-        # Results info
-        self.win_results = self.get_win_results(self.home_score, self.away_score, self.home_spread)
-        self.spread_results = self.get_cover_results(self.home_spread_result, self.home_spread)
-        self.total_results = {
-            'over': self.total_score > self.total,
-            'under': self.total_score < self.total
-        }
+        # Home/Away Favorite/Underdog info
+        self.home_favorite = home_spread < 0
+        self.away_underdog = home_spread < 0
 
-        self.identifier = f"{self.home_abbreviation}{self.away_abbreviation}{self.year}{str(date.split('-')[1]).zfill(2)}{self.day}"
+        self.away_favorite = home_spread > 0
+        self.home_underdog = home_spread > 0
+
+        # Win Results info
+        self.home_win, \
+        self.away_win, \
+        self.favorite_win, \
+        self.underdog_win, \
+        self.home_favorite_win, \
+        self.away_underdog_win, \
+        self.away_favorite_win, \
+        self.home_underdog_win = self.get_win_results(self.home_score, self.away_score, self.home_spread)
+
+        # Cover Results info
+        self.home_cover, \
+        self.away_cover, \
+        self.favorite_cover, \
+        self.underdog_cover, \
+        self.home_favorite_cover, \
+        self.away_underdog_cover, \
+        self.away_favorite_cover, \
+        self.home_underdog_cover = self.get_cover_results(self.home_spread_result, self.home_spread)
+
+        # Total Results info
+        self.over_hit = self.combined_score > self.total
+        self.under_hit = self.combined_score < self.total
+
+        self.id = f"{self.home_abbreviation}{self.away_abbreviation}{self.year}{str(date.split('-')[1]).zfill(2)}{self.day}"
 
         # Conditions info
-        game_conditions = self.get_game_conditions(self.season_phase, self.month, self.day_of_week, self.divisional_game)
+        game_conditions = self.get_game_conditions(self.phase, self.month, self.day_of_week, self.divisional)
         spread_conditions = self.get_spread_conditions(self.spread)
         total_conditions = self.get_total_conditions(self.total)
         season_conditions = self.get_season_conditions(self.season)
@@ -122,34 +170,62 @@ class CompletedGame:
         return "NOT IN DIVISION"
 
     def get_win_results(self, home_score, away_score, home_spread):
-        win_results = {}
-        win_results['home'] = home_score > away_score
-        win_results['away'] = home_score < away_score
-        win_results['favorite'] = (home_score > away_score) if home_spread < 0 else (home_score < away_score)
-        win_results['underdog'] = (home_score > away_score) if home_spread > 0 else (home_score < away_score)
-        if home_spread < 0:
-            win_results['home_favorite'] = home_score > away_score
-            win_results['away_underdog'] = home_score < away_score
-        elif home_spread > 0:
-            win_results['away_favorite'] = home_score < away_score
-            win_results['home_underdog'] = home_score > away_score
+        home, away, favorite, underdog, home_favorite, away_underdog, away_favorite, home_underdog = False, False, False, False, False, False, False, False
 
-        return win_results
+        if not self.tie:
+            home = home_score > away_score
+            away = home_score < away_score
+            if home_spread != 0:
+                favorite = home_score > away_score if home_spread < 0 else home_score < away_score
+                underdog = home_score < away_score if home_spread < 0 else home_score > away_score
+                if self.home_favorite:
+                    home_favorite = home_score > away_score
+                    away_underdog = home_score < away_score
+                    away_favorite = False
+                    home_underdog = False
+                else:
+                    away_favorite = home_score < away_score
+                    home_underdog = home_score > away_score
+                    home_favorite = False
+                    away_underdog = False
+            else:
+                favorite = False
+                underdog = False
+                home_favorite = False
+                away_underdog = False
+                away_favorite = False
+                home_underdog = False
+
+        return home, away, favorite, underdog, home_favorite, away_underdog, away_favorite, home_underdog
     
     def get_cover_results(self, home_spread_result, home_spread):
-        cover_results = {}
-        cover_results['home'] = home_spread_result < home_spread
-        cover_results['away'] = home_spread_result > home_spread
-        cover_results['favorite'] = (home_spread_result < home_spread) if home_spread < 0 else (home_spread_result > home_spread)
-        cover_results['underdog'] = (home_spread_result < home_spread) if home_spread > 0 else (home_spread_result > home_spread)
-        if home_spread < 0:
-            cover_results['home_favorite'] = home_spread_result < home_spread
-            cover_results['away_underdog'] = home_spread_result > home_spread
-        elif home_spread > 0:
-            cover_results['away_favorite'] = home_spread_result > home_spread
-            cover_results['home_underdog'] = home_spread_result < home_spread
+        home, away, favorite, underdog, home_favorite, away_underdog, away_favorite, home_underdog = False, False, False, False, False, False, False, False
 
-        return cover_results
+        if not self.spread_push:
+            home = home_spread_result < home_spread
+            away = home_spread_result > home_spread
+            if home_spread != 0:
+                favorite = home_spread_result < home_spread if home_spread < 0 else home_spread_result > home_spread
+                underdog = home_spread_result < home_spread if home_spread > 0 else home_spread_result > home_spread
+                if home_spread < 0:
+                    home_favorite = home_spread_result < home_spread
+                    away_underdog = home_spread_result > home_spread
+                    away_favorite = False
+                    home_underdog = False
+                else:
+                    away_favorite = home_spread_result > home_spread
+                    home_underdog = home_spread_result < home_spread
+                    home_favorite = False
+                    away_underdog = False
+            else:
+                favorite = False
+                underdog = False
+                home_favorite = False
+                away_underdog = False
+                away_favorite = False
+                home_underdog = False
+
+        return home, away, favorite, underdog, home_favorite, away_underdog, away_favorite, home_underdog
 
     def get_game_conditions(self, season_phase, month, day_of_week, divisional_game):
         game_conditions = [
@@ -262,20 +338,81 @@ class CompletedGame:
                 condition = game_condition.condition
                 value = game_condition.value
                 if condition == 'season_phase':
-                    description += f"it is the {'regular season' if value == 'Regular' else 'playoffs'} / "
+                    description += f"it is the {'regular season' if value == 'Regular Season' else 'playoffs'} / "
                 elif condition == 'month':
                     description += f'it is {value} / '
                 elif condition == 'day':
                     description += f'it is a {value} / '
                 elif condition == 'divisional_game':
-                    description += f'it is a divisional game / '
+                    description += f"it is {'not' if value == False else ''} a divisional game / "
 
         return description
     
     def get_season_description(self, season_condition):
         description = f'since the {season_condition.season_since} season / '
         return description
-    
+
+    def to_dict(self):
+        attributes = {key: value for key, value in vars(self).items() if key != 'conditions'}
+        return attributes
+
+    def to_tuple(self):
+        values = (
+            self.id, 
+            self.date, 
+            self.month, 
+            int(self.day), 
+            int(self.year), 
+            self.season,
+            self.day_of_week, 
+            self.phase, 
+            self.home_team, 
+            self.home_abbreviation,
+            self.home_division, 
+            self.away_team, 
+            self.away_abbreviation,
+            self.away_division, 
+            self.divisional, 
+            int(self.home_score),
+            int(self.away_score), 
+            int(self.combined_score), 
+            self.tie,
+            self.winner, 
+            self.loser, 
+            int(self.spread), 
+            int(self.home_spread),
+            int(self.home_spread_result), 
+            int(self.away_spread), 
+            int(self.away_spread_result),
+            self.spread_push, 
+            self.pk, 
+            int(self.total),
+            self.total_push, 
+            self.home_favorite, 
+            self.away_underdog,
+            self.away_favorite, 
+            self.home_underdog, 
+            self.home_win,
+            self.away_win, 
+            self.favorite_win, 
+            self.underdog_win,
+            self.home_favorite_win, 
+            self.away_underdog_win,
+            self.away_favorite_win, 
+            self.home_underdog_win,
+            self.home_cover, 
+            self.away_cover,
+            self.favorite_cover, 
+            self.underdog_cover, 
+            self.home_favorite_cover,
+            self.away_underdog_cover, 
+            self.away_favorite_cover,
+            self.home_underdog_cover, 
+            self.over_hit, 
+            self.under_hit
+        )
+        return values
+
     def __str__(self):
         returner = ''
         for key, value in vars(self).items():
