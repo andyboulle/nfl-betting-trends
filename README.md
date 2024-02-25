@@ -24,7 +24,17 @@ To use the NFL Trends Analyzer, follow these steps:
    pip install -r requirements.txt
 ```
 ## Usage
-1. Run `db.py` to create PostgreSQL database for Games and Trends:
+1. Adjust `db.py` with the details from your PostgreSQL database:
+```python
+   conn = psycopg2.connect(
+      host = 'localhost',
+      dbname = 'postgres',
+      user = 'postgres',
+      password = 'pass',
+      port = 5432
+   )
+```
+3. Run `db.py` to create PostgreSQL database for Games and Trends:
 ```bash
    python db.py
 ```
