@@ -71,7 +71,7 @@ def format_dataframe(df):
         away_mask = df['Away Team'].str.contains(key)
         df.loc[home_mask, 'Home Team'] = value
         df.loc[away_mask, 'Away Team'] = value
-        
+
     return df
 
 ########################
@@ -224,7 +224,7 @@ def make_trends_table(cur):
 ### EXECUTION ###
 #################
 
-df = pd.read_excel('datafiles/excel/nfl.xlsx')
+df = pd.read_excel('datafiles/nfl.xlsx')
 
 df = format_dataframe(df)
 
