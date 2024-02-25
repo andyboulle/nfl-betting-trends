@@ -1,15 +1,14 @@
+import hashlib
 import itertools
 from datetime import datetime
 import src.constants as constants
-from src.objects.conditions.GameCondition import GameCondition
-from src.objects.conditions.SpreadCondition import SpreadCondition
-from src.objects.conditions.TotalCondition import TotalCondition
-from src.objects.conditions.SeasonCondition import SeasonCondition
+from src.objects.Trend import Trend
 
 class Game:
 
     # How the game will be selected from database
     id = None
+    id_string = None
 
     # Game info
     date = None
@@ -78,10 +77,9 @@ class Game:
     over_hit = None
     under_hit = None
 
-    # Conditions info
-    conditions = None
+    trends = None
 
-    def __init__(self, date, season_phase, home_team, away_team, home_score, away_score, home_spread, total):
+    def __init__(self, date, season_phase, home_team, away_team, home_score, away_score, home_spread, total, trends_indicator=False):
         # Game info
         self.date = date
         self.month = datetime.strptime(date.split('-')[1], '%m').strftime('%B')
@@ -154,14 +152,36 @@ class Game:
         self.over_hit = self.combined_score > self.total
         self.under_hit = self.combined_score < self.total
 
-        self.id = f"{self.home_abbreviation}{self.away_abbreviation}{self.year}{str(date.split('-')[1]).zfill(2)}{self.day}"
+        # Id info
+        self.id_string = f"{self.home_abbreviation}{self.away_abbreviation}{self.year}{str(date.split('-')[1]).zfill(2)}{self.day}"
+        self.id = hashlib.sha256(self.id_string.encode()).hexdigest()
 
-        # Conditions info
-        game_conditions = self.get_game_conditions(self.phase, self.month, self.day_of_week, self.divisional)
-        spread_conditions = self.get_spread_conditions(self.spread)
-        total_conditions = self.get_total_conditions(self.total)
-        season_conditions = self.get_season_conditions(self.season)
-        self.conditions = self.get_conditions(game_conditions, spread_conditions, total_conditions, season_conditions)
+        if trends_indicator:
+            self.trends = self.get_trends(self.phase, self.month, self.day_of_week, self.divisional, self.spread, self.total, self.season)
+
+    def get_trends(self, phase, month, day_of_week, divisional, spread, total, season):
+        spread_conditions = [None, f'{spread}'] + [f'{i} or more' for i in range(1, int(spread) + 1)] + [f'{i} or less' for i in range(int(spread), constants.MAX_SPREAD + 1)]
+        total_conditions = [None, f'{total}'] + [f'{i} or more' for i in range(constants.MIN_TOTAL, int(total) + 1)] + [f'{i} or less' for i in range(int(total), constants.MAX_TOTAL + 1)]
+        start_year, end_year = map(int, constants.OLDEST_SEASON.split('-'))
+        season_conditions = [f'since {start_year}-{end_year}']
+        while end_year < int(season.split('-')[1]):
+            start_year += 1
+            end_year += 1
+            season_conditions.append(f'since {start_year}-{end_year}')
+
+        categories = [
+            'home outright', 'away outright', 'favorite outright', 'underdog outright', 
+            'home favorite outright', 'away underdog outright', 'away favorite outright', 'home underdog outright',
+            'home ats', 'away ats', 'favorite ats', 'underdog ats', 
+            'home favorite ats', 'away underdog ats', 'away favorite ats', 'home underdog ats',
+            'over', 'under'
+        ]
+
+        conditions = [categories, [phase, None], [month, None], [day_of_week, None], [divisional, None], spread_conditions, total_conditions, season_conditions]
+        trends = [Trend(*args) for args in itertools.product(*conditions)]
+
+        return trends
+                
 
     def get_division(self, team):
         for division, teams in constants.DIVISIONS.items():
@@ -227,138 +247,17 @@ class Game:
 
         return home, away, favorite, underdog, home_favorite, away_underdog, away_favorite, home_underdog
 
-    def get_game_conditions(self, season_phase, month, day_of_week, divisional_game):
-        game_conditions = [
-            GameCondition('season_phase', season_phase),
-            GameCondition('month', month),
-            GameCondition('day', day_of_week),
-            GameCondition('divisional_game', divisional_game)
-        ]
-
-        return game_conditions
-
-    def get_spread_conditions(self, spread):
-        spread_conditions = []
-        spread_conditions.append(SpreadCondition(spread, 'equal'))
-        
-        current_spread = 1.0
-        max_spread = constants.MAX_SPREAD
-        while current_spread <= max_spread:
-            if current_spread <= spread:
-                spread_conditions.append(SpreadCondition(current_spread, 'more'))
-            if current_spread >= spread:
-                spread_conditions.append(SpreadCondition(current_spread, 'less'))
-            current_spread += 1.0
-
-        return spread_conditions
-
-    def get_total_conditions(self, total):
-        total_conditions = []
-        total_conditions.append(TotalCondition(self.total, 'equal'))
-        
-        current_total = constants.MIN_TOTAL
-        max_total = constants.MAX_TOTAL
-        while current_total <= max_total:
-            if current_total <= total:
-                total_conditions.append(TotalCondition(current_total, 'more'))
-            if current_total >= total:
-                total_conditions.append(TotalCondition(current_total, 'less'))
-            current_total += 1.0
-
-        return total_conditions
-
-    def get_season_conditions(self, season):
-        season_conditions = []
-        current_season = constants.OLDEST_SEASON
-        
-        while current_season <= season:
-            start_year, end_year = current_season.split('-')
-            season_conditions.append(SeasonCondition(f'{start_year}-{end_year}', self.season))
-            start_year = int(start_year)
-            end_year = int(end_year)
-            start_year += 1
-            end_year += 1
-            current_season = f"{start_year}-{end_year}"
-
-        return season_conditions
-
-    def get_conditions(self, game_conditions, spread_conditions, total_conditions, season_conditions):
-        all_combinations = []
-
-        # Iterate over game_combinations
-        for r in range(len(game_conditions) + 1):
-            game_combination_tuples = itertools.combinations(game_conditions, r)
-            game_combinations = [list(combination) for combination in game_combination_tuples]
-            for game_combination in game_combinations:
-                for spread_condition in [None] + spread_conditions:
-                    for total_condition in [None] + total_conditions:
-                        for season_condition in [None] + season_conditions:
-                            condition_description = self.create_description(game_combination, spread_condition, total_condition, season_condition)
-                            all_combinations.append(condition_description)
-
-        return all_combinations
     
-    def create_description(self, game_conditions, spread_condition, total_condition, season_condition):
-        description = ''
-        if game_conditions == None and spread_condition == None and total_condition == None and season_condition == None:
-            description += 'No conditions'
-        else:
-            description += self.get_spread_description(spread_condition) if spread_condition != None else ''
-            description += self.get_total_description(total_condition) if total_condition != None else ''
-            description += self.get_game_description(game_conditions) if game_conditions != None else ''
-            description += self.get_season_description(season_condition) if season_condition != None else ''
-        return description
-    
-    def get_spread_description(self, spread_condition):
-        description = ""
-        description += f'the spread is {spread_condition.number}'
-        if spread_condition.relation == 'less':
-            description += ' or less'
-        elif spread_condition.relation == 'more':
-            description += ' or more'
-        description += ' / '
-
-        return description
-
-    def get_total_description(self, total_condition):
-        description = ""
-        description += f'the total is {total_condition.number}'
-        if total_condition.relation == 'less':
-            description += ' or less'
-        elif total_condition.relation == 'more':
-            description += ' or more'
-        description += ' / '
-
-        return description
-    
-    def get_game_description(self, game_conditions):
-        description = ""
-        if len(game_conditions) > 0:
-            for game_condition in game_conditions:
-                condition = game_condition.condition
-                value = game_condition.value
-                if condition == 'season_phase':
-                    description += f"it is the {'regular season' if value == 'Regular Season' else 'playoffs'} / "
-                elif condition == 'month':
-                    description += f'it is {value} / '
-                elif condition == 'day':
-                    description += f'it is a {value} / '
-                elif condition == 'divisional_game':
-                    description += f"it is {'not' if value == False else ''} a divisional game / "
-
-        return description
-    
-    def get_season_description(self, season_condition):
         description = f'since the {season_condition.season_since} season / '
         return description
 
     def to_dict(self):
-        attributes = {key: value for key, value in vars(self).items() if key != 'conditions'}
-        return attributes
+        return vars(self)
 
     def to_tuple(self):
         values = (
-            self.id, 
+            self.id,
+            self.id_string, 
             self.date, 
             self.month, 
             int(self.day), 
@@ -379,14 +278,14 @@ class Game:
             self.tie,
             self.winner, 
             self.loser, 
-            int(self.spread), 
-            int(self.home_spread),
+            float(self.spread), 
+            float(self.home_spread),
             int(self.home_spread_result), 
-            int(self.away_spread), 
+            float(self.away_spread), 
             int(self.away_spread_result),
             self.spread_push, 
             self.pk, 
-            int(self.total),
+            float(self.total),
             self.total_push, 
             self.home_favorite, 
             self.away_underdog,
