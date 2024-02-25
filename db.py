@@ -1,7 +1,5 @@
-import time
 import psycopg2
 import pandas as pd
-from sqlalchemy import create_engine
 from src.objects.Game import Game
 
 #########################
@@ -82,11 +80,15 @@ def format_dataframe(df):
 ### DATABASE METHODS ###
 ########################
 
-def make_games_table(cur, df, conn):
+def make_games_table(cur, df):
+    cur.execute('''
+       DROP TABLE IF EXISTS games         
+    ''')
     cur.execute(
     '''
         CREATE TABLE IF NOT EXISTS games (
-            id VARCHAR(14) PRIMARY KEY,
+            id VARCHAR(64) PRIMARY KEY,
+            id_string VARCHAR(14),
             date VARCHAR(10),
             month VARCHAR(10),
             day INT,
@@ -107,14 +109,14 @@ def make_games_table(cur, df, conn):
             tie BOOLEAN,
             winner VARCHAR(25),
             loser VARCHAR(25),
-            spread INT,
-            home_spread INT,
+            spread DECIMAL(4, 1),
+            home_spread DECIMAL(4, 1),
             home_spread_result INT,
-            away_spread INT,
+            away_spread DECIMAL(4, 1),
             away_spread_result INT,
             spread_push BOOLEAN,
             pk BOOLEAN,
-            total INT,
+            total DECIMAL(4, 1),
             total_push BOOLEAN,
             home_favorite BOOLEAN,
             away_underdog BOOLEAN,
@@ -143,11 +145,7 @@ def make_games_table(cur, df, conn):
 
     # Add Games to `games` table in database
     games = []
-    for index, row in df.iterrows():
-        if index % 100 == 0:
-            end_time = time.time()
-            print(f'Added games {index-100}-{index} -- Elapsed Time: {end_time - start_time}')
-            start_time = time.time()
+    for _, row in df.iterrows():
         game = Game(
             row['Date'], 
             row['Season Phase'], 
@@ -156,52 +154,73 @@ def make_games_table(cur, df, conn):
             row['Home Spread'],
             row['Total']
         )
-        games.append(game.to_tuple())
+        games.append(game.to_dict())
 
-    games_df = pd.DataFrame(games, columns=[
-        'id', 'date', 'month', 'day', 'year', 'season', 'day_of_week', 'phase', 
-        'home_team', 'home_abbreviation', 'home_division', 'away_team', 'away_abbreviation', 
-        'away_division', 'divisional', 'home_score', 'away_score', 'combined_score', 'tie', 
-        'winner', 'loser', 'spread', 'home_spread', 'home_spread_result', 'away_spread', 
-        'away_spread_result', 'spread_push', 'pk', 'total', 'total_push', 'home_favorite', 
-        'away_underdog', 'away_favorite', 'home_underdog', 'home_win', 'away_win', 
-        'favorite_win', 'underdog_win', 'home_favorite_win', 'away_underdog_win', 
-        'away_favorite_win', 'home_underdog_win', 'home_cover', 'away_cover', 
-        'favorite_cover', 'underdog_cover', 'home_favorite_cover', 'away_underdog_cover', 
-        'away_favorite_cover', 'home_underdog_cover', 'over_hit', 'under_hit'
-    ])
-
-    games_df.to_sql('games', conn, if_exists='replace', index=False)
+    sql_insert = '''
+        INSERT INTO games VALUES (
+            %(id)s, %(id_string)s, %(date)s, %(month)s, %(day)s, %(year)s, %(season)s, 
+            %(day_of_week)s, %(phase)s, %(home_team)s, %(home_abbreviation)s, %(home_division)s, 
+            %(away_team)s, %(away_abbreviation)s, %(away_division)s, %(divisional)s, %(home_score)s, 
+            %(away_score)s, %(combined_score)s, %(tie)s, %(winner)s, %(loser)s, %(spread)s, 
+            %(home_spread)s, %(home_spread_result)s, %(away_spread)s, %(away_spread_result)s, 
+            %(spread_push)s, %(pk)s, %(total)s, %(total_push)s, %(home_favorite)s, %(away_underdog)s, 
+            %(away_favorite)s, %(home_underdog)s, %(home_win)s, %(away_win)s, %(favorite_win)s, 
+            %(underdog_win)s, %(home_favorite_win)s, %(away_underdog_win)s, %(away_favorite_win)s, 
+            %(home_underdog_win)s, %(home_cover)s, %(away_cover)s, %(favorite_cover)s, 
+            %(underdog_cover)s, %(home_favorite_cover)s, %(away_underdog_cover)s, %(away_favorite_cover)s, 
+            %(home_underdog_cover)s, %(over_hit)s, %(under_hit)s
+        )
+    '''
+    cur.executemany(sql_insert, games)
 
 def make_trends_table(cur):
     cur.execute('''
-       drop table if exists trends         
+       DROP TABLE IF EXISTS trends         
     ''')
     cur.execute('''
         CREATE TABLE IF NOT EXISTS trends (
-            id VARCHAR(250) PRIMARY KEY,
+            id VARCHAR(64),
+            id_string VARCHAR(250),
             category VARCHAR(25),
             phase VARCHAR(15),
             month VARCHAR(10),
             day_of_week VARCHAR(8),
             divisional BOOLEAN,
-            spread DECIMAL(4, 1),
-            total DECIMAL(4, 1),
-            seasons DECIMAL(9),
+            spread VARCHAR(15),
+            total VARCHAR(15),
+            seasons VARCHAR(15),
             wins INT,
             losses INT,
             pushes INT,
-            total_games INT GENERATED ALWAYS AS (
-                wins + losses + pushes
-            ) STORED,
-            win_pct DECIMAL(5, 2) GENERATED ALWAYS AS (
-                ROUND((100.0 * wins / NULLIF(wins + losses + (pushes / 2.0), 0)), 2)
-            ) STORED
+            total_games INT,
+            win_percentage DECIMAL(5, 2)
         )
     ''')
 
-def populate_trends_table(cur):
-    return
+    trends = {}
+    for _, row in df.iterrows():
+        game = Game(
+            row['Date'], 
+            row['Season Phase'], 
+            row['Home Team'], row['Away Team'],
+            row['Home Score'], row['Away Score'],
+            row['Home Spread'],
+            row['Total'], True
+        )
+
+        for trend in game.trends:
+            trend_to_update = trends.get(trend.id)
+            if trend_to_update is None:
+                trends[trend.id] = trend
+                trend_to_update = trends[trend.id]
+            trend_to_update.update_record(game)
+
+    trends_arr = [trend.to_tuple() for trend in trends.values()]
+    sql_insert = '''
+        INSERT INTO trends (id, id_string, category, phase, month, day_of_week, divisional, spread, total, seasons, wins, losses, pushes, total_games, win_percentage)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    '''
+    cur.executemany(sql_insert, trends_arr)
 
 #################
 ### EXECUTION ###
@@ -209,24 +228,19 @@ def populate_trends_table(cur):
 
 df = pd.read_excel('datafiles/excel/nfl.xlsx')
 
-# Clean dataframe
 df = format_dataframe(df)
-
-conn_string = 'postgresql://postgres:bangarang19@localhost:5432/postgres'
-db = create_engine(conn_string)
-conn1 = db.connect()
 
 # Connect to sql database
 conn = psycopg2.connect(
     host = 'localhost',
     dbname = 'postgres',
     user = 'postgres',
-    password = 'bangarang19',
+    password = 'pass',
     port = 5432
 )
 cur = conn.cursor()
 
-# make_games_table(cur, df, conn1)
+make_games_table(cur, df)
 make_trends_table(cur)
 
 # Commit database changes
