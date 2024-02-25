@@ -71,9 +71,7 @@ def format_dataframe(df):
         away_mask = df['Away Team'].str.contains(key)
         df.loc[home_mask, 'Home Team'] = value
         df.loc[away_mask, 'Away Team'] = value
-
-    # Save this new, cleaned, and condensed dataframe to a csv
-    df.to_csv('datafiles/csv/nfl_condensed.csv')
+        
     return df
 
 ########################
