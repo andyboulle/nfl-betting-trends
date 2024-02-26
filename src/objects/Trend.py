@@ -5,7 +5,6 @@ class Trend:
     id = None
 
     category = None
-    phase = None
     month = None
     day_of_week = None
     divisional = None
@@ -20,9 +19,8 @@ class Trend:
     total_games = None
     win_pct = None
 
-    def __init__(self, category, phase, month, day_of_week, divisional, spread, total, seasons):
+    def __init__(self, category, month, day_of_week, divisional, spread, total, seasons):
         self.category = category
-        self.phase = phase
         self.month = month
         self.day_of_week = day_of_week
         self.divisional = divisional
@@ -30,7 +28,7 @@ class Trend:
         self.total = total
         self.seasons = seasons
         
-        self.id_string = ','.join(map(str, [category, phase, month, day_of_week, divisional, spread, total, seasons]))
+        self.id_string = ','.join(map(str, [category, month, day_of_week, divisional, spread, total, seasons]))
         self.id = hashlib.sha256(self.id_string.encode()).hexdigest()
 
         self.wins = 0
@@ -126,7 +124,6 @@ class Trend:
             self.id,
             self.id_string,
             self.category,
-            self.phase,
             self.month,
             self.day_of_week,
             self.divisional,

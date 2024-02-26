@@ -17,7 +17,6 @@ class Game:
     year = None
     season = None
     day_of_week = None
-    phase = None
 
     # Team info
     home_team = None
@@ -79,7 +78,7 @@ class Game:
 
     trends = None
 
-    def __init__(self, date, season_phase, home_team, away_team, home_score, away_score, home_spread, total, trends_indicator=False):
+    def __init__(self, date, home_team, away_team, home_score, away_score, home_spread, total, trends_indicator=False):
         # Game info
         self.date = date
         self.month = datetime.strptime(date.split('-')[1], '%m').strftime('%B')
@@ -87,7 +86,6 @@ class Game:
         self.year = date.split('-')[0]
         self.season = f'{self.year}-{int(self.year) + 1}' if int(date.split('-')[1]) > 8 else f'{int(self.year) - 1}-{self.year}'
         self.day_of_week = datetime.strptime(date, '%Y-%m-%d').strftime('%A')
-        self.phase = season_phase if season_phase == "Playoffs" else "Regular Season"
 
         # Team info
         self.home_team = home_team if home_team in constants.TEAMS else ValueError(f'{home_team} not a valid team')
@@ -157,11 +155,25 @@ class Game:
         self.id = hashlib.sha256(self.id_string.encode()).hexdigest()
 
         if trends_indicator:
-            self.trends = self.get_trends(self.phase, self.month, self.day_of_week, self.divisional, self.spread, self.total, self.season)
+            self.trends = self.get_trends(self.month, self.day_of_week, self.divisional, self.spread, self.total, self.season)
 
-    def get_trends(self, phase, month, day_of_week, divisional, spread, total, season):
-        spread_conditions = [None, f'{spread}'] + [f'{i} or more' for i in range(1, int(spread) + 1)] + [f'{i} or less' for i in range(int(spread), constants.MAX_SPREAD + 1)]
-        total_conditions = [None, f'{total}'] + [f'{i} or more' for i in range(constants.MIN_TOTAL, int(total) + 1)] + [f'{i} or less' for i in range(int(total), constants.MAX_TOTAL + 1)]
+    def get_trends(self, month, day_of_week, divisional, spread, total, season):
+        spread_conditions = [None, f'{spread}']
+        for i in range(1, constants.MAX_SPREAD + 1):
+            if i < spread:
+                spread_conditions.append(f'{i} or more')
+            elif i == total:
+                spread_conditions.extend([f'{i} or more', f'{i} or less'])
+            else:
+                spread_conditions.append(f'{i} or less')
+        total_conditions = [None]
+        for i in range(constants.MIN_TOTAL, constants.MAX_TOTAL + 1, 5):
+            if i < total:
+                total_conditions.append(f'{i} or more')
+            elif i == total:
+                total_conditions.extend([f'{i} or more', f'{i} or less'])
+            else:
+                total_conditions.append(f'{i} or less')      
         start_year, end_year = map(int, constants.OLDEST_SEASON.split('-'))
         season_conditions = [f'since {start_year}-{end_year}']
         while end_year < int(season.split('-')[1]):
@@ -177,7 +189,7 @@ class Game:
             'over', 'under'
         ]
 
-        conditions = [categories, [phase, None], [month, None], [day_of_week, None], [divisional, None], spread_conditions, total_conditions, season_conditions]
+        conditions = [categories, [month, None], [day_of_week, None], [divisional, None], spread_conditions, total_conditions, season_conditions]
         trends = [Trend(*args) for args in itertools.product(*conditions)]
 
         return trends
@@ -247,10 +259,6 @@ class Game:
 
         return home, away, favorite, underdog, home_favorite, away_underdog, away_favorite, home_underdog
 
-    
-        description = f'since the {season_condition.season_since} season / '
-        return description
-
     def to_dict(self):
         return vars(self)
 
@@ -264,7 +272,6 @@ class Game:
             int(self.year), 
             self.season,
             self.day_of_week, 
-            self.phase, 
             self.home_team, 
             self.home_abbreviation,
             self.home_division, 

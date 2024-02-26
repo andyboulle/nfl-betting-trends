@@ -1,9 +1,9 @@
 OLDEST_SEASON = '2006-2007'
 CURRENT_SEASON = '2023-2024'
 
-MAX_SPREAD = 27
-MAX_TOTAL = 63
-MIN_TOTAL = 31
+MAX_SPREAD = 14
+MAX_TOTAL = 60
+MIN_TOTAL = 30
 
 TEAMS = [
     'New York Jets', 'Miami Dolphins', 'New England Patriots', 'Buffalo Bills',
