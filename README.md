@@ -34,7 +34,7 @@ To use the NFL Trends Analyzer, follow these steps:
       port = 5432
    )
 ```
-3. Run `db.py` to create PostgreSQL database for Games and Trends:
+3. Run `db.py` to create PostgreSQL database for Games and Trends. NOTE: This will take a very long time (took me ~13 hours).
 ```bash
    python db.py
 ```
