@@ -1,7 +1,7 @@
 import time
 import psycopg2
 import pandas as pd
-from src.objects.Game import Game
+from src.models.game import Game
 
 #########################
 ### DATAFRAME METHODS ###
@@ -173,9 +173,6 @@ def process_game_rows(cur, df):
     trends = {}
     games = []
 
-    print(time.time())
-    beginning_time = time.time()
-    start_time = time.time()
     for _, row in df.iterrows():
         game = Game(
             row['Date'],  
@@ -214,16 +211,13 @@ def process_game_rows(cur, df):
     cur.executemany(sql_games_insert, games)
 
     conn.commit()
-    end_time = time.time()
-
-    print(f'TOTAL TIME: {end_time - beginning_time}\n')
 
 #################
 ### EXECUTION ###
 #################
 
+start_time = time.time()
 df = pd.read_excel('datafiles/nfl.xlsx')
-
 df = format_dataframe(df)
 
 # Connect to sql database
@@ -240,9 +234,9 @@ make_games_table(cur, df)
 make_trends_table(cur)
 process_game_rows(cur, df)
 
-# Commit database changes
 conn.commit()
-
-# Close cursor and connection
 cur.close()
 conn.close()
+
+end_time = time.time()
+print(f'TOTAL TIME: {end_time - start_time}\n')

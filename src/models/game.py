@@ -1,8 +1,8 @@
 import hashlib
 import itertools
 from datetime import datetime
-import src.constants as constants
-from src.objects.Trend import Trend
+import src.config as config
+from src.models.trend import Trend
 
 class Game:
 
@@ -88,11 +88,11 @@ class Game:
         self.day_of_week = datetime.strptime(date, '%Y-%m-%d').strftime('%A')
 
         # Team info
-        self.home_team = home_team if home_team in constants.TEAMS else ValueError(f'{home_team} not a valid team')
-        self.home_abbreviation = constants.ABBREVIATIONS[home_team]
+        self.home_team = home_team if home_team in config.TEAMS else ValueError(f'{home_team} not a valid team')
+        self.home_abbreviation = config.ABBREVIATIONS[home_team]
         self.home_division = self.get_division(home_team)
-        self.away_team = away_team if away_team in constants.TEAMS else ValueError(f'{away_team} not a valid team')
-        self.away_abbreviation = constants.ABBREVIATIONS[away_team]
+        self.away_team = away_team if away_team in config.TEAMS else ValueError(f'{away_team} not a valid team')
+        self.away_abbreviation = config.ABBREVIATIONS[away_team]
         self.away_division = self.get_division(away_team)
         self.divisional = self.home_division == self.away_division
 
@@ -159,7 +159,7 @@ class Game:
 
     def get_trends(self, month, day_of_week, divisional, spread, total, season):
         spread_conditions = [None, f'{spread}']
-        for i in range(1, constants.MAX_SPREAD + 1):
+        for i in range(1, config.MAX_SPREAD + 1):
             if i < spread:
                 spread_conditions.append(f'{i} or more')
             elif i == total:
@@ -167,14 +167,14 @@ class Game:
             else:
                 spread_conditions.append(f'{i} or less')
         total_conditions = [None]
-        for i in range(constants.MIN_TOTAL, constants.MAX_TOTAL + 1, 5):
+        for i in range(config.MIN_TOTAL, config.MAX_TOTAL + 1, 5):
             if i < total:
                 total_conditions.append(f'{i} or more')
             elif i == total:
                 total_conditions.extend([f'{i} or more', f'{i} or less'])
             else:
                 total_conditions.append(f'{i} or less')      
-        start_year, end_year = map(int, constants.OLDEST_SEASON.split('-'))
+        start_year, end_year = map(int, config.OLDEST_SEASON.split('-'))
         season_conditions = [f'since {start_year}-{end_year}']
         while end_year < int(season.split('-')[1]):
             start_year += 1
@@ -196,7 +196,7 @@ class Game:
                 
 
     def get_division(self, team):
-        for division, teams in constants.DIVISIONS.items():
+        for division, teams in config.DIVISIONS.items():
             if team in teams:
                 return division
         return "NOT IN DIVISION"
