@@ -194,7 +194,6 @@ class Game:
 
         return trends
                 
-
     def get_division(self, team):
         for division, teams in config.DIVISIONS.items():
             if team in teams:
