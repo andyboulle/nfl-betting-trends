@@ -182,12 +182,17 @@ class Game:
             season_conditions.append(f'since {start_year}-{end_year}')
 
         categories = [
-            'home outright', 'away outright', 'favorite outright', 'underdog outright', 
-            'home favorite outright', 'away underdog outright', 'away favorite outright', 'home underdog outright',
-            'home ats', 'away ats', 'favorite ats', 'underdog ats', 
-            'home favorite ats', 'away underdog ats', 'away favorite ats', 'home underdog ats',
+            'home outright', 'away outright', 
+            'home ats', 'away ats',
             'over', 'under'
         ]
+
+        if self.pk == False:
+            categories.extend(['favorite outright', 'underdog outright', 'favorite ats', 'underdog ats'])
+            categories.extend(
+                ['home favorite outright', 'away underdog outright', 'home favorite ats', 'away underdog ats'] if self.home_favorite 
+                else ['away favorite outright', 'home underdog outright', 'away favorite ats', 'home underdog ats']
+            )
 
         conditions = [categories, [month, None], [day_of_week, None], [divisional, None], spread_conditions, total_conditions, season_conditions]
         trends = [Trend(*args) for args in itertools.product(*conditions)]

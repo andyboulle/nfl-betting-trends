@@ -139,10 +139,10 @@ def make_games_table(cur):
 
 def make_trends_table(cur):
     cur.execute('''
-       DROP TABLE IF EXISTS trends         
+       DROP TABLE IF EXISTS new_trends         
     ''')
     cur.execute('''
-        CREATE TABLE IF NOT EXISTS trends (
+        CREATE TABLE IF NOT EXISTS new_trends (
             id VARCHAR(64),
             id_string VARCHAR(250),
             category VARCHAR(25),
@@ -183,7 +183,7 @@ def process_game_rows(cur, df):
         )
 
         process_game_trends(game.trends, trends, game)
-        games.append(game)
+        games.append(game.to_dict())
 
     trends_arr = [trend.to_tuple() for trend in trends.values()]
 
