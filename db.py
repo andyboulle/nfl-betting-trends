@@ -139,10 +139,10 @@ def make_games_table(cur):
 
 def make_trends_table(cur):
     cur.execute('''
-       DROP TABLE IF EXISTS new_trends         
+       DROP TABLE IF EXISTS trends         
     ''')
     cur.execute('''
-        CREATE TABLE IF NOT EXISTS new_trends (
+        CREATE TABLE IF NOT EXISTS trends (
             id VARCHAR(64),
             id_string VARCHAR(250),
             category VARCHAR(25),
