@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import psycopg2
 from models.upcoming_game import UpcomingGame
+from models.trend import Trend
 import time
 
 app = Flask(__name__)
@@ -100,9 +101,9 @@ def single_game(id):
 
         sql_query += ' OR ('
         if filters['over'] == 'true':
-            sql_query += f" category LIKE '%over%' OR"
+            sql_query += f" category = 'over' OR"
         if filters['under'] == 'true':
-            sql_query += f" category LIKE '%under%' OR"
+            sql_query += f" category = 'under' OR"
         sql_query += ' FALSE))'
 
         #
@@ -192,15 +193,11 @@ def single_game(id):
         filters['second_sort_category'] = request.form['second-sort-category']
         filters['second_sort_order'] = request.form['second-sort-order']
 
-        sql_query += f" ORDER BY {filters['first_sort_category']} {filters['first_sort_order']}, {filters['second_sort_category']} {filters['second_sort_order']}"
-
         #
         # Max Results Filter
         #
         filters['max_results'] = request.form['max_results']
 
-        for filter, value in filters.items():
-            print(f'{filter}: {value}')
     else:
         filters['home'] = 'true'
         filters['away'] = 'true'
@@ -237,15 +234,31 @@ def single_game(id):
 
         filters['max_results'] = '50'
 
+    sql_query += f" ORDER BY {filters['first_sort_category']} {filters['first_sort_order']}, {filters['second_sort_category']} {filters['second_sort_order']}"
     sql_query += f" LIMIT {filters['max_results']}"
+
+    for key, value in filters.items():
+        print(f'{key}: {value}')
+
+    print(sql_query)
 
     cur.execute(sql_query)
     trend_rows = cur.fetchall()
+
+    trends = []
+    trends_descriptions = []
+    index_to_describe = 0
+    for row in trend_rows:
+        trends.append(Trend(row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13]))
+    
+    for trend in trends:
+        trends_descriptions.append(trend.get_description())
+
     
     cur.close()
     conn.close()
 
-    return render_template('single_game_trend_page.html', game=game, trends=trend_rows, filters=filters)
+    return render_template('single_game_trend_page.html', game=game, trends=trends, trends_descriptions=trends_descriptions, filters=filters)
 
 
 if __name__ == '__main__':

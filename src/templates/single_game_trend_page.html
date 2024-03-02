@@ -229,13 +229,13 @@
                 <th>Record</th>
                 <th>Win %</th>
             </tr>
-            {% for trend in trends %}
-            <tr>
-                <td>{{ trend[1] }}</td>
-                <td>{{ trend[12] }}</td>
-                <td>{{ trend[9] }}-{{ trend[10] }}-{{ trend[11] }}</td>
-                <td>{{ trend[13] }}</td>
-            </tr>
+            {% for i in range(trends | length) %}
+                <tr>
+                    <td>{{ trends_descriptions[i] }}</td>
+                    <td>{{ trends[i].total_games }}</td>
+                    <td>{{ trends[i].wins }}-{{ trends[i].losses }}-{{ trends[i].pushes }}</td>
+                    <td>{{ trends[i].win_pct }}</td>
+                </tr>
             {% endfor %}
         </table>
     </div>

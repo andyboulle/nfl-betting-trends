@@ -19,7 +19,7 @@ class Trend:
     total_games = None
     win_pct = None
 
-    def __init__(self, category, month, day_of_week, divisional, spread, total, seasons):
+    def __init__(self, category, month, day_of_week, divisional, spread, total, seasons, wins=0, losses=0, pushes=0, total_games=0, win_pct=0):
         self.category = category
         self.month = month
         self.day_of_week = day_of_week
@@ -31,11 +31,11 @@ class Trend:
         self.id_string = ','.join(map(str, [category, month, day_of_week, divisional, spread, total, seasons]))
         self.id = hashlib.sha256(self.id_string.encode()).hexdigest()
 
-        self.wins = 0
-        self.losses = 0
-        self.pushes = 0
-        self.total_games = 0
-        self.win_pct = 0
+        self.wins = wins
+        self.losses = losses
+        self.pushes = pushes
+        self.total_games = total_games
+        self.win_pct = win_pct
 
     def update_record(self, game):
         if self.category in ['home outright', 'away outright']:
@@ -115,6 +115,68 @@ class Trend:
         self.total_games = self.wins+self.losses+self.pushes
         win_pct_games = self.wins + self.losses + (self.pushes / 2)
         self.win_pct = 0 if win_pct_games == 0 else round(self.wins / (self.wins + self.losses + (self.pushes / 2)) * 100, 2)
+
+    def get_description(self):
+        returner = ''
+        returner += self.get_category_description(self.category)
+        if self.day_of_week != None:
+            returner += f' on {self.day_of_week}s'
+        if self.month != None:
+            returner += f' in {self.month}'
+        if self.divisional != None:
+            returner += ' in divisional games' if self.divisional else ' in non-divisional games'
+        if self.spread != None:
+            returner += f' when the spread is {self.spread}'
+        if self.total != None:
+            returner += f' and the total is {self.total}' if self.spread != None else f' when the total is {self.total}'
+        if self.seasons != None:
+            returner += f' {self.seasons}'
+
+        return returner
+
+    def get_category_description(self, category):
+        returner = ''
+        if category == 'home outright':
+            returner += 'Home teams outright'
+        elif category == 'away outright':
+            returner += 'Away teams outright'
+        elif category == 'favorite outright':
+            returner += 'Favorites outright'
+        elif category == 'underdog outright':
+            returner += 'Underdogs outright'
+        elif category == 'home favorite outright':
+            returner += 'Home Favorites outright'
+        elif category == 'away underdog outright':
+            returner += 'Away Underdogs outright'
+        elif category == 'away favorite outright':
+            returner += 'Away Favorites outright'
+        elif category == 'home underog outright':
+            returner += 'Home Underdogs outright'
+        elif category == 'home ats':
+            returner += 'Home teams against the spread'
+        elif category == 'away ats':
+            returner += 'Away teams against the spread'
+        elif category == 'favorite ats':
+            returner += 'Favorites against the spread'
+        elif category == 'underdog ats':
+            returner += 'Underdogs against the spread'
+        elif category == 'home favorite ats':
+            returner += 'Home Favorites against the spread'
+        elif category == 'away underdog ats':
+            returner += 'Away Underdogs against the spread'
+        elif category == 'away favorite ats':
+            returner += 'Away Favorites against the spread'
+        elif category == 'home underog ats':
+            returner += 'Home Underdogs against the spread'
+        elif category == 'over':
+            returner += 'Overs'
+        elif category == 'under':
+            returner += 'Unders'
+        return returner
+
+
+    def get_month_description(self, month):
+        return f' in {month}'
 
     def to_dict(self):
         return vars(self)
