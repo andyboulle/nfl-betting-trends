@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>NFL Betting Trends</title>
+{% endblock %}
+
+{% block body %}
+
+<div class="content">
+    <a href="/"><h1>NFL Betting Trends</h1></a>
+    <div class="games">
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Team</th>
+                <th>Spread</th>
+                <th>Moneyline</th>
+                <th>Total</th>
+            </tr>
+            <tr>
+                <td>{{ game.date }}</td>
+                <td>{{ game.away_team }}</td>
+                <td>
+                    {{ game.away_spread }}
+                    <br>
+                    {{ game.away_spread_odds }}
+                </td>
+                <td>{{ game.away_moneyline_odds }}</td>
+                <td>
+                    u{{ game.under }}
+                    <br>
+                    {{ game.under_odds }}
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>{{ game.home_team }}</td>
+                <td>
+                    {{ game.home_spread }}
+                    <br>
+                    {{ game.home_spread_odds }}
+                </td>
+                <td>{{ game.home_moneyline_odds }}</td>
+                <td>
+                    o{{ game.over }}
+                    <br>
+                    {{ game.over_odds }}
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="filters">
+        <form action="/{{ game.id }}" method="POST" >
+            Specific Trend Categories<br>
+            <label><input type="checkbox" name="home" value="true" {% if filters['home'] == 'true' %} checked {% endif %}> Home</label>
+            <input type="hidden" name="home" value="false">
+            <label><input type="checkbox" name="away" value="true" {% if filters['away'] == 'true' %} checked {% endif %}> Away</label>
+            <input type="hidden" name="away" value="false">
+            {% if game.spread != 0 %}
+                <label><input type="checkbox" name="favorite" value="true" {% if filters['favorite'] == 'true' %} checked {% endif %}> Favorite</label>
+                <input type="hidden" name="favorite" value="false">
+                <label><input type="checkbox" name="underdog" value="true" {% if filters['underdog'] == 'true' %} checked {% endif %}> Underdog</label>
+                <input type="hidden" name="underdog" value="false">
+                {% if game.home_spread < 0 %}
+                    <label><input type="checkbox" name="home_favorite" value="true" {% if filters['home favorite'] == 'true' %} checked {% endif %}> Home Favorite</label>
+                    <input type="hidden" name="home_favorite" value="false">
+                    <label><input type="checkbox" name="away_underdog" value="true" {% if filters['away underdog'] == 'true' %} checked {% endif %}> Away Underdog</label>
+                    <input type="hidden" name="away_underdog" value="false">
+                {% else %}
+                    <label><input type="checkbox" name="away_favorite" value="true" {% if filters['away favorite'] == 'true' %} checked {% endif %}> Away Favorite</label>
+                    <input type="hidden" name="away_favorite" value="false">
+                    <label><input type="checkbox" name="home_underdog" value="true" {% if filters['home underdog'] == 'true' %} checked {% endif %}> Home Underdog</label>
+                    <input type="hidden" name="home_underdog" value="false">
+                {% endif %}
+            {% endif %}
+            <label><input type="checkbox" name="over" value="true" {% if filters['over'] == 'true' %} checked {% endif %}> Over</label>
+            <input type="hidden" name="over" value="false">
+            <label><input type="checkbox" name="under" value="true" {% if filters['under'] == 'true' %} checked {% endif %}> Under</label>
+            <input type="hidden" name="under" value="false">
+            <br>
+            Specific Betting Categories<br>
+            <label><input type="checkbox" name="ats" value="true" {% if filters['ats'] == 'true' %} checked {% endif %}> Against the Spread</label>
+            <input type="hidden" name="ats" value="false">
+            <label><input type="checkbox" name="outright" value="true" {% if filters['outright'] == 'true' %} checked {% endif %}> Outright</label>
+            <input type="hidden" name="outright" value="false">
+            <br>
+
+            Only in {{ game.month }}<input type="checkbox" name="month" value="true" {% if filters['month'] == 'true' %} checked {% endif %}>
+            <input type="hidden" name="month" value="false">
+            <br>
+            Only on {{ game.day_of_week }}s<input type="checkbox" name="day-of-week" value="true" {% if filters['day'] == 'true' %} checked {% endif %}>
+            <input type="hidden" name="day-of-week" value="false">
+            <br>
+            Only in
+            {% if game.divisional == False %}
+                Non
+            {% endif %}
+            Divisional Games<input type="checkbox" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}>
+            <input type="hidden" name="divisional" value="false">
+            <br>
+
+            <label for="spread">Spread</label>
+            <select name="spread">
+                <option value="any" {% if filters['spread'] == 'any' %} selected {% endif %}>Any Spread</option>
+                <option value="{{ game.spread }}" {% if filters['spread'] == game.spread %} selected {% endif %}>{{ game.spread }}</option>
+                {% for i in range(1, 15) %}
+                    {% set more_str = i ~ ' or more' %}
+                    {% set less_str = i ~ ' or less' %}
+                    {% if i <= game.spread %}
+                        <option value="{{ i }} or more" {% if filters['spread'] == more_str %} selected {% endif %}>{{ i }} or more</option>
+                    {% endif %}
+                    {% if i >= game.spread %}
+                        <option value="{{ i }} or less" {% if filters['spread'] == less_str %} selected {% endif %}>{{ i }} or less</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <br>
+            <label for="total">Total</label>
+            <select name="total">
+                <option value="any" {% if filters['total'] == 'any' %} selected {% endif %}>Any Total</option>
+                {% for i in range(30, 61, 5) %}
+                    {% set more_str = i ~ ' or more' %}
+                    {% set less_str = i ~ ' or less' %}
+                    {% if i <= game.total %}
+                        <option value="{{ i }} or more" {% if filters['total'] == more_str %} selected {% endif %}>{{ i }} or more</option>
+                    {% endif %}
+                    {% if i >= game.total %}
+                        <option value="{{ i }} or less" {% if filters['total'] == less_str %} selected {% endif %}>{{ i }} or less</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <br>
+            <label for="seasons">Seasons Included</label>
+            <select name="seasons">
+                {% for i in range(2006, 2024) %}
+                    {% set season_str = 'since ' ~ i ~ '-' ~ (i + 1) %}
+                    <option value="since {{ i }}-{{ i + 1 }}" {% if filters['seasons'] == season_str %} selected {% endif %}>since {{ i }}-{{ i + 1 }}</option>
+                {% endfor %}
+            </select>
+            <br>
+
+            Total Games
+            <select name="gle-total-games">
+                <option value="gt" {% if filters['gle_total_games'] == 'gt' %} selected {% endif %}>></option>
+                <option value="gte" {% if filters['gle_total_games'] == 'gte' %} selected {% endif %}>>=</option>
+                <option value="eq" {% if filters['gle_total_games'] == 'eq' %} selected {% endif %}>=</option>
+                <option value="lte" {% if filters['gle_total_games'] == 'lte' %} selected {% endif %}><=</option>
+                <option value="lt" {% if filters['gle_total_games'] == 'lt' %} selected {% endif %}><</option>
+            </select>    
+            <input type="text" name="total-games" value="{{ filters['total_games'] }}"">
+            <br>
+
+            Win %
+            <select name="gle-win-pct">
+                <option value="gt" {% if filters['gle_win_pct'] == 'gt' %} selected {% endif %}>></option>
+                <option value="gte" {% if filters['gle_win_pct'] == 'gte' %} selected {% endif %}>>=</option>
+                <option value="eq" {% if filters['gle_win_pct'] == 'eq' %} selected {% endif %}>=</option>
+                <option value="lte" {% if filters['gle_win_pct'] == 'lte' %} selected {% endif %}><=</option>
+                <option value="lt" {% if filters['gle_win_pct'] == 'lt' %} selected {% endif %}><</option>
+            </select>    
+            <input type="text" name="win-pct" value="{{ filters['win_pct'] }}">
+            <br>
+
+            <label for="first-sort-category">First Sort By</label>
+            <select name="first-sort-category">
+                <option value="win_percentage" {% if filters['first_sort_category'] == 'win_percentage' %} selected {% endif %}>Win %</option> 
+                <option value="total_games" {% if filters['first_sort_category'] == 'total_games' %} selected {% endif %}>Total Games</option>               
+            </select>
+            <select name="first-sort-order">
+                <option value="desc" {% if filters['first_sort_order'] == 'desc' %} selected {% endif %}>High to Low</option>
+                <option value="asc" {% if filters['first_sort_order'] == 'asc' %} selected {% endif %}>Low to High</option>                
+            </select>
+            <br>
+
+            <label for="second-sort-category">Second Sort By</label>
+            <select name="second-sort-category">
+                <option value="total_games" {% if filters['second_sort_category'] == 'total_games' %} selected {% endif %}>Total Games</option>
+                <option value="win_percentage" {% if filters['second_sort_category'] == 'win_percentage' %} selected {% endif %}>Win %</option>                
+            </select>
+            <select name="second-sort-order">
+                <option value="desc" {% if filters['second_sort_order'] == 'desc' %} selected {% endif %}>High to Low</option>
+                <option value="asc" {% if filters['second_sort_order'] == 'asc' %} selected {% endif %}>Low to High</option>                
+            </select>
+            <br>
+            Maximum Results:<input type="text" name="max_results" value="{{ filters['max_results'] }}"><input type="submit" value="Filter">
+        </form>
+    </div>
+    <script>
+        // Get references to the "All" checkboxes
+        const allTrendCategoriesCheckbox = document.getElementById('all-trend-categories');
+        const allBettingCategoriesCheckbox = document.getElementById('all-betting-categories');
+    
+        // Get references to other checkboxes
+        const trendCheckboxes = document.querySelectorAll('input[name^="home"], input[name^="away"]'); // Select all checkboxes with name starting with "home" or "away"
+        const bettingCheckboxes = document.querySelectorAll('input[name^="ats"], input[name^="outright"]'); // Select all checkboxes with name starting with "ats" or "outright"
+    
+        // Add change event listeners to "All" checkboxes
+        allTrendCategoriesCheckbox.addEventListener('change', function() {
+            // Set the checked state of other checkboxes based on the state of the "All" checkbox
+            trendCheckboxes.forEach(checkbox => checkbox.checked = allTrendCategoriesCheckbox.checked);
+        });
+    
+        allBettingCategoriesCheckbox.addEventListener('change', function() {
+            // Set the checked state of other checkboxes based on the state of the "All" checkbox
+            bettingCheckboxes.forEach(checkbox => checkbox.checked = allBettingCategoriesCheckbox.checked);
+        });
+    
+        // Add change event listeners to other checkboxes
+        trendCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // If any other checkbox is unchecked, uncheck the "All" checkbox
+                allTrendCategoriesCheckbox.checked = [...trendCheckboxes].every(checkbox => checkbox.checked);
+            });
+        });
+    
+        bettingCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // If any other checkbox is unchecked, uncheck the "All" checkbox
+                allBettingCategoriesCheckbox.checked = [...bettingCheckboxes].every(checkbox => checkbox.checked);
+            });
+        });
+    </script>
+    <div class="trends">
+        {{ trends | length }}
+        <table>
+            <tr>
+                <th>Trend</th>
+                <th>Total Games</th>
+                <th>Record</th>
+                <th>Win %</th>
+            </tr>
+            {% for trend in trends %}
+            <tr>
+                <td>{{ trend[1] }}</td>
+                <td>{{ trend[12] }}</td>
+                <td>{{ trend[9] }}-{{ trend[10] }}-{{ trend[11] }}</td>
+                <td>{{ trend[13] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>NFL Betting Trends</title>
+{% endblock %}
+
+{% block body %}
+
+<div class="content">
+    <h1>NFL Betting Trends</h1>
+    <div class="games">
+        {% for game_id, game in games.items() %}
+        <a href="/{{ game_id }}">
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Team</th>
+                    <th>Spread</th>
+                    <th>Moneyline</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>{{ game.away_team }}</td>
+                    <td>
+                        {{ game.away_spread }}
+                        <br>
+                        {{ game.away_spread_odds }}
+                    </td>
+                    <td>{{ game.away_moneyline_odds }}</td>
+                    <td>
+                        u{{ game.under }}
+                        <br>
+                        {{ game.under_odds }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ game.date }}</td>
+                    <td>{{ game.home_team }}</td>
+                    <td>
+                        {{ game.home_spread }}
+                        <br>
+                        {{ game.home_spread_odds }}
+                    </td>
+                    <td>{{ game.home_moneyline_odds }}</td>
+                    <td>
+                        o{{ game.over }}
+                        <br>
+                        {{ game.over_odds }}
+                    </td>
+                </tr>
+            </table>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

@@ -162,7 +162,7 @@ class Game:
         for i in range(1, config.MAX_SPREAD + 1):
             if i < spread:
                 spread_conditions.append(f'{i} or more')
-            elif i == total:
+            elif i == spread:
                 spread_conditions.extend([f'{i} or more', f'{i} or less'])
             else:
                 spread_conditions.append(f'{i} or less')
