@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 <title>NFL Betting Trends</title>
 {% endblock %}
 
@@ -20,14 +21,20 @@
                     <th>Total</th>
                 </tr>
                 <tr>
-                    <td></td>
+                    <td>{{ game.date }}</td>
                     <td>{{ game.away_team }}</td>
                     <td>
                         {{ game.away_spread }}
                         <br>
                         {{ game.away_spread_odds }}
                     </td>
-                    <td>{{ game.away_moneyline_odds }}</td>
+                    <td>
+                        {% if game.away_moneyline_odds > 0 %}
+                            +{{ game.away_moneyline_odds }}
+                        {% else %}
+                            {{ game.away_moneyline_odds }}
+                        {% endif %}
+                    </td>
                     <td>
                         u{{ game.under }}
                         <br>
@@ -35,14 +42,20 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>{{ game.date }}</td>
+                    <td></td>
                     <td>{{ game.home_team }}</td>
                     <td>
                         {{ game.home_spread }}
                         <br>
                         {{ game.home_spread_odds }}
                     </td>
-                    <td>{{ game.home_moneyline_odds }}</td>
+                    <td>
+                        {% if game.home_moneyline_odds > 0 %}
+                            +{{ game.home_moneyline_odds }}
+                        {% else %}
+                            {{ game.home_moneyline_odds }}
+                        {% endif %}
+                    </td>
                     <td>
                         o{{ game.over }}
                         <br>

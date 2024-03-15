@@ -110,30 +110,75 @@ def single_game(id):
         # Game Info Filters
         #
         filters['month'] = request.form['month']
-        filters['day'] = request.form['day-of-week']
-        filters['divisional'] = request.form['divisional']
+        filters['day'] = request.form['day']
+        filters['type'] = request.form['type']
 
-        if filters['month'] == 'true':
+        if filters['month'] == 'game_month':
             sql_query += f" AND month='{game.month}'"
-        if filters['day'] == 'true':
+            filters['game_month'] = 'true'
+            filters['any_month'] = 'false'
+        else:
+            filters['any_month'] = 'true'
+            filters['game_month'] = 'false'
+            sql_query += ' AND month IS NULL'
+
+        if filters['day'] == 'game_day':
             sql_query += f" AND day_of_week='{game.day_of_week}'"
-        if filters['divisional'] == 'true':
+            filters['game_day'] = 'true'
+            filters['any_day'] = 'false'
+        else:
+            filters['any_day'] = 'true'
+            filters['game_day'] = 'false'
+            sql_query += ' AND day_of_week IS NULL'
+
+        if filters['type'] == 'divisional':
             if game.divisional == True:
                 sql_query += f" AND divisional=TRUE"
+                filters['divisional'] = 'true'
+                filters['any_type'] = 'false'
             else:
                 sql_query += f" AND divisional=FALSE"
+                filters['divisional'] = 'true'
+                filters['any_type'] = 'false'
+        else:
+            filters['any_type'] = 'true'
+            filters['divisional'] = 'false'
+            sql_query += ' AND divisional IS NULL'
 
         #
         # Betting Info Filters
         #
         filters['spread'] = request.form['spread']
-        filters['total'] = request.form['total']
+        for key, value in request.form.items():
+            if 'spread' in key:
+                filters[key] = request.form[key]
 
-        if filters['spread'] != 'any':
-            sql_query += f" AND spread='{filters['spread']}'"
-        if filters['total'] != 'any':
-            sql_query += f" AND total='{filters['total']}'"
-        
+        if filters['spread'] == 'true':
+            sql_query += ' AND ('
+            for key, value in filters.items():
+                if 'spread ' in key and value == 'true':
+                    sql_query += f" spread='{key[7:]}' OR "
+            sql_query += ' FALSE)'
+        else:
+            sql_query += ' AND spread IS NULL'
+
+        filters['total'] = request.form['total']
+        for key, value in request.form.items():
+            if 'total' in key:
+                filters[key] = request.form[key]
+
+        if filters['total'] == 'true':
+            sql_query += ' AND ('
+            for key, value in filters.items():
+                if 'total ' in key and value == 'true':
+                    sql_query += f" total='{key[6:]}' OR "
+            sql_query += ' FALSE)'
+        else:
+            sql_query += ' AND total IS NULL'
+
+        # TODO: Figure out why when "less than 4" is selected, nothing shows up, but when "less than 3" is selected, stuff shows up
+        # TODO: Figure out a better and/or system. Should add an option for game details: "any month, september, any month or just september", should also give option for combination of criteria selected, not just automatically all criteria selected has to be applied
+
         #
         # Season Info Filters
         #
@@ -214,12 +259,25 @@ def single_game(id):
         filters['over'] = 'true'
         filters['under'] = 'true'
 
-        filters['month'] = 'false'
-        filters['day'] = 'false'
+        filters['any_month'] = 'true'
+        filters['game_month'] = 'false'
+        filters['any_day'] = 'true'
+        filters['game_day'] = 'false'
+        filters['any_type'] = 'true'
         filters['divisional'] = 'false'
 
-        filters['spread'] = 'any'
-        filters['total'] = 'any'
+        filters['spread'] = 'true'
+        for i in range(1, 21):
+            filters[f'spread {i} or more'] = 'true'
+            filters[f'spread {i} or less'] = 'true'
+            filters[f'spread {i}.0'] = 'true'
+            filters[f'spread {i}.5'] = 'true'
+
+        filters['total'] = 'true'
+        for i in range(30, 61, 5):
+            filters[f'total {i} or more'] = 'true'
+            filters[f'total {i} or less'] = 'true'
+
         filters['seasons'] = 'since 2006-2007'
 
         filters['gle_total_games'] = 'gt'
@@ -237,23 +295,16 @@ def single_game(id):
     sql_query += f" ORDER BY {filters['first_sort_category']} {filters['first_sort_order']}, {filters['second_sort_category']} {filters['second_sort_order']}"
     sql_query += f" LIMIT {filters['max_results']}"
 
-    for key, value in filters.items():
-        print(f'{key}: {value}')
-
-    print(sql_query)
-
     cur.execute(sql_query)
     trend_rows = cur.fetchall()
 
     trends = []
     trends_descriptions = []
-    index_to_describe = 0
     for row in trend_rows:
         trends.append(Trend(row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13]))
     
     for trend in trends:
         trends_descriptions.append(trend.get_description())
-
     
     cur.close()
     conn.close()

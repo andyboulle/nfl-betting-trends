@@ -166,7 +166,7 @@ class Trend:
             returner += 'Away Underdogs against the spread'
         elif category == 'away favorite ats':
             returner += 'Away Favorites against the spread'
-        elif category == 'home underog ats':
+        elif category == 'home underdog ats':
             returner += 'Home Underdogs against the spread'
         elif category == 'over':
             returner += 'Overs'
