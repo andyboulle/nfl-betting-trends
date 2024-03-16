@@ -106,44 +106,67 @@ def single_game(id):
             sql_query += f" category = 'under' OR"
         sql_query += ' FALSE))'
 
+        # Begin OR part of query
+
+        filters['criteria'] = request.form['criteria']
+
         #
         # Game Info Filters
         #
-        filters['month'] = request.form['month']
-        filters['day'] = request.form['day']
-        filters['type'] = request.form['type']
+        filters['any_month'] = request.form['any_month']
+        filters['game_month'] = request.form['game_month']
 
-        if filters['month'] == 'game_month':
-            sql_query += f" AND month='{game.month}'"
-            filters['game_month'] = 'true'
-            filters['any_month'] = 'false'
+        sql_query += " AND ("
+        if filters['any_month'] == 'true' or filters['game_month'] == 'true':
+            if filters['game_month'] == 'true':
+                sql_query += f" month='{game.month}'"
+            if filters['any_month'] == 'true' and filters['game_month'] == 'true':
+                sql_query += " OR"
+            if filters['any_month'] == 'true':
+                sql_query += " month IS NULL"
         else:
-            filters['any_month'] = 'true'
-            filters['game_month'] = 'false'
-            sql_query += ' AND month IS NULL'
+            sql_query += f" month IS NULL"
+        if filters['criteria'] == 'any':
+            sql_query += f" OR month IS NULL"
+        sql_query += ")"
 
-        if filters['day'] == 'game_day':
-            sql_query += f" AND day_of_week='{game.day_of_week}'"
-            filters['game_day'] = 'true'
-            filters['any_day'] = 'false'
-        else:
-            filters['any_day'] = 'true'
-            filters['game_day'] = 'false'
-            sql_query += ' AND day_of_week IS NULL'
+            
+        filters['any_day'] = request.form['any_day']
+        filters['game_day'] = request.form['game_day']
 
-        if filters['type'] == 'divisional':
-            if game.divisional == True:
-                sql_query += f" AND divisional=TRUE"
-                filters['divisional'] = 'true'
-                filters['any_type'] = 'false'
-            else:
-                sql_query += f" AND divisional=FALSE"
-                filters['divisional'] = 'true'
-                filters['any_type'] = 'false'
+        sql_query += f" AND ("
+        if filters['any_day'] == 'true' or filters['game_day'] == 'true':
+            if filters['game_day'] == 'true':
+                sql_query += f" day_of_week='{game.day_of_week}'"
+            if filters['any_day'] == 'true' and filters['game_day'] == 'true':
+                sql_query += " OR"
+            if filters['any_day'] == 'true':
+                sql_query += " day_of_week IS NULL"
         else:
-            filters['any_type'] = 'true'
-            filters['divisional'] = 'false'
-            sql_query += ' AND divisional IS NULL'
+            sql_query += f" day_of_week IS NULL"
+        if filters['criteria'] == 'any':
+            sql_query += f" OR day_of_week IS NULL"
+        sql_query += ")"
+
+        filters['any_type'] = request.form['any_type']
+        filters['divisional'] = request.form['divisional']
+
+        sql_query += f" AND ("
+        if filters['any_type'] == 'true' or filters['divisional'] == 'true':
+            if filters['divisional'] == 'true':
+                if game.divisional == True:
+                    sql_query += f" divisional=TRUE"
+                else:
+                    sql_query += f" divisional=FALSE"
+            if filters['any_type'] == 'true' and filters['divisional'] == 'true':
+                sql_query += f" OR"
+            if filters['any_type'] == 'true':
+                sql_query += f" divisional IS NULL"
+        else:
+            sql_query += f" divisional IS NULL"
+        if filters['criteria'] == 'any':
+            sql_query += f" OR divisional IS NULL"
+        sql_query += ')'
 
         #
         # Betting Info Filters
@@ -158,6 +181,8 @@ def single_game(id):
             for key, value in filters.items():
                 if 'spread ' in key and value == 'true':
                     sql_query += f" spread='{key[7:]}' OR "
+            if filters['criteria'] == 'any':
+                sql_query += f" spread IS NULL OR"
             sql_query += ' FALSE)'
         else:
             sql_query += ' AND spread IS NULL'
@@ -172,6 +197,8 @@ def single_game(id):
             for key, value in filters.items():
                 if 'total ' in key and value == 'true':
                     sql_query += f" total='{key[6:]}' OR "
+            if filters['criteria'] == 'any':
+                sql_query += f" total IS NULL OR"
             sql_query += ' FALSE)'
         else:
             sql_query += ' AND total IS NULL'
@@ -260,11 +287,12 @@ def single_game(id):
         filters['under'] = 'true'
 
         filters['any_month'] = 'true'
-        filters['game_month'] = 'false'
+        filters['game_month'] = 'true'
+
         filters['any_day'] = 'true'
-        filters['game_day'] = 'false'
+        filters['game_day'] = 'true'
         filters['any_type'] = 'true'
-        filters['divisional'] = 'false'
+        filters['divisional'] = 'true'
 
         filters['spread'] = 'true'
         for i in range(1, 21):
@@ -277,6 +305,8 @@ def single_game(id):
         for i in range(30, 61, 5):
             filters[f'total {i} or more'] = 'true'
             filters[f'total {i} or less'] = 'true'
+
+        filters['criteria'] = 'any'
 
         filters['seasons'] = 'since 2006-2007'
 
@@ -294,6 +324,9 @@ def single_game(id):
 
     sql_query += f" ORDER BY {filters['first_sort_category']} {filters['first_sort_order']}, {filters['second_sort_category']} {filters['second_sort_order']}"
     sql_query += f" LIMIT {filters['max_results']}"
+
+    # with open('output.txt', 'w') as file:
+    #     file.write(sql_query)
 
     cur.execute(sql_query)
     trend_rows = cur.fetchall()

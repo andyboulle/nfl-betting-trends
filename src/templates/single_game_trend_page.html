@@ -102,29 +102,30 @@
             <br>
 
             Month<br>
-            <input type="radio" name="month" value="any_month" {% if filters['any_month'] == 'true' %} checked {% endif %}>
-            <label for="any_month">Any Month</label>
-            <input type="radio" name="month" value="game_month" {% if filters['game_month'] == 'true' %} checked {% endif %}>
-            <label for="game_month">{{ game.month }}</label>
+            <label><input type="checkbox" name="any_month" value="true" {% if filters['any_month'] == 'true' %} checked {% endif %}> Any Month</label>
+            <input type="hidden" name="any_month" value="false">
+            <label><input type="checkbox" name="game_month" value="true" {% if filters['game_month'] == 'true' %} checked {% endif %}> Only {{ game.month }}</label>
+            <input type="hidden" name="game_month" value="false">
             <br>
 
             Day<br>
-            <input type="radio" name="day" value="any_day" {% if filters['any_day'] == 'true' %} checked {% endif %}>
-            <label for="any_game">Any Day</label>
-            <input type="radio" name="day" value="game_day" {% if filters['game_day'] == 'true' %} checked {% endif %}>
-            <label for="game_day">{{ game.day_of_week }}</label>
+            <label><input type="checkbox" name="any_day" value="true" {% if filters['any_day'] == 'true' %} checked {% endif %}> Any Day</label>
+            <input type="hidden" name="any_day" value="false">
+            <label><input type="checkbox" name="game_day" value="true" {% if filters['game_day'] == 'true' %} checked {% endif %}> Only {{ game.day_of_week }}</label>
+            <input type="hidden" name="game_day" value="false">
             <br>
 
             Game Type<br>
-            <input type="radio" name="type" value="any_type" {% if filters['any_type'] == 'true' %} checked {% endif %}>
-            <label for="any_type">Any Type</label>
-            <input type="radio" name="type" value="divisional" {% if filters['divisional'] == 'true' %} checked {% endif %}>
-            <label for="divisional">
+            <label><input type="checkbox" name="any_type" value="true" {% if filters['any_type'] == 'true' %} checked {% endif %}> Any Type</label>
+            <input type="hidden" name="any_type" value="false">
+            <input type="checkbox" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}>
+            <label for="divisional">Only
                 {% if game.divisional == False %}
                     Non
                 {% endif %}
                 Divisional Games
             </label>
+            <input type="hidden" name="divisional" value="false">
             <br>
 
             <label for="spread">Spread</label>
@@ -187,6 +188,12 @@
                     toggleCheckboxes(this, 'total-options');
                 });
             </script>
+
+            <label>Include trends that meet:</label><br>
+            <input type="radio" name="criteria" value="all" {% if filters['criteria'] == 'all' %} checked {% endif %}>
+            <label for="all_criteria">All selected criteria (month, day, type, spread, total)</label><br>
+            <input type="radio" name="criteria" value="any" {% if filters['criteria'] == 'any' %} checked {% endif %}>
+            <label for="any_combination">Any combination of selected criteria (month, day, type, spread, total)</label><br>
 
             <label for="seasons">Seasons Included</label>
             <select name="seasons">
