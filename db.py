@@ -74,7 +74,7 @@ def format_dataframe(df):
 ### DATABASE METHODS ###
 ########################
 
-def make_games_table(cur, df):
+def make_games_table(cur):
     cur.execute('''
        DROP TABLE IF EXISTS games         
     ''')
@@ -183,7 +183,7 @@ def process_game_rows(cur, df):
         )
 
         process_game_trends(game.trends, trends, game)
-        games.append(game)
+        games.append(game.to_dict())
 
     trends_arr = [trend.to_tuple() for trend in trends.values()]
 
@@ -230,7 +230,7 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 
-make_games_table(cur, df)
+make_games_table(cur)
 make_trends_table(cur)
 process_game_rows(cur, df)
 
