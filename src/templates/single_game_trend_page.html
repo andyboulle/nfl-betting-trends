@@ -1,10 +1,6 @@
 {% extends 'base.html' %}
 
 {% block head %}
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <title>NFL Betting Trends</title>
 {% endblock %}
 
@@ -115,22 +111,16 @@
             <br><br>
             <!-- Month -->
             <strong>Month<br></strong>
-            <label><input type="checkbox" name="any_month" value="true" {% if filters['any_month'] == 'true' %} checked {% endif %}> Any Month</label>
-            <input type="hidden" name="any_month" value="false">
-            <label><input type="checkbox" name="game_month" value="true" {% if filters['game_month'] == 'true' %} checked {% endif %}> Only {{ game.month }}</label>
+            <label><input type="checkbox" name="game_month" value="true" {% if filters['game_month'] == 'true' %} checked {% endif %}> Only Games in {{ game.month }}</label>
             <input type="hidden" name="game_month" value="false">
             <br>
             <!-- Day -->
             <strong>Day<br></strong>
-            <label><input type="checkbox" name="any_day" value="true" {% if filters['any_day'] == 'true' %} checked {% endif %}> Any Day</label>
-            <input type="hidden" name="any_day" value="false">
-            <label><input type="checkbox" name="game_day" value="true" {% if filters['game_day'] == 'true' %} checked {% endif %}> Only {{ game.day_of_week }}</label>
+            <label><input type="checkbox" name="game_day" value="true" {% if filters['game_day'] == 'true' %} checked {% endif %}> Only Games on {{ game.day_of_week }}s</label>
             <input type="hidden" name="game_day" value="false">
             <br>
             <!-- Game Type -->
             <strong>Game Type<br></strong>
-            <label><input type="checkbox" name="any_type" value="true" {% if filters['any_type'] == 'true' %} checked {% endif %}> Any Type</label>
-            <input type="hidden" name="any_type" value="false">
             <input type="checkbox" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}>
             <label for="divisional">Only
                 {% if game.divisional == False %}
@@ -142,8 +132,6 @@
             <br>
             <!-- Spread -->
             <strong><label for="spread">Spread</label></strong>
-            <label><input type="checkbox" name="spread" value="true" {% if filters['spread'] == 'true' %} checked {% endif %}></label>
-            <input type="hidden" name="spread" value="false">
             <br>
             <!-- Spread Options -->
             {% set spread_integer = game.spread|int %}
@@ -168,8 +156,6 @@
             <br>
             <!-- Total -->
             <strong><label for="total">Total</label></strong>
-            <label><input type="checkbox" name="total" value="true" {% if filters['total'] == 'true' %} checked {% endif %}></label>
-            <input type="hidden" name="total" value="false">
             <br>
             <!-- Total Options -->
             {% set total_integer = game.total|int %}
@@ -187,22 +173,6 @@
                 <input type="hidden" name="{{ less_str }}" value="false">                
             {% endfor %}
             <br>
-            <!-- JavaScript for Checkbox Toggling -->
-            <script>
-                function toggleCheckboxes(source, targetName) {
-                    var checkboxes = document.getElementsByClassName(targetName);
-                    console.log(checkboxes);
-                    for (var i = 0; i < checkboxes.length; i++) {
-                        checkboxes[i].checked = source.checked;
-                    }
-                }
-                document.getElementsByName('spread')[0].addEventListener('change', function() {
-                    toggleCheckboxes(this, 'spread-options');
-                });
-                document.getElementsByName('total')[0].addEventListener('change', function() {
-                    toggleCheckboxes(this, 'total-options');
-                });
-            </script>
             <!-- Include trends that meet -->
             <strong><label>Include trends that meet:</label><br></strong>
             <input type="radio" name="criteria" value="all" {% if filters['criteria'] == 'all' %} checked {% endif %}>
