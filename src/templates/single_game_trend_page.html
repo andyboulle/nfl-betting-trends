@@ -111,16 +111,54 @@
             <br><br>
             <!-- Month -->
             <strong>Month<br></strong>
-            <label><input type="checkbox" name="game_month" value="true" {% if filters['game_month'] == 'true' %} checked {% endif %}> Only Games in {{ game.month }}</label>
+            <label><input type="checkbox" name="no_month" value="true" {% if filters['no_month'] == 'true' %} checked {% endif %}> No Month</label>
+            <input type="hidden" name="no_month" value="false">
+            <label><input type="checkbox" name="game_month" value="true" {% if filters['game_month'] == 'true' %} checked {% endif %}> Games in {{ game.month }}</label>
             <input type="hidden" name="game_month" value="false">
+            <!-- Script that ensures at least the "No Month" option will be checked -->
+            <script>
+                const noMonthCheckbox = document.querySelector('input[name="no_month"]');
+                const gameMonthCheckbox = document.querySelector('input[name="game_month"]');
+            
+                function updateMonthCheckboxes() {
+                    if (!noMonthCheckbox.checked && !gameMonthCheckbox.checked) {
+                        noMonthCheckbox.checked = true;
+                    }
+                }
+            
+                noMonthCheckbox.addEventListener('change', updateMonthCheckboxes);
+                gameMonthCheckbox.addEventListener('change', updateMonthCheckboxes);
+            
+                updateMonthCheckboxes();
+            </script>
             <br>
             <!-- Day -->
             <strong>Day<br></strong>
-            <label><input type="checkbox" name="game_day" value="true" {% if filters['game_day'] == 'true' %} checked {% endif %}> Only Games on {{ game.day_of_week }}s</label>
+            <label><input type="checkbox" name="no_day" value="true" {% if filters['no_day'] == 'true' %} checked {% endif %}> No Day</label>
+            <input type="hidden" name="no_day" value="false">
+            <label><input type="checkbox" name="game_day" value="true" {% if filters['game_day'] == 'true' %} checked {% endif %}> Games on {{ game.day_of_week }}s</label>
             <input type="hidden" name="game_day" value="false">
+            <!-- Script that ensures at least the "No Day" option will be checked -->
+            <script>
+                const noDayCheckbox = document.querySelector('input[name="no_day"]');
+                const gameDayCheckbox = document.querySelector('input[name="game_day"]');
+            
+                function updateDayCheckboxes() {
+                    if (!noDayCheckbox.checked && !gameDayCheckbox.checked) {
+                        noDayCheckbox.checked = true;
+                    }
+                }
+            
+                noDayCheckbox.addEventListener('change', updateDayCheckboxes);
+                gameDayCheckbox.addEventListener('change', updateDayCheckboxes);
+            
+                updateDayCheckboxes();
+            </script>
             <br>
             <!-- Game Type -->
             <strong>Game Type<br></strong>
+            <label><input type="checkbox" name="no_type" value="true" {% if filters['no_type'] == 'true' %} checked {% endif %}> No Type</label>
+            <input type="hidden" name="no_type" value="false">
             <input type="checkbox" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}>
             <label for="divisional">Only
                 {% if game.divisional == False %}
@@ -129,11 +167,29 @@
                 Divisional Games
             </label>
             <input type="hidden" name="divisional" value="false">
+            <!-- Script that ensures at least the "No Type" option will be checked -->
+            <script>
+                const noTypeCheckbox = document.querySelector('input[name="no_type"]');
+                const divisionalCheckbox = document.querySelector('input[name="divisional"]');
+            
+                function updateGameTypeCheckboxes() {
+                    if (!noTypeCheckbox.checked && !divisionalCheckbox.checked) {
+                        noTypeCheckbox.checked = true;
+                    }
+                }
+            
+                noTypeCheckbox.addEventListener('change', updateGameTypeCheckboxes);
+                divisionalCheckbox.addEventListener('change', updateGameTypeCheckboxes);
+            
+                updateGameTypeCheckboxes();
+            </script>
             <br>
             <!-- Spread -->
             <strong><label for="spread">Spread</label></strong>
             <br>
             <!-- Spread Options -->
+            <label><input type="checkbox" name="no_spread" value="true" {% if filters['no_spread'] == 'true' %} checked {% endif %}> No Spread</label>
+            <input type="hidden" name="no_spread" value="false">
             {% set spread_integer = game.spread|int %}
             <!-- Individual Spread Options -->
             <label><input type="checkbox" class="spread-options" name="spread {{ game.spread }}" value="true" {% if filters['spread ' ~ game.spread|string] == 'true' %} checked {% endif %}> {{ game.spread }}</label>
@@ -153,11 +209,37 @@
                 <label><input type="checkbox" class="spread-options" name="{{ less_str }}" value="true" {% if filters[less_str] == 'true' %} checked {% endif %}> {{i}} or less</label>
                 <input type="hidden" name="{{ less_str }}" value="false">                
             {% endfor %}
+            <!-- Script that ensures at least the "No Spread" option will be checked -->
+            <script>
+                const noSpreadCheckbox = document.querySelector('input[name="no_spread"]')
+                const spreadCheckboxes = document.querySelectorAll('.spread-options');
+            
+                function updateSpreadCheckboxes() {
+                    let anyChecked = false;
+                    spreadCheckboxes.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            anyChecked = true;
+                        }
+                    });
+                    if (!anyChecked) {
+                        document.querySelector('input[name="no_spread"]').checked = true;
+                    }
+                }
+            
+                noSpreadCheckbox.addEventListener('change', updateSpreadCheckboxes)
+                spreadCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', updateSpreadCheckboxes);
+                });
+
+                updateSpreadCheckboxes();
+            </script>
             <br>
             <!-- Total -->
             <strong><label for="total">Total</label></strong>
             <br>
             <!-- Total Options -->
+            <label><input type="checkbox" name="no_total" value="true" {% if filters['no_total'] == 'true' %} checked {% endif %}> No Total</label>
+            <input type="hidden" name="no_total" value="false">
             {% set total_integer = game.total|int %}
             {% set floor_total = (total_integer // 5) * 5 %}
             {% set ceiling_total = ((total_integer + 4) // 5) * 5 %}
@@ -173,12 +255,6 @@
                 <input type="hidden" name="{{ less_str }}" value="false">                
             {% endfor %}
             <br>
-            <!-- Include trends that meet -->
-            <strong><label>Include trends that meet:</label><br></strong>
-            <input type="radio" name="criteria" value="all" {% if filters['criteria'] == 'all' %} checked {% endif %}>
-            <label for="all_criteria">All selected criteria (month, day, type, spread, total)</label><br>
-            <input type="radio" name="criteria" value="any" {% if filters['criteria'] == 'any' %} checked {% endif %}>
-            <label for="any_combination">Any combination of selected criteria (month, day, type, spread, total)</label><br><br>
             <!-- Seasons Included -->
             </strong><label for="seasons">Seasons Included</label></strong>
             <select name="seasons">
@@ -187,6 +263,35 @@
                     <option value="since {{ i }}-{{ i + 1 }}" {% if filters['seasons'] == season_str %} selected {% endif %}>since {{ i }}-{{ i + 1 }}</option>
                 {% endfor %}
             </select>
+            <!-- Script that ensures at least the "No Total" option will be checked -->
+            <script>
+                // Get references to the total checkboxes
+                const noTotalCheckbox = document.querySelector('input[name="no_total"]');
+                const totalCheckboxes = document.querySelectorAll('.total-options');
+            
+                // Function to check "No Total" if all total checkboxes are unchecked
+                function updateTotalCheckboxes() {
+                    let anyChecked = false;
+                    totalCheckboxes.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            anyChecked = true;
+                        }
+                    });
+                    // If none of the checkboxes are checked, check the "No Total" checkbox
+                    if (!anyChecked) {
+                        noTotalCheckbox.checked = true;
+                    }
+                }
+            
+                // Add event listeners to the total checkboxes to monitor changes
+                noTotalCheckbox.addEventListener('change', updateTotalCheckboxes);
+                totalCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', updateTotalCheckboxes);
+                });
+            
+                // Call the function initially to set the initial state
+                updateTotalCheckboxes();
+            </script>
             <br>
             <!-- Total Games -->
             Total Games
