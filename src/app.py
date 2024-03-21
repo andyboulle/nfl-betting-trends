@@ -104,95 +104,80 @@ def single_game(id):
             sql_query += f" category = 'under' OR"
         sql_query += ' FALSE))'
 
-        # Extract criteria from POST form
-        filters['criteria'] = request.form['criteria']
-
         # Extract month category and add it to SQL query
+        filters['no_month'] = request.form['no_month']
         filters['game_month'] = request.form['game_month']
-        sql_query += " AND ("
+        sql_query += f" AND("
 
-        # Check if month filtering is enabled
+        # Filter by selected month categories
+        if filters['no_month'] == 'true':
+            sql_query += f" month IS NULL"
+        if filters['no_month'] == 'true' and filters['game_month'] == 'true':
+            sql_query += f" OR"
         if filters['game_month'] == 'true':
             sql_query += f" month='{game.month}'"
-        else:
-            sql_query += " month IS NULL"
-        # Check criteria
-        if filters['criteria'] == 'any':
-            sql_query += " OR month IS NULL)"
-        else:
-            sql_query += ")"
-
+        sql_query += ')'
 
         # Extract day category and add it to SQL query
+        filters['no_day'] = request.form['no_day']
         filters['game_day'] = request.form['game_day']
-        sql_query += " AND ("
+        sql_query += f" AND("
 
-        # Check if day filtering is enabled
+        # Filter by selected day categories
+        if filters['no_day'] == 'true':
+            sql_query += f" day_of_week IS NULL"
+        if filters['no_day'] == 'true' and filters['game_day'] == 'true':
+            sql_query += f" OR"
         if filters['game_day'] == 'true':
             sql_query += f" day_of_week='{game.day_of_week}'"
-        else:
-            sql_query += " day_of_week IS NULL"
-        # Check criteria
-        if filters['criteria'] == 'any':
-            sql_query += " OR day_of_week IS NULL)"
-        else:
-            sql_query += ")"
+        sql_query += ')'    
 
-        # Extract divisional category and add it to SQL query
+        # Extract type category and add it to SQL query
+        filters['no_type'] = request.form['no_type']
         filters['divisional'] = request.form['divisional']
-        sql_query += " AND ("
-        
-        if filters['criteria'] == 'any':
-            if filters['divisional'] == 'true':
-                if game.divisional == True:
-                    sql_query += f" divisional=TRUE OR"
-                else:
-                    sql_query += f" divisional=FALSE OR"
-            sql_query += f" divisional IS NULL)"
-        else:
-            if filters['divisional'] == 'true':
-                if game.divisional == True:
-                    sql_query += f" divisional=TRUE)"
-                else:
-                    sql_query += f" divisional=FALSE)"
-            else:
-                sql_query += f" divisional IS NULL)"
+        sql_query += f" AND("
 
-        for key, value in request.form.items():
-            if 'spread' in key:
-                filters[key] = request.form[key]
+        # Filter by selected type categories
+        if filters['no_type'] == 'true':
+            sql_query += f" divisional IS NULL"
+        if filters['no_type'] == 'true' and filters['divisional'] == 'true':
+            sql_query += f" OR"
+        if filters['divisional'] == 'true':
+            if game.divisional == True:
+                sql_query += f" divisional=TRUE"
+            else:
+                sql_query += f" divisional=FALSE"
+        sql_query += ')'
 
         # Extract spread filters from request form
+        filters['no_spread'] = request.form['no_spread']
         for key, value in request.form.items():
-            if 'spread' in key:
+            if 'spread ' in key:
                 filters[key] = value
 
         # Add spread to SQL query
         sql_query += ' AND ('
-        spread_count = sum(1 for key, value in filters.items() if 'spread ' in key and value == 'true')
+        if filters['no_spread'] == 'true':
+            sql_query += " spread IS NULL OR"
         for key, value in filters.items():
             if 'spread ' in key and value == 'true':
                 sql_query += f" spread='{key[7:]}' OR "
-        if filters['criteria'] == 'any' or spread_count == 0:
-            sql_query += " spread IS NULL OR"
         sql_query += ' FALSE)'
 
-        # Extract spread filters from request form
+        # Extract total filters from request form
+        filters['no_total'] = request.form['no_total']
         for key, value in request.form.items():
-            if 'spread' in key:
+            if 'total ' in key:
                 filters[key] = value
 
-        # Add total to SQL query
+        # Add spread to SQL query
         sql_query += ' AND ('
-        total_count = sum(1 for key, value in filters.items() if 'total' in key and value == 'true')
+        if filters['no_total'] == 'true':
+            sql_query += " total IS NULL OR"
         for key, value in filters.items():
             if 'total ' in key and value == 'true':
                 sql_query += f" total='{key[6:]}' OR "
-        if filters['criteria'] == 'any' or total_count == 0:
-            sql_query += " total IS NULL OR"
         sql_query += ' FALSE)'
-
-        # TODO: Figure out why when "less than 4" is selected, nothing shows up, but when "less than 3" is selected, stuff shows up
 
         # Extract seasons and add them to SQL query
         filters['seasons'] = request.form['seasons']
@@ -259,21 +244,24 @@ def single_game(id):
         filters['over'] = 'true'
         filters['under'] = 'true'
 
+        filters['no_month'] = 'true'
         filters['game_month'] = 'true'
+        filters['no_day'] = 'true'
         filters['game_day'] = 'true'
+        filters['no_type'] = 'true'
         filters['divisional'] = 'true'
 
+        filters['no_spread'] = 'true'
         for i in range(1, 21):
             filters[f'spread {i} or more'] = 'true'
             filters[f'spread {i} or less'] = 'true'
             filters[f'spread {i}.0'] = 'true'
             filters[f'spread {i}.5'] = 'true'
 
+        filters['no_total'] = 'true'
         for i in range(30, 61, 5):
             filters[f'total {i} or more'] = 'true'
             filters[f'total {i} or less'] = 'true'
-
-        filters['criteria'] = 'any'
 
         filters['seasons'] = 'since 2006-2007'
 
