@@ -186,6 +186,7 @@
             <br>
             <!-- Spread -->
             <strong><label for="spread">Spread</label></strong>
+            <label><input type="checkbox" id="toggle-all-spread" checked> Select/Deselect All</label>
             <br>
             <!-- Spread Options -->
             <label><input type="checkbox" name="no_spread" value="true" {% if filters['no_spread'] == 'true' %} checked {% endif %}> No Spread</label>
@@ -209,10 +210,21 @@
                 <label><input type="checkbox" class="spread-options" name="{{ less_str }}" value="true" {% if filters[less_str] == 'true' %} checked {% endif %}> {{i}} or less</label>
                 <input type="hidden" name="{{ less_str }}" value="false">                
             {% endfor %}
-            <!-- Script that ensures at least the "No Spread" option will be checked -->
+            <!-- Script that ensures at least the "No Spread" option will be checked, select/deselect all -->
             <script>
-                const noSpreadCheckbox = document.querySelector('input[name="no_spread"]')
                 const spreadCheckboxes = document.querySelectorAll('.spread-options');
+                const toggleAllSpreadCheckbox = document.getElementById('toggle-all-spread');
+
+                function toggleAllSpreads() {
+                    const allChecked = toggleAllSpreadCheckbox.checked;
+                    spreadCheckboxes.forEach(checkbox => {
+                        checkbox.checked = allChecked;
+                    });
+                }
+
+                toggleAllSpreadCheckbox.addEventListener('change', toggleAllSpreads);
+
+                const noSpreadCheckbox = document.querySelector('input[name="no_spread"]')
             
                 function updateSpreadCheckboxes() {
                     let anyChecked = false;
@@ -236,6 +248,7 @@
             <br>
             <!-- Total -->
             <strong><label for="total">Total</label></strong>
+            <label><input type="checkbox" id="toggle-all-total" checked> Select/Deselect All</label>
             <br>
             <!-- Total Options -->
             <label><input type="checkbox" name="no_total" value="true" {% if filters['no_total'] == 'true' %} checked {% endif %}> No Total</label>
@@ -254,6 +267,41 @@
                 <label><input type="checkbox" class="total-options" name="{{ less_str }}" value="true" {% if filters[less_str] == 'true' %} checked {% endif %}> {{i}} or less</label>
                 <input type="hidden" name="{{ less_str }}" value="false">                
             {% endfor %}
+            <!-- Script that ensures at least the "No Total" option will be checked, select/deselect all -->
+            <script>
+                const totalCheckboxes = document.querySelectorAll('.total-options');
+                const toggleAllTotalCheckbox = document.getElementById('toggle-all-total');
+
+                function toggleAllTotals() {
+                    const allChecked = toggleAllTotalCheckbox.checked;
+                    totalCheckboxes.forEach(checkbox => {
+                        checkbox.checked = allChecked;
+                    });
+                }
+
+                toggleAllTotalCheckbox.addEventListener('change', toggleAllTotals);
+
+                const noTotalCheckbox = document.querySelector('input[name="no_total"]');
+            
+                function updateTotalCheckboxes() {
+                    let anyChecked = false;
+                    totalCheckboxes.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            anyChecked = true;
+                        }
+                    });
+                    if (!anyChecked) {
+                        noTotalCheckbox.checked = true;
+                    }
+                }
+            
+                noTotalCheckbox.addEventListener('change', updateTotalCheckboxes);
+                totalCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', updateTotalCheckboxes);
+                });
+            
+                updateTotalCheckboxes();
+            </script>
             <br>
             <!-- Seasons Included -->
             </strong><label for="seasons">Seasons Included</label></strong>
@@ -263,35 +311,6 @@
                     <option value="since {{ i }}-{{ i + 1 }}" {% if filters['seasons'] == season_str %} selected {% endif %}>since {{ i }}-{{ i + 1 }}</option>
                 {% endfor %}
             </select>
-            <!-- Script that ensures at least the "No Total" option will be checked -->
-            <script>
-                // Get references to the total checkboxes
-                const noTotalCheckbox = document.querySelector('input[name="no_total"]');
-                const totalCheckboxes = document.querySelectorAll('.total-options');
-            
-                // Function to check "No Total" if all total checkboxes are unchecked
-                function updateTotalCheckboxes() {
-                    let anyChecked = false;
-                    totalCheckboxes.forEach(checkbox => {
-                        if (checkbox.checked) {
-                            anyChecked = true;
-                        }
-                    });
-                    // If none of the checkboxes are checked, check the "No Total" checkbox
-                    if (!anyChecked) {
-                        noTotalCheckbox.checked = true;
-                    }
-                }
-            
-                // Add event listeners to the total checkboxes to monitor changes
-                noTotalCheckbox.addEventListener('change', updateTotalCheckboxes);
-                totalCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', updateTotalCheckboxes);
-                });
-            
-                // Call the function initially to set the initial state
-                updateTotalCheckboxes();
-            </script>
             <br>
             <!-- Total Games -->
             Total Games
