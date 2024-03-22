@@ -12,7 +12,7 @@ db_name = 'postgres'
 db_user = 'postgres'
 db_password = 'bangarang19'
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     # Connect to database
     conn = psycopg2.connect(database=db_name, 
@@ -28,10 +28,293 @@ def index():
     for row in rows:
         games[row[0]] = UpcomingGame(row[2], row[8], row[11], row[16], row[17], row[19], row[20], row[21], row[23], row[24], row[26])
     
+    sql_query = f"SELECT * FROM trends WHERE id IS NOT NULL"
+
+    filters = {}
+
+    if request.method == 'POST':
+        # Extract trend categories from POST form
+        filters['home'] = request.form['home']
+        filters['away'] = request.form['away']
+        filters['favorite'] = request.form['favorite']
+        filters['underdog'] = request.form['underdog']
+        filters['home favorite'] = request.form['home_favorite']
+        filters['away underdog'] = request.form['away_underdog']
+        filters['away favorite'] = request.form['away_favorite']
+        filters['home underdog'] = request.form['home_underdog']
+
+        # Add trend categories to SQL query
+        sql_query += ' AND ((('
+        for filter, value in filters.items():
+            if value == 'true':
+                if (filter == 'home' or filter == 'away' or filter == 'favorite' or filter == 'underdog'):
+                    sql_query += f" category LIKE '{filter} o%' OR category LIKE '{filter} a%' OR"
+                else:
+                    sql_query += f" category LIKE '%{filter}%' OR"
+        sql_query += ' FALSE)'
+
+        # Extract betting categories from POST form
+        filters['ats'] = request.form['ats']
+        filters['outright'] = request.form['outright']
+
+        # Add betting categories to SQL query
+        sql_query += ' AND ('
+        for filter, value in filters.items():
+            if (filter == 'ats' or filter == 'outright') and value == 'true':
+                sql_query += f" category LIKE '%{filter}%' OR"
+        sql_query += ' FALSE))'
+
+        # Extract over/under categories from POST form
+        filters['over'] = request.form['over']
+        filters['under'] = request.form['under']
+
+        # Add over/under categories to SQL query
+        sql_query += ' OR ('
+        if filters['over'] == 'true':
+            sql_query += f" category = 'over' OR"
+        if filters['under'] == 'true':
+            sql_query += f" category = 'under' OR"
+        sql_query += ' FALSE))'
+
+        # Extract month categories and add them to SQL query
+        filters['no_month'] = request.form['no_month']
+        months = ['January', 'February', 'September', 'October', 'November', 'December']
+        selected_months = []
+        for month in months:
+            filters[month.lower()] = request.form[month.lower()]
+            if filters[month.lower()] == 'true':
+                selected_months.append(f"'{month}'")
+        sql_query += f" AND ("
+
+        month_list = ','.join(selected_months)
+
+        # Filter by selected month categories
+        if filters['no_month'] == 'true':
+            sql_query += f" month IS NULL"
+        if filters['no_month'] == 'true' and len(selected_months) > 0:
+            sql_query += f" OR"
+        if len(selected_months) > 0:
+            sql_query += f" (month IN ({month_list}))"
+        sql_query += ')'
+
+        # Extract day categories and add them to SQL query
+        filters['no_day'] = request.form['no_day']
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        selected_days = []
+        for day in days:
+            filters[day.lower()] = request.form[day.lower()]
+            if filters[day.lower()] == 'true':
+                selected_days.append(f"'{day}'")
+        sql_query += f" AND ("
+
+        day_list = ','.join(selected_days)
+
+        # Filter by selected day categories
+        if filters['no_day'] == 'true':
+            sql_query += f" day_of_week IS NULL"
+        if filters['no_day'] == 'true' and len(selected_days) > 0:
+            sql_query += f" OR"
+        if len(selected_days) > 0:
+            sql_query += f" (day_of_week IN ({day_list}))"
+        sql_query += ')'
+
+        # Extract type categories and add them to SQL query
+        filters['no_type'] = request.form['no_type']
+        filters['divisional'] = request.form['divisional']
+        filters['non_divisional'] = request.form['non_divisional']
+        sql_query += f" AND ("
+
+        # Filter by selected type categories
+        if filters['no_type'] == 'true':
+            sql_query += f" divisional IS NULL"
+        if filters['no_type'] == 'true' and filters['divisional'] == 'true':
+            sql_query += f" OR"
+        if filters['divisional'] == 'true':
+            sql_query += f" divisional=TRUE"
+        if filters['no_type'] == 'true' and filters['non_divisional'] == 'true':
+            sql_query += f" OR"
+        if filters['non_divisional'] == 'true':
+            sql_query += f" divisional=FALSE"
+        sql_query += ')'
+
+        # Extract spread categories and add them to SQL query
+        filters['no_spread'] = request.form['no_spread']
+        spreads = []
+        for i in range(1, 15):
+            spreads.append(f'spread {i} or more')
+            spreads.append(f'spread {i} or less')
+            spreads.append(f'spread {i}.0')
+            spreads.append(f'spread {i}.5')
+
+        selected_spreads = []
+        for spread in spreads:
+            filters[spread] = request.form[spread]
+            if filters[spread] == 'true':
+                selected_spreads.append(f"'{spread[7:]}'")
+        sql_query += f" AND ("
+
+        spread_list = ','.join(selected_spreads)
+
+        # Filter by selected spread categories
+        if filters['no_spread'] == 'true':
+            sql_query += f" spread IS NULL"
+        if filters['no_spread'] == 'true' and len(selected_spreads) > 0:
+            sql_query += f" OR"
+        if len(selected_spreads) > 0:
+            sql_query += f" (spread IN ({spread_list}))"
+        sql_query += ')'
+
+        # Extract total categories and add them to SQL query
+        filters['no_total'] = request.form['no_total']
+        totals = []
+        for i in range(30, 61, 5):
+            totals.append(f'total {i} or more')
+            totals.append(f'total {i} or less')
+
+        selected_totals = []
+        for total in totals:
+            filters[total] = request.form[total]
+            if filters[total] == 'true':
+                selected_totals.append(f"'{total[6:]}'")
+        sql_query += f" AND ("
+
+        total_list = ','.join(selected_totals)
+
+        # Filter by selected total categories
+        if filters['no_total'] == 'true':
+            sql_query += f" total IS NULL"
+        if filters['no_total'] == 'true' and len(selected_totals) > 0:
+            sql_query += f" OR"
+        if len(selected_totals) > 0:
+            sql_query += f" (total IN ({total_list}))"
+        sql_query += ')'
+
+        # Extract seasons and add them to SQL query
+        filters['seasons'] = request.form['seasons']
+        if filters['seasons'] != 'since 2006-2007':
+            seasons_included = []
+            season_selected = filters['seasons'][6:]
+            for i in range(int(season_selected[:4]), 2024):
+                seasons_included.append(f"'since {i}-{i + 1}'")
+            sql_query += f" AND seasons IN ({','.join(seasons_included)})"
+
+        # Extract total games filtering method and add it to SQL query
+        filters['gle_total_games'] = request.form['gle-total-games']
+        filters['total_games'] = request.form['total-games']
+        sql_query += ' AND total_games'
+        if filters['gle_total_games'] == 'gt':
+            sql_query += ' >'
+        elif filters['gle_total_games'] == 'gte':
+            sql_query += ' >='
+        elif filters['gle_total_games'] == 'eq':
+            sql_query += ' ='
+        elif filters['gle_total_games'] == 'lte':
+            sql_query += ' <='
+        elif filters['gle_total_games'] == 'lt':
+            sql_query += ' <'    
+        sql_query += f" {filters['total_games']}"
+
+        # Extract win pct filtering method and add it to SQL query
+        filters['gle_win_pct'] = request.form['gle-win-pct']
+        filters['win_pct'] = request.form['win-pct']
+        sql_query += ' AND win_percentage'
+        if filters['gle_win_pct'] == 'gt':
+            sql_query += ' >'
+        elif filters['gle_win_pct'] == 'gte':
+            sql_query += ' >='
+        elif filters['gle_win_pct'] == 'eq':
+            sql_query += ' ='
+        elif filters['gle_win_pct'] == 'lte':
+            sql_query += ' <='
+        elif filters['gle_win_pct'] == 'lt':
+            sql_query += ' <'     
+        sql_query += f" {filters['win_pct']}"
+
+        filters['first_sort_category'] = request.form['first-sort-category']
+        filters['first_sort_order'] = request.form['first-sort-order']
+        filters['second_sort_category'] = request.form['second-sort-category']
+        filters['second_sort_order'] = request.form['second-sort-order']
+
+        filters['max_results'] = request.form['max_results']
+
+    else:
+        filters['home'] = 'true'
+        filters['away'] = 'true'
+        filters['favorite'] = 'true'
+        filters['underdog'] = 'true'
+        filters['home favorite'] = 'true'
+        filters['away underdog'] = 'true'
+        filters['away favorite'] = 'true'
+        filters['home underdog'] = 'true'
+
+        filters['ats'] = 'true'
+        filters['outright'] = 'true'
+
+        filters['over'] = 'true'
+        filters['under'] = 'true'
+
+        filters['no_month'] = 'true'
+        months = ['January', 'February', 'September', 'October', 'November', 'December']
+        for month in months:
+            filters[month.lower()] = 'true'
+
+        filters['no_day'] = 'true'
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        for day in days:
+            filters[day.lower()] = 'true'
+
+        filters['no_type'] = 'true'
+        filters['divisional'] = 'true'
+        filters['non_divisional'] = 'true'
+
+        filters['no_spread'] = 'true'
+        for i in range(1, 15):
+            filters[f'spread {i} or more'] = 'true'
+            filters[f'spread {i} or less'] = 'true'
+            filters[f'spread {i}.0'] = 'true'
+            filters[f'spread {i}.5'] = 'true'
+
+        filters['no_total'] = 'true'
+        for i in range(30, 61, 5):
+            filters[f'total {i} or more'] = 'true'
+            filters[f'total {i} or less'] = 'true'
+
+        filters['seasons'] = 'since 2006-2007'
+
+        filters['gle_total_games'] = 'gt'
+        filters['total_games'] = '0'
+        filters['gle_win_pct'] = 'gt'
+        filters['win_pct'] = '0'
+
+        filters['first_sort_category'] = 'win_percentage'
+        filters['first_sort_order'] = 'desc'
+        filters['second_sort_category'] = 'total_games'
+        filters['second_sort_order'] = 'desc'
+
+        filters['max_results'] = '50'
+
+    print(sql_query)
+
+    # Add sorting methods and max results to SQL query
+    sql_query += f" ORDER BY {filters['first_sort_category']} {filters['first_sort_order']}, {filters['second_sort_category']} {filters['second_sort_order']}"
+    sql_query += f" LIMIT {filters['max_results']}"
+
+    cur.execute(sql_query)
+    trend_rows = cur.fetchall()
+
+    trends = []
+    trends_descriptions = []
+    for row in trend_rows:
+        trends.append(Trend(row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13]))
+    
+    # Get descriptions for all trends for a game
+    for trend in trends:
+        trends_descriptions.append(trend.get_description())
+
     cur.close()
     conn.close()
 
-    return render_template('index.html', games=games)
+    return render_template('index.html', games=games, trends=trends, trends_descriptions=trends_descriptions, filters=filters)
 
 @app.route('/<id>', methods=['GET', 'POST'])
 def single_game(id):
