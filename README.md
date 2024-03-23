@@ -35,17 +35,17 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-3. Install the required dependencies by running:
+4. Install the required dependencies by running:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Set up the database schema by executing:
+5. Set up the database schema by executing:
 ```bash
 python db.py
 ```
 
-5. Launch the Flask application:
+6. Launch the Flask application:
 ```bash
 python app.py
 ```
