@@ -29,6 +29,12 @@ git clone https://github.com/your_username/nfl-betting-trends.git
 cd nfl-betting-trends
 ```
 
+3. Create and activate a python virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
 3. Install the required dependencies by running:
 ```bash
 pip install -r requirements.txt
