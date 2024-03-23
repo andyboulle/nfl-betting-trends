@@ -40,14 +40,14 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5. Set up the database schema by executing:
+5. Set up the database schema by executing (takes a long time. ~12 hours):
 ```bash
-python db.py
+python src/db.py
 ```
 
 6. Launch the Flask application:
 ```bash
-python app.py
+python src/app.py
 ```
 Access the web application through your preferred web browser at http://localhost:5000.
 
