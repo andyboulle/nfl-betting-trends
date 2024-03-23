@@ -6,12 +6,12 @@ It includes methods for formatting DataFrames, creating database tables, process
 inserting game data into the database, and executing the data processing pipeline.
 
 Functions:
-- format_dataframe(df): Format the DataFrame containing game data.
+- format_dataframe(dataframe): Format the DataFrame containing game data.
 - make_games_table(cur, conn): Create the 'games' table in the database.
 - make_trends_table(cur, conn): Create the 'trends' table in the database.
 - process_game_trends(game_trends, trends_dict, game): Process game trends 
   and update trends dictionary.
-- process_game_rows(cur, conn, df): Process game rows and insert data into the database.
+- process_game_rows(cur, conn, dataframe): Process game rows and insert data into the database.
 
 Execution:
 The module also contains execution code to read game data from an Excel file, 
@@ -54,30 +54,30 @@ from models.game import Game
 ### DATAFRAME METHODS ###
 #########################
 
-def format_dataframe(df):
+def format_dataframe(dataframe):
     """
     Format the DataFrame containing game data.
 
     Args:
-    - df (pd.DataFrame): DataFrame containing game data.
+    - dataframe (pd.DataFrame): DataFrame containing game data.
 
     Returns:
     - pd.DataFrame: Formatted DataFrame.
     """
 
     # Change date entered from date object to just "YYYY-MM-DD" format
-    df['Date'] = df['Date'].astype(str).str[:10]
+    dataframe['Date'] = dataframe['Date'].astype(str).str[:10]
 
     # Reverse dataframe so oldest game is indexed first
-    df = df.iloc[::-1].reset_index(drop=True)
+    dataframe = dataframe.iloc[::-1].reset_index(drop=True)
 
     # If 'Home Line Close' and 'Away Line Close' are empty, replace them
     # with 'Home Line Open' and 'Home Line Open * -1'
-    df['Home Line Close'].fillna(df['Home Line Open'], inplace=True)
-    df['Total Score Close'].fillna(df['Total Score Open'], inplace=True)
+    dataframe['Home Line Close'].fillna(dataframe['Home Line Open'], inplace=True)
+    dataframe['Total Score Close'].fillna(dataframe['Total Score Open'], inplace=True)
 
     # Delete unnecessary columns
-    df.drop(columns=[
+    dataframe.drop(columns=[
         # Don't need any moneyline odds columns
         'Home Odds Open', 'Home Odds Min', 'Home Odds Max', 'Home Odds Close',
         'Away Odds Open', 'Away Odds Min', 'Away Odds Max', 'Away Odds Close',
@@ -104,15 +104,15 @@ def format_dataframe(df):
     ], inplace = True)
 
     # Replace
-    df.rename(columns={
+    dataframe.rename(columns={
         'Home Line Close': 'Home Spread', 
         'Total Score Close': 'Total',
         'Neutral Venue?': 'Neutral Venue'
     }, inplace=True)
 
     # Replace Y and N (or NaN) with True and False
-    df.fillna(False, inplace=True)
-    df.replace('Y', True, inplace=True)
+    dataframe.fillna(False, inplace=True)
+    dataframe.replace('Y', True, inplace=True)
 
     # Keep team names and locations consistent
     name_change_dict = {
@@ -123,12 +123,12 @@ def format_dataframe(df):
     }
 
     for key, value in name_change_dict.items():
-        home_mask = df['Home Team'].str.contains(key)
-        away_mask = df['Away Team'].str.contains(key)
-        df.loc[home_mask, 'Home Team'] = value
-        df.loc[away_mask, 'Away Team'] = value
+        home_mask = dataframe['Home Team'].str.contains(key)
+        away_mask = dataframe['Away Team'].str.contains(key)
+        dataframe.loc[home_mask, 'Home Team'] = value
+        dataframe.loc[away_mask, 'Away Team'] = value
 
-    return df
+    return dataframe
 
 ########################
 ### DATABASE METHODS ###
@@ -257,14 +257,14 @@ def process_game_trends(game_trends, trends_dict, game):
             trend_to_update = trends_dict[trend.id]
         trend_to_update.update_record(game)
 
-def process_game_rows(cur, conn, df):
+def process_game_rows(cur, conn, dataframe):
     """
     Process game rows and insert data into the database.
 
     Args:
     - cur (psycopg2.extensions.cursor): Database cursor.
     - conn (psycopg2.extensions.connection): Database connection.
-    - df (pd.DataFrame): DataFrame containing game data.
+    - dataframe (pd.DataFrame): DataFrame containing game data.
 
     Returns:
     - None
@@ -273,7 +273,7 @@ def process_game_rows(cur, conn, df):
     trends = {}
     games = []
 
-    for _, row in df.iterrows():
+    for _, row in dataframe.iterrows():
         game = Game(
             row['Date'],
             row['Home Team'], row['Away Team'],
