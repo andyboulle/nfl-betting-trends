@@ -251,10 +251,10 @@ def process_game_trends(game_trends, trends_dict, game):
     """
 
     for trend in game_trends:
-        trend_to_update = trends_dict.get(trend.id)
+        trend_to_update = trends_dict.get(trend.trend_id)
         if trend_to_update is None:
-            trends_dict[trend.id] = trend
-            trend_to_update = trends_dict[trend.id]
+            trends_dict[trend.trend_id] = trend
+            trend_to_update = trends_dict[trend.trend_id]
         trend_to_update.update_record(game)
 
 def process_game_rows(cur, conn, dataframe):
@@ -293,12 +293,12 @@ def process_game_rows(cur, conn, dataframe):
     '''
     sql_games_insert = '''
         INSERT INTO games VALUES (
-            %(id)s, %(id_string)s, %(date)s, %(month)s, %(day)s, %(year)s, %(season)s, 
+            %(game_id)s, %(id_string)s, %(date)s, %(month)s, %(day)s, %(year)s, %(season)s, 
             %(day_of_week)s, %(home_team)s, %(home_abbreviation)s, %(home_division)s, 
             %(away_team)s, %(away_abbreviation)s, %(away_division)s, %(divisional)s, %(home_score)s, 
             %(away_score)s, %(combined_score)s, %(tie)s, %(winner)s, %(loser)s, %(spread)s, 
             %(home_spread)s, %(home_spread_result)s, %(away_spread)s, %(away_spread_result)s, 
-            %(spread_push)s, %(pk)s, %(total)s, %(total_push)s, %(home_favorite)s, %(away_underdog)s, 
+            %(spread_push)s, %(pickem)s, %(total)s, %(total_push)s, %(home_favorite)s, %(away_underdog)s, 
             %(away_favorite)s, %(home_underdog)s, %(home_win)s, %(away_win)s, %(favorite_win)s, 
             %(underdog_win)s, %(home_favorite_win)s, %(away_underdog_win)s, %(away_favorite_win)s, 
             %(home_underdog_win)s, %(home_cover)s, %(away_cover)s, %(favorite_cover)s, 

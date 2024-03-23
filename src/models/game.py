@@ -7,7 +7,7 @@ including game information, team information, score information, betting informa
 win results, cover results, total results, and trends.
 
 Attributes:
-    - id: A unique identifier for the game.
+    - game_id: A unique identifier for the game.
     - id_string: A string representation of the game identifier.
     - date: The date of the game.
     - month: The month of the game.
@@ -34,7 +34,7 @@ Attributes:
     - away_spread_result: The result of the spread for the away team.
     - spread_push: Indicates whether the spread resulted in a push.
     - spread: The maximum spread value.
-    - pk: Indicates whether the spread is zero.
+    - pickem: Indicates whether the spread is zero.
     - total: The total score for betting purposes.
     - total_push: Indicates whether the total resulted in a push.
     - home_favorite: Indicates whether the home team is the favorite.
@@ -84,7 +84,7 @@ class Game:
     """
 
     # How the game will be selected from database
-    id = None
+    game_id = None
     id_string = None
 
     # Game info
@@ -119,7 +119,7 @@ class Game:
     away_spread_result = None
     spread_push = None
     spread = None
-    pk = None
+    pickem = None
     total = None
     total_push = None
 
@@ -211,7 +211,7 @@ class Game:
         self.away_spread_result = home_score - away_score
         self.spread_push = self.home_spread_result == self.home_spread
         self.spread = max(self.home_spread, self.away_spread)
-        self.pk = self.spread == 0.0
+        self.pickem = self.spread == 0.0
         self.total = total
         self.total_push = self.total == self.combined_score
 
@@ -249,8 +249,11 @@ class Game:
         self.under_hit = self.combined_score < self.total
 
         # Id info
-        self.id_string = f"{self.home_abbreviation}{self.away_abbreviation}{self.year}{str(date.split('-')[1]).zfill(2)}{self.day}"
-        self.id = hashlib.sha256(self.id_string.encode()).hexdigest()
+        self.id_string = (
+            f"{self.home_abbreviation}{self.away_abbreviation}{self.year}"
+            f"{str(date.split('-')[1]).zfill(2)}{self.day}"
+        )
+        self.game_id = hashlib.sha256(self.id_string.encode()).hexdigest()
 
         if trends_indicator:
             self.trends = self.get_trends(self.month, self.day_of_week,
@@ -301,7 +304,7 @@ class Game:
             'over', 'under'
         ]
 
-        if not self.pk:
+        if not self.pickem:
             categories.extend(['favorite outright', 'underdog outright',
                                 'favorite ats', 'underdog ats'])
             categories.extend(
@@ -439,7 +442,7 @@ class Game:
         """
 
         values = (
-            self.id,
+            self.game_id,
             self.id_string,
             self.date,
             self.month,
@@ -466,7 +469,7 @@ class Game:
             float(self.away_spread),
             int(self.away_spread_result),
             self.spread_push,
-            self.pk,
+            self.pickem,
             float(self.total),
             self.total_push,
             self.home_favorite,
@@ -507,8 +510,8 @@ class Game:
             returner += f'{key}: '
             if isinstance(value, dict):
                 returner += ' {\n'
-                for k, v in value.items():
-                    returner += f'    {k}: {v}\n'
+                for key2, value2 in value.items():
+                    returner += f'    {key2}: {value2}\n'
                 returner += '}\n'
             elif isinstance(value, list):
                 returner += ' [\n'

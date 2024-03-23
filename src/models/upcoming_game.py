@@ -46,7 +46,7 @@ class UpcomingGame:
     Represents an upcoming game with its attributes and methods.
 
     Attributes:
-    - id: The unique identifier for the game.
+    - game_id: The unique identifier for the game.
     - id_string: A string representation of the game's identifier.
     - date: The date of the game.
     - month: The month of the game date.
@@ -83,7 +83,7 @@ class UpcomingGame:
     - __str__: Returns a string representation of the UpcomingGame object.
     """
 
-    id = None
+    game_id = None
     id_string = None
 
     # Game info
@@ -184,8 +184,11 @@ class UpcomingGame:
         self.under_odds = under_odds
 
         # Id info
-        self.id_string = f"{self.home_abbreviation}{self.away_abbreviation}{self.year}{str(date.split('-')[1]).zfill(2)}{self.day}"
-        self.id = hashlib.sha256(self.id_string.encode()).hexdigest()
+        self.id_string = (
+            f"{self.home_abbreviation}{self.away_abbreviation}{self.year}"
+            f"{str(date.split('-')[1]).zfill(2)}{self.day}"
+        )
+        self.game_id = hashlib.sha256(self.id_string.encode()).hexdigest()
 
         if trends_indicator:
             self.trends = self.get_trends(self.month, self.day_of_week, \
@@ -287,7 +290,7 @@ class UpcomingGame:
         """
 
         values = (
-            self.id,
+            self.game_id,
             self.id_string,
             self.date,
             self.month,
@@ -330,8 +333,8 @@ class UpcomingGame:
             returner += f'{key}: '
             if isinstance(value, dict):
                 returner += ' {\n'
-                for k, v in value.items():
-                    returner += f'    {k}: {v}\n'
+                for key2, value2 in value.items():
+                    returner += f'    {key2}: {value2}\n'
                 returner += '}\n'
             elif isinstance(value, list):
                 returner += ' [\n'
