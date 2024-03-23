@@ -1,20 +1,78 @@
+"""
+Module: db.py
+
+This module contains functions for processing game data and storing it in a PostgreSQL database. 
+It includes methods for formatting DataFrames, creating database tables, processing game trends, 
+inserting game data into the database, and executing the data processing pipeline.
+
+Functions:
+- format_dataframe(df): Format the DataFrame containing game data.
+- make_games_table(cur, conn): Create the 'games' table in the database.
+- make_trends_table(cur, conn): Create the 'trends' table in the database.
+- process_game_trends(game_trends, trends_dict, game): Process game trends 
+  and update trends dictionary.
+- process_game_rows(cur, conn, df): Process game rows and insert data into the database.
+
+Execution:
+The module also contains execution code to read game data from an Excel file, 
+connect to a PostgreSQL database, create necessary tables, process game data, 
+and store it in the database.
+
+Usage:
+To use this module, import it into your Python script and call the necessary functions.
+
+Example:
+    import pandas as pd
+    from data_processing import format_dataframe, make_games_table,
+      make_trends_table, process_game_rows
+
+    # Read game data from Excel file
+    data = pd.read_excel('datafiles/nfl.xlsx')
+
+    # Format the DataFrame
+    data = format_dataframe(data)
+
+    # Connect to PostgreSQL database
+    # (Assuming the database parameters are properly configured)
+
+    # Create 'games' table
+    make_games_table(cursor, connection)
+
+    # Create 'trends' table
+    make_trends_table(cursor, connection)
+
+    # Process game rows and insert data into the database
+    process_game_rows(cursor, connection, data)
+"""
+
 import time
 import psycopg2
 import pandas as pd
-from src.models.game import Game
+from models.game import Game
 
 #########################
 ### DATAFRAME METHODS ###
 #########################
 
 def format_dataframe(df):
+    """
+    Format the DataFrame containing game data.
+
+    Args:
+    - df (pd.DataFrame): DataFrame containing game data.
+
+    Returns:
+    - pd.DataFrame: Formatted DataFrame.
+    """
+
     # Change date entered from date object to just "YYYY-MM-DD" format
     df['Date'] = df['Date'].astype(str).str[:10]
 
     # Reverse dataframe so oldest game is indexed first
     df = df.iloc[::-1].reset_index(drop=True)
 
-    # If 'Home Line Close' and 'Away Line Close' are empty, replace them with 'Home Line Open' and 'Home Line Open * -1'
+    # If 'Home Line Close' and 'Away Line Close' are empty, replace them
+    # with 'Home Line Open' and 'Home Line Open * -1'
     df['Home Line Close'].fillna(df['Home Line Open'], inplace=True)
     df['Total Score Close'].fillna(df['Total Score Open'], inplace=True)
 
@@ -36,14 +94,16 @@ def format_dataframe(df):
         'Total Score Open', 'Total Score Min', 'Total Score Max',
 
         # Don't need any total score odds columns
-        'Total Score Over Open', 'Total Score Over Min', 'Total Score Over Max', 'Total Score Over Close',
-        'Total Score Under Open', 'Total Score Under Min', 'Total Score Under Max', 'Total Score Under Close',
+        'Total Score Over Open', 'Total Score Over Min',
+        'Total Score Over Max', 'Total Score Over Close',
+        'Total Score Under Open', 'Total Score Under Min',
+        'Total Score Under Max', 'Total Score Under Close',
 
         # Don't need overtime, neutral venue, or notes
         'Overtime?', 'Neutral Venue?', 'Playoff Game?', 'Notes'
     ], inplace = True)
 
-    # Replace 
+    # Replace
     df.rename(columns={
         'Home Line Close': 'Home Spread', 
         'Total Score Close': 'Total',
@@ -74,7 +134,15 @@ def format_dataframe(df):
 ### DATABASE METHODS ###
 ########################
 
-def make_games_table(cur):
+def make_games_table(cur, conn):
+    """
+    Create the 'games' table in the database.
+
+    Args:
+    - cur (psycopg2.extensions.cursor): Database cursor.
+    - conn (psycopg2.extensions.connection): Database connection.
+    """
+
     cur.execute('''
        DROP TABLE IF EXISTS games         
     ''')
@@ -137,7 +205,15 @@ def make_games_table(cur):
     ''')
     conn.commit()
 
-def make_trends_table(cur):
+def make_trends_table(cur, conn):
+    """
+    Create the 'trends' table in the database.
+
+    Args:
+    - cur (psycopg2.extensions.cursor): Database cursor.
+    - conn (psycopg2.extensions.connection): Database connection.
+    """
+
     cur.execute('''
        DROP TABLE IF EXISTS trends         
     ''')
@@ -162,6 +238,18 @@ def make_trends_table(cur):
     conn.commit()
 
 def process_game_trends(game_trends, trends_dict, game):
+    """
+    Process game trends and update trends dictionary.
+
+    Args:
+    - game_trends (list): List of trend objects for the game.
+    - trends_dict (dict): Dictionary to store trends.
+    - game (Game): Game object.
+
+    Returns:
+    - None
+    """
+
     for trend in game_trends:
         trend_to_update = trends_dict.get(trend.id)
         if trend_to_update is None:
@@ -169,13 +257,25 @@ def process_game_trends(game_trends, trends_dict, game):
             trend_to_update = trends_dict[trend.id]
         trend_to_update.update_record(game)
 
-def process_game_rows(cur, df):
+def process_game_rows(cur, conn, df):
+    """
+    Process game rows and insert data into the database.
+
+    Args:
+    - cur (psycopg2.extensions.cursor): Database cursor.
+    - conn (psycopg2.extensions.connection): Database connection.
+    - df (pd.DataFrame): DataFrame containing game data.
+
+    Returns:
+    - None
+    """
+
     trends = {}
     games = []
 
     for _, row in df.iterrows():
         game = Game(
-            row['Date'],  
+            row['Date'],
             row['Home Team'], row['Away Team'],
             row['Home Score'], row['Away Score'],
             row['Home Spread'],
@@ -217,26 +317,26 @@ def process_game_rows(cur, df):
 #################
 
 start_time = time.time()
-df = pd.read_excel('datafiles/nfl.xlsx')
-df = format_dataframe(df)
+data = pd.read_excel('datafiles/nfl.xlsx')
+data = format_dataframe(data)
 
 # Connect to sql database
-conn = psycopg2.connect(
+connection = psycopg2.connect(
     host = 'localhost',
     dbname = 'postgres',
     user = 'postgres',
     password = 'pass',
     port = 5432
 )
-cur = conn.cursor()
+cursor = connection.cursor()
 
-make_games_table(cur)
-make_trends_table(cur)
-process_game_rows(cur, df)
+make_games_table(cursor, connection)
+make_trends_table(cursor, connection)
+process_game_rows(cursor, connection, data)
 
-conn.commit()
-cur.close()
-conn.close()
+connection.commit()
+cursor.close()
+connection.close()
 
 end_time = time.time()
 print(f'TOTAL TIME: {end_time - start_time}\n')

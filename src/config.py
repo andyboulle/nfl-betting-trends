@@ -1,5 +1,9 @@
+"""
+This module contains configuration settings for the application.
+"""
+
 OLDEST_SEASON = '2006-2007'
-CURRENT_SEASON = '2023-2024'
+CURRENT_SEASON = '2024-2025'
 
 MAX_SPREAD = 14
 MAX_TOTAL = 60
@@ -52,12 +56,12 @@ ABBREVIATIONS = {
 }
 
 DIVISIONS = {
-    "AFC EAST": ['New York Jets', 'Miami Dolphins', 'New England Patriots', 'Buffalo Bills'],
-    "AFC NORTH": ['Baltimore Ravens', 'Pittsburgh Steelers', 'Cincinnati Bengals', 'Cleveland Browns'],
-    "AFC WEST": ['Kansas City Chiefs', 'Denver Broncos', 'Los Angeles Chargers', 'Las Vegas Raiders'],
-    "AFC SOUTH": ['Jacksonville Jaguars', 'Indianapolis Colts', 'Tennessee Titans', 'Houston Texans'],
-    "NFC EAST": ['Washington Commanders', 'Philadelphia Eagles', 'Dallas Cowboys', 'New York Giants'],
-    "NFC NORTH": ['Detroit Lions', 'Green Bay Packers', 'Minnesota Vikings', 'Chicago Bears'],
-    "NFC WEST": ['San Francisco 49ers', 'Seattle Seahawks', 'Arizona Cardinals', 'Los Angeles Rams'],
-    "NFC SOUTH": ['New Orleans Saints', 'Atlanta Falcons', 'Carolina Panthers', 'Tampa Bay Buccaneers']
+    "AFC EAST": ['New York Jets','Miami Dolphins','New England Patriots','Buffalo Bills'],
+    "AFC NORTH": ['Baltimore Ravens','Pittsburgh Steelers','Cincinnati Bengals','Cleveland Browns'],
+    "AFC WEST": ['Kansas City Chiefs','Denver Broncos','Los Angeles Chargers','Las Vegas Raiders'],
+    "AFC SOUTH": ['Jacksonville Jaguars','Indianapolis Colts','Tennessee Titans','Houston Texans'],
+    "NFC EAST": ['Washington Commanders','Philadelphia Eagles','Dallas Cowboys','New York Giants'],
+    "NFC NORTH": ['Detroit Lions','Green Bay Packers','Minnesota Vikings','Chicago Bears'],
+    "NFC WEST": ['San Francisco 49ers','Seattle Seahawks','Arizona Cardinals','Los Angeles Rams'],
+    "NFC SOUTH": ['New Orleans Saints','Atlanta Falcons','Carolina Panthers','Tampa Bay Buccaneers']
 }
