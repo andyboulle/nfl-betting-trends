@@ -69,7 +69,7 @@
     <!-- Filters -->
     <div class="filters">
         <h3>Filters</h3>
-        <form action="/{{ game.id }}" method="POST">
+        <form action="/{{ game.game_id }}" method="POST">
             <!-- Specific Trend Categories -->
             <strong>Specific Trend Categories</strong><br>
             <!-- Home/Away -->
@@ -113,8 +113,8 @@
             <strong>Month<br></strong>
             <label><input type="checkbox" name="no_month" value="true" {% if filters['no_month'] == 'true' %} checked {% endif %}> No Month</label>
             <input type="hidden" name="no_month" value="false">
-            <label><input type="checkbox" name="game_month" value="true" {% if filters['game_month'] == 'true' %} checked {% endif %}> Games in {{ game.month }}</label>
-            <input type="hidden" name="game_month" value="false">
+            <label><input type="checkbox" name="{{ game.month.lower() }}" value="true" {% if filters[game.month.lower()] == 'true' %} checked {% endif %}> Games in {{ game.month }}</label>
+            <input type="hidden" name="{{ game.month.lower() }}" value="false">
             <!-- Script that ensures at least the "No Month" option will be checked -->
             <script>
                 const noMonthCheckbox = document.querySelector('input[name="no_month"]');
@@ -136,8 +136,8 @@
             <strong>Day<br></strong>
             <label><input type="checkbox" name="no_day" value="true" {% if filters['no_day'] == 'true' %} checked {% endif %}> No Day</label>
             <input type="hidden" name="no_day" value="false">
-            <label><input type="checkbox" name="game_day" value="true" {% if filters['game_day'] == 'true' %} checked {% endif %}> Games on {{ game.day_of_week }}s</label>
-            <input type="hidden" name="game_day" value="false">
+            <label><input type="checkbox" name="{{ game.day_of_week.lower() }}" value="true" {% if filters[game.day_of_week.lower()] == 'true' %} checked {% endif %}> Games on {{ game.day_of_week }}s</label>
+            <input type="hidden" name="{{ game.day_of_week.lower() }}" value="false">
             <!-- Script that ensures at least the "No Day" option will be checked -->
             <script>
                 const noDayCheckbox = document.querySelector('input[name="no_day"]');
@@ -157,31 +157,40 @@
             <br>
             <!-- Game Type -->
             <strong>Game Type<br></strong>
-            <label><input type="checkbox" name="no_type" value="true" {% if filters['no_type'] == 'true' %} checked {% endif %}> No Type</label>
+            <label><input type="checkbox" class="type-options" name="no_type" value="true" {% if filters['no_type'] == 'true' %} checked {% endif %}> No Type</label>
             <input type="hidden" name="no_type" value="false">
-            <input type="checkbox" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}>
-            <label for="divisional">Only
+            {% set divisional_str = 'divisional' if game.divisional else 'non_divisional' %}
+            <input type="checkbox" class="type-options" name="{{ divisional_str }}" value="true" {% if filters[divisional_str] == 'true' %} checked {% endif %}>
+            <label for="{{ divisional_str }}">Only
                 {% if game.divisional == False %}
                     Non
                 {% endif %}
                 Divisional Games
             </label>
-            <input type="hidden" name="divisional" value="false">
+            <input type="hidden" name="{{ divisional_str }}" value="false">
             <!-- Script that ensures at least the "No Type" option will be checked -->
             <script>
-                const noTypeCheckbox = document.querySelector('input[name="no_type"]');
-                const divisionalCheckbox = document.querySelector('input[name="divisional"]');
+                const typeCheckboxes = document.querySelectorAll('.type-options');
+                const noTypeCheckbox = document.querySelector('input[name="no_type"]')
             
-                function updateGameTypeCheckboxes() {
-                    if (!noTypeCheckbox.checked && !divisionalCheckbox.checked) {
-                        noTypeCheckbox.checked = true;
+                function updateTypeCheckboxes() {
+                    let anyChecked = false;
+                    typeCheckboxes.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            anyChecked = true;
+                        }
+                    });
+                    if (!anyChecked) {
+                        document.querySelector('input[name="no_type"]').checked = true;
                     }
                 }
             
-                noTypeCheckbox.addEventListener('change', updateGameTypeCheckboxes);
-                divisionalCheckbox.addEventListener('change', updateGameTypeCheckboxes);
-            
-                updateGameTypeCheckboxes();
+                noTypeCheckbox.addEventListener('change', updateTypeCheckboxes)
+                typeCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', updateTypeCheckboxes);
+                });
+
+                updateTypeCheckboxes();
             </script>
             <br>
             <!-- Spread -->

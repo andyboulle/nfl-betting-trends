@@ -9,7 +9,7 @@ Classes:
 - Trend: Represents a trend in sports betting.
 
 Attributes:
-- id: Unique identifier for the trend.
+- trend_id: Unique identifier for the trend.
 - category: Category of the trend, e.g., 'home outright', 'away ats'.
 - month: Month of the trend.
 - day_of_week: Day of the week of the trend.
@@ -42,7 +42,7 @@ class Trend:
     Class representing a trend in sports betting.
 
     Attributes:
-    - id (str): Unique identifier for the trend.
+    - trend_id (str): Unique identifier for the trend.
     - category (str): Category of the trend, e.g., 'home outright', 'away ats'.
     - month (str): Month of the trend.
     - day_of_week (str): Day of the week of the trend.
@@ -67,7 +67,7 @@ class Trend:
     - __str__: Returns a string representation of the trend.
     """
 
-    id = None
+    trend_id = None
 
     category = None
     month = None
@@ -114,7 +114,7 @@ class Trend:
 
         self.id_string = ','.join(map(str, [category, month, day_of_week,
                                              divisional, spread, total, seasons]))
-        self.id = hashlib.sha256(self.id_string.encode()).hexdigest()
+        self.trend_id = hashlib.sha256(self.id_string.encode()).hexdigest()
 
         self.wins = wins
         self.losses = losses
@@ -142,7 +142,7 @@ class Trend:
             else:
                 self.losses += 1
         elif self.category in ['favorite outright', 'underdog outright']:
-            if not game.pk:
+            if not game.pickem:
                 if game.tie:
                     self.pushes += 1
                 elif (self.category == 'favorite outright' and game.favorite_win) \
@@ -151,7 +151,7 @@ class Trend:
                 else:
                     self.losses += 1
         elif self.category in ['home favorite outright', 'away underdog outright']:
-            if not game.pk:
+            if not game.pickem:
                 if game.home_favorite:
                     if game.tie:
                         self.pushes += 1
@@ -161,7 +161,7 @@ class Trend:
                     else:
                         self.losses += 1
         elif self.category in ['away favorite outright', 'home underdog outright']:
-            if not game.pk:
+            if not game.pickem:
                 if game.away_favorite:
                     if game.tie:
                         self.pushes += 1
@@ -179,7 +179,7 @@ class Trend:
             else:
                 self.losses += 1
         elif self.category in ['favorite ats', 'underdog ats']:
-            if not game.pk:
+            if not game.pickem:
                 if game.spread_push:
                     self.pushes += 1
                 elif (self.category == 'favorite ats' and game.favorite_cover) \
@@ -188,7 +188,7 @@ class Trend:
                 else:
                     self.losses += 1
         elif self.category in ['home favorite ats', 'away underdog ats']:
-            if not game.pk:
+            if not game.pickem:
                 if game.home_favorite:
                     if game.spread_push:
                         self.pushes += 1
@@ -198,7 +198,7 @@ class Trend:
                     else:
                         self.losses += 1
         elif self.category in ['away favorite ats', 'home underdog ats']:
-            if not game.pk:
+            if not game.pickem:
                 if game.away_favorite:
                     if game.spread_push:
                         self.pushes += 1
@@ -316,7 +316,7 @@ class Trend:
         """
 
         values = (
-            self.id,
+            self.trend_id,
             self.id_string,
             self.category,
             self.month,
