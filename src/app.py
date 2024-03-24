@@ -30,7 +30,7 @@ DB_HOST = 'postgres'
 DB_PORT = "5432"
 DB_NAME = 'postgres'
 DB_USER = 'postgres'
-DB_PASSWORD = 'bangarang19'
+DB_PASSWORD = 'password'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -250,6 +250,7 @@ def get_default_filters():
         filters[f'total {i} or less'] = 'true'
 
     filters['seasons'] = 'since 2006-2007'
+    filters['season_type'] = 'all_seasons'
 
     filters['gle_total_games'] = 'gt'
     filters['total_games'] = '0'
@@ -567,11 +568,15 @@ def get_season_query(filters, req):
 
     # Extract seasons and add them to SQL query
     filters['seasons'] = req.form['seasons']
+    filters['season_type'] = req.form['season_type']
     if filters['seasons'] != 'since 2006-2007':
         seasons_included = []
         season_selected = filters['seasons'][6:]
-        for i in range(int(season_selected[:4]), 2024):
-            seasons_included.append(f"'since {i}-{i + 1}'")
+        if filters['season_type'] == 'selected_season':
+            seasons_included.append(f"'{filters['seasons']}'")
+        else:
+            for i in range(int(season_selected[:4]), 2024):
+                seasons_included.append(f"'since {i}-{i + 1}'")
         sql_query += f" AND seasons IN ({','.join(seasons_included)})"
 
     return sql_query

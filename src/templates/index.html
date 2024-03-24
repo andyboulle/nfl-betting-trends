@@ -9,6 +9,7 @@
 
 <div class="content">
     <a href="/"><h1>NFL Betting Trends</h1></a>
+    <p>Click on any game to see trends in similar games or scroll to the bottom of the page to filter trends in all games since 2006-2007.</p>
     <div class="games">
         {% for game_id, game in games.items() %}
         <a href="/{{ game_id }}">
@@ -389,6 +390,10 @@
                     <option value="since {{ i }}-{{ i + 1 }}" {% if filters['seasons'] == season_str %} selected {% endif %}>since {{ i }}-{{ i + 1 }}</option>
                 {% endfor %}
             </select>
+            <input type="radio" name="season_type" id="all_seasons" value="all_seasons" {% if filters['season_type'] == 'all_seasons' %} checked {% endif %}>
+            <label for="all_seasons">Include all seasons</label>
+            <input type="radio" name="season_type" id="selected_season" value="selected_season" {% if filters['season_type'] == 'selected_season' %} checked {% endif %}>
+            <label for="selected_season">Include just selected season</label>
             <br>
             <!-- Total Games -->
             Total Games
