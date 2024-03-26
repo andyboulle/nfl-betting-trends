@@ -84,8 +84,11 @@ class Trend:
     total_games = None
     win_pct = None
 
+    applicable_games = None
+
     def __init__(self, category, month, day_of_week, divisional, spread, total,
-                  seasons, wins=0, losses=0, pushes=0, total_games=0, win_pct=0):
+                  seasons, wins=0, losses=0, pushes=0, total_games=0, win_pct=0,
+                    applicable_games=None):
         """
         Initializes a Trend object with the given attributes.
 
@@ -121,6 +124,8 @@ class Trend:
         self.pushes = pushes
         self.total_games = total_games
         self.win_pct = win_pct
+
+        self.applicable_games = applicable_games
 
     def update_record(self, game):
         """
@@ -315,6 +320,25 @@ class Trend:
         - tuple: Tuple representation of the trend.
         """
 
+        if self.applicable_games is None:
+            values = (
+                self.trend_id,
+                self.id_string,
+                self.category,
+                self.month,
+                self.day_of_week,
+                self.divisional,
+                self.spread,
+                self.total,
+                self.seasons,
+                int(self.wins),
+                int(self.losses),
+                int(self.pushes),
+                int(self.total_games),
+                float(self.win_pct)
+            )
+            return values
+
         values = (
             self.trend_id,
             self.id_string,
@@ -329,7 +353,8 @@ class Trend:
             int(self.losses),
             int(self.pushes),
             int(self.total_games),
-            float(self.win_pct)
+            float(self.win_pct),
+            self.applicable_games
         )
         return values
 
