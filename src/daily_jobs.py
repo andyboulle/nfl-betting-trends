@@ -1,8 +1,12 @@
+# This file will run every night
+
+# Update each individual game table in the database
+# Update the weekly_trends database
+# Update the weekly_config file with updated unique values
+
+import psycopg2
 from models.upcoming_game import UpcomingGame
 import time
-import psycopg2
-
-# This file will run every night at 3:00 AM to update the database with the latest lines.
 
 total_start_time = time.time()
 print('Starting...')
@@ -202,6 +206,21 @@ for game in games:
     cur.executemany(insert_query, trend_tuples)
     conn.commit()
 
+    # Update individual game trends records to match records in trends table
+    update_query = f'''
+        UPDATE {game.id_string.lower()}
+        SET 
+            wins = trends.wins,
+            losses = trends.losses,
+            pushes = trends.pushes,
+            total_games = trends.total_games,
+            win_percentage = trends.win_percentage
+        FROM trends
+        WHERE {game.id_string.lower()}.id_string = trends.id_string;
+    '''
+    cur.execute(update_query)
+    conn.commit()
+
     # Insert trends into weekly_trends dictionary with updated applicable games
     for trend in game.trends:
         weekly_game_string = f'{game.home_abbreviation}vs{game.away_abbreviation}'
@@ -229,9 +248,79 @@ conn.commit()
 weekly_trends_end_time = time.time()
 print(f'Inserting weekly trends took {weekly_trends_end_time - weekly_trends_start_time}')
 
-# Close the cursor and the connection
-cur.close()
-conn.close()
+updating_trends_start_time = time.time()
+print('Updating weekly trends...')
+update_query = '''
+    UPDATE weekly_trends
+    SET 
+        wins = trends.wins,
+        losses = trends.losses,
+        pushes = trends.pushes,
+        total_games = trends.total_games,
+        win_percentage = trends.win_percentage
+    FROM trends
+    WHERE weekly_trends.id_string = trends.id_string;
+'''
+cur.execute(update_query)
+conn.commit()
+updating_trends_end_time = time.time()
+print(f'Updating weekly trends took {updating_trends_end_time - updating_trends_start_time}')
+
+##############################################################################
+# Update all_time_config with new unique values from the weekly_trends table #
+##############################################################################
+
+table = 'weekly_trends'
+columns = ['month', 'day_of_week', 'divisional', 'spread', 'total']
+unique_values = {}
+
+weekly_config_start_time = time.time()
+print(f'Updating unique weekly config values...')
+
+# Retrieve the unqiue elements from designated columns and add to dictionary
+for column in columns:
+    cur.execute(f'SELECT DISTINCT {column} FROM {table}')
+    unique_values[f'{column.upper()}S'] = [row[0] for row in cur.fetchall() if row[0] is not None]
+    if column == 'day_of_week':
+        # Sort columns in weekday order
+        unique_values[f'{column.upper()}S'] = sorted(unique_values[f'{column.upper()}S'], key=lambda x: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].index(x))
+    elif column == 'month':
+        # Sort columns in month order
+        unique_values[f'{column.upper()}S'] = sorted(unique_values[f'{column.upper()}S'], key=lambda x: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].index(x))
+    elif column == 'spread':
+        # Sort columns in the following order: exact values, "or more" values, "or less" values (by numeric value)
+        contains_or_more = []
+        contains_or_less = []
+        for value in unique_values[f'{column.upper()}S']:
+            if 'or more' in value:
+                contains_or_more.append(value)
+            elif 'or less' in value:
+                contains_or_less.append(value)
+        without_or_more_or_less = [value for value in unique_values[f'{column.upper()}S'] if 'or more' not in value and 'or less' not in value]
+        without_or_more_or_less.sort(key=lambda x: float(x))
+        contains_or_more.sort(key=lambda x: float(x.split(' ')[0]))
+        contains_or_less.sort(key=lambda x: float(x.split(' ')[0]))
+        unique_values[f'{column.upper()}S'] = without_or_more_or_less + contains_or_more + contains_or_less
+    elif column == 'total':
+        # Sort columns in the following order: exact values, "or more" values, "or less" values (by numeric value)
+        contains_or_more = []
+        contains_or_less = []
+        for value in unique_values[f'{column.upper()}S']:
+            if 'or more' in value:
+                contains_or_more.append(value)
+            elif 'or less' in value:
+                contains_or_less.append(value)
+        contains_or_more.sort(key=lambda x: float(x.split(' ')[0]))
+        contains_or_less.sort(key=lambda x: float(x.split(' ')[0]))
+        unique_values[f'{column.upper()}S'] = contains_or_more + contains_or_less
+
+# Write new unique weekly values to weekly_config file
+with open('src/config/weekly_config.py', 'w') as f:
+    for key, values in unique_values.items():
+        f.write(f'{key} = {values}\n')
+
+weekly_config_end_time = time.time()
+print(f'Updating unique weekly config values took {weekly_config_end_time - weekly_config_start_time}')
 
 total_end_time = time.time()
 print(f'Total time took {total_end_time - total_start_time}')

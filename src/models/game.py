@@ -76,7 +76,7 @@ import hashlib
 import itertools
 from datetime import datetime
 from models.trend import Trend
-import config
+import config.config as config
 
 class Game:
     """
