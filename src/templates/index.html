@@ -6,13 +6,19 @@
 {% endblock %}
 
 {% block body %}
-
 <div class="content">
+    <!----------------------------------------------->
+    <!--------------- Begin: HEADER ----------------->
+    <!----------------------------------------------->
     <a href="/"><h1>NFL Betting Trends</h1></a>
-    <p>Click on any game to see trends in similar games or scroll to the bottom of the page to filter trends in all games since 2006-2007.</p>
+    <p>Click on any game to see trends in similar games or scroll to the bottom of the page to filter trends from all the games this week or from all games since the 2006-2007 season.</p>
+    
+    <!----------------------------------------------->
+    <!--------------- Begin: GAMES ------------------>
+    <!----------------------------------------------->
     <div class="games">
-        {% for game_id, game in games.items() %}
-        <a href="/{{ game_id }}">
+        {% for id, game in games.items() %}
+        <a href="/{{ game.id_string }}">
             <table>
                 <tr>
                     <th>Date</th>
@@ -31,9 +37,9 @@
                     </td>
                     <td>
                         {% if game.away_moneyline_odds > 0 %}
-                            +{{ game.away_moneyline_odds }}
+                        +{{ game.away_moneyline_odds }}
                         {% else %}
-                            {{ game.away_moneyline_odds }}
+                        {{ game.away_moneyline_odds }}
                         {% endif %}
                     </td>
                     <td>
@@ -52,9 +58,9 @@
                     </td>
                     <td>
                         {% if game.home_moneyline_odds > 0 %}
-                            +{{ game.home_moneyline_odds }}
+                        +{{ game.home_moneyline_odds }}
                         {% else %}
-                            {{ game.home_moneyline_odds }}
+                        {{ game.home_moneyline_odds }}
                         {% endif %}
                     </td>
                     <td>
@@ -67,12 +73,31 @@
         </a>
         {% endfor %}
     </div>
-
-    <!-- Filters -->
+    
+    <!----------------------------------------------->
+    <!--------------- Begin: FILTERS ---------------->
+    <!----------------------------------------------->
     <div class="filters">
-        <h3>Filters</h3>
         <form action="/" method="POST">
-            <!-- Specific Trend Categories -->
+            <!--
+                Time Frame Filters
+            -->
+            <div class="tabs-container">
+                <div class="tab">
+                  <input type="radio" id="weekly_radio" name="config" value="weekly" {% if filters['config'] == 'weekly' %} checked {% endif %}>
+                  <label for="weekly_radio">Weekly</label>
+                </div>
+                <div class="tab">
+                  <input type="radio" id="all_time_radio" name="config" value="all_time" {% if filters['config'] == 'all_time' %} checked {% endif %}>
+                  <label for="all_time_radio">All Time</label>
+                </div>
+            </div>
+            <br>
+            <h3>Filters</h3>
+            
+            <!--
+                Trend Category Filters
+            -->
             <strong>Specific Trend Categories</strong><br>
             <!-- Home/Away -->
             <label><input type="checkbox" name="home" value="true" {% if filters['home'] == 'true' %} checked {% endif %}> Home</label>
@@ -99,303 +124,219 @@
             <label><input type="checkbox" name="under" value="true" {% if filters['under'] == 'true' %} checked {% endif %}> Under</label>
             <input type="hidden" name="under" value="false">
             <br>
-            <!-- Specific Betting Categories -->
+            
+            <!--
+                Betting Category Filters
+            -->
             <strong>Specific Betting Categories</strong><br>
             <label><input type="checkbox" name="ats" value="true" {% if filters['ats'] == 'true' %} checked {% endif %}> Against the Spread</label>
             <input type="hidden" name="ats" value="false">
             <label><input type="checkbox" name="outright" value="true" {% if filters['outright'] == 'true' %} checked {% endif %}> Outright</label>
             <input type="hidden" name="outright" value="false">
-            <br><br>
-            <!-- Month -->
+            <br>
+            <br>
+            
+            <!-- 
+                Month Filters
+            -->
             <strong>Month</strong>
             <label><input type="checkbox" id="toggle-all-month" checked> Select/Deselect All</label>
             <br>
             <label><input type="checkbox" name="no_month" value="true" {% if filters['no_month'] == 'true' %} checked {% endif %}> No Month</label>
             <input type="hidden" name="no_month" value="false">
-            <label><input type="checkbox" class="month-options" name="january" value="true" {% if filters['january'] == 'true' %} checked {% endif %}> January</label>
-            <input type="hidden" name="january" value="false">
-            <label><input type="checkbox" class="month-options" name="february" value="true" {% if filters['february'] == 'true' %} checked {% endif %}> February</label>
-            <input type="hidden" name="february" value="false">
-            <label><input type="checkbox" class="month-options" name="september" value="true" {% if filters['september'] == 'true' %} checked {% endif %}> September</label>
-            <input type="hidden" name="september" value="false">
-            <label><input type="checkbox" class="month-options" name="october" name="game_month" value="true" {% if filters['october'] == 'true' %} checked {% endif %}> October</label>
-            <input type="hidden" name="october" value="false">
-            <label><input type="checkbox" class="month-options" name="november" value="true" {% if filters['november'] == 'true' %} checked {% endif %}> November</label>
-            <input type="hidden" name="november" value="false">
-            <label><input type="checkbox" class="month-options" name="december" value="true" {% if filters['december'] == 'true' %} checked {% endif %}> December</label>
-            <input type="hidden" name="december" value="false">
-            <!-- Script that ensures at least the "No Month" option will be checked -->
-            <script>
-                const monthCheckboxes = document.querySelectorAll('.month-options');
-                const toggleAllMonthCheckbox = document.getElementById('toggle-all-month');
-
-                function toggleAllMonths() {
-                    const allChecked = toggleAllMonthCheckbox.checked;
-                    monthCheckboxes.forEach(checkbox => {
-                        checkbox.checked = allChecked;
-                    });
-                }
-
-                toggleAllMonthCheckbox.addEventListener('change', toggleAllMonths);
-
-                const noMonthCheckbox = document.querySelector('input[name="no_month"]')
-            
-                function updateMonthCheckboxes() {
-                    let anyChecked = false;
-                    monthCheckboxes.forEach(checkbox => {
-                        if (checkbox.checked) {
-                            anyChecked = true;
-                        }
-                    });
-                    if (!anyChecked) {
-                        document.querySelector('input[name="no_month"]').checked = true;
-                    }
-                }
-            
-                noMonthCheckbox.addEventListener('change', updateMonthCheckboxes)
-                monthCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', updateMonthCheckboxes);
-                });
-
-                updateMonthCheckboxes();
-            </script>
+            <!-- Weekly Config Months -->
+            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                {% for month in configs.weekly_config.MONTHS %}
+                    <label><input type="checkbox" class="month-options" name="{{ month.lower() }}" value="true" {% if filters[month.lower()] == 'true' %} checked {% endif %}> {{ month }}</label>
+                    <input type="hidden" name="{{ month.lower() }}" value="false">
+                {% endfor %}
+            </div>
+            <!-- All Time Config Months -->
+            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                {% for month in configs.all_time_config.MONTHS %}
+                    <label><input type="checkbox" class="month-options" name="{{ month.lower() }}" value="true" {% if filters[month.lower()] == 'true' %} checked {% endif %}> {{ month }}</label>
+                    <input type="hidden" name="{{ month.lower() }}" value="false">
+                {% endfor %}
+            </div>
             <br>
-            <!-- Day -->
+            
+            <!-- 
+                Day Filters
+            -->
             <strong>Day</strong>
             <label><input type="checkbox" id="toggle-all-day" checked> Select/Deselect All</label>
             <br>
             <label><input type="checkbox" name="no_day" value="true" {% if filters['no_day'] == 'true' %} checked {% endif %}> No Day</label>
             <input type="hidden" name="no_day" value="false">
-            <label><input type="checkbox" class="day-options" name="monday" value="true" {% if filters['monday'] == 'true' %} checked {% endif %}> Monday</label>
-            <input type="hidden" name="monday" value="false">
-            <label><input type="checkbox" class="day-options" name="tuesday" value="true" {% if filters['tuesday'] == 'true' %} checked {% endif %}> Tuesday</label>
-            <input type="hidden" name="tuesday" value="false">
-            <label><input type="checkbox" class="day-options" name="wednesday" value="true" {% if filters['wednesday'] == 'true' %} checked {% endif %}> Wednesday</label>
-            <input type="hidden" name="wednesday" value="false">
-            <label><input type="checkbox" class="day-options" name="thursday" value="true" {% if filters['thursday'] == 'true' %} checked {% endif %}> Thursday</label>
-            <input type="hidden" name="thursday" value="false">
-            <label><input type="checkbox" class="day-options" name="friday" value="true" {% if filters['friday'] == 'true' %} checked {% endif %}> Friday</label>
-            <input type="hidden" name="friday" value="false">
-            <label><input type="checkbox" class="day-options" name="saturday" value="true" {% if filters['saturday'] == 'true' %} checked {% endif %}> Saturday</label>
-            <input type="hidden" name="saturday" value="false">
-            <label><input type="checkbox" class="day-options" name="sunday" value="true" {% if filters['sunday'] == 'true' %} checked {% endif %}> Sunday</label>
-            <input type="hidden" name="sunday" value="false">
-            <!-- Script that ensures at least the "No Day" option will be checked -->
-            <script>
-                const dayCheckboxes = document.querySelectorAll('.day-options');
-                const toggleAllDayCheckbox = document.getElementById('toggle-all-day');
-
-                function toggleAllDays() {
-                    const allChecked = toggleAllDayCheckbox.checked;
-                    dayCheckboxes.forEach(checkbox => {
-                        checkbox.checked = allChecked;
-                    });
-                }
-
-                toggleAllDayCheckbox.addEventListener('change', toggleAllDays);
-
-                const noDayCheckbox = document.querySelector('input[name="no_day"]')
-            
-                function updateDayCheckboxes() {
-                    let anyChecked = false;
-                    dayCheckboxes.forEach(checkbox => {
-                        if (checkbox.checked) {
-                            anyChecked = true;
-                        }
-                    });
-                    if (!anyChecked) {
-                        document.querySelector('input[name="no_day"]').checked = true;
-                    }
-                }
-            
-                noDayCheckbox.addEventListener('change', updateDayCheckboxes)
-                dayCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', updateDayCheckboxes);
-                });
-
-                updateDayCheckboxes();
-            </script>
+            <!-- Weekly Config Days -->
+            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                {% for day in configs.weekly_config.DAY_OF_WEEKS %}
+                    <label><input type="checkbox" class="day-options" name="{{ day.lower() }}" value="true" {% if filters[day.lower()] == 'true' %} checked {% endif %}> {{ day }}</label>
+                    <input type="hidden" name="{{ day.lower() }}" value="false">
+                {% endfor %}
+            </div>
+            <!-- All Time Config Days -->
+            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                {% for day in configs.all_time_config.DAY_OF_WEEKS %}
+                    <label><input type="checkbox" class="day-options" name="{{ day.lower() }}" value="true" {% if filters[day.lower()] == 'true' %} checked {% endif %}> {{ day }}</label>
+                    <input type="hidden" name="{{ day.lower() }}" value="false">
+                {% endfor %}
+            </div>
             <br>
-            <!-- Game Type -->
+            
+            <!-- 
+                Game Type Filters 
+            -->
             <strong>Game Type</strong>
             <label><input type="checkbox" id="toggle-all-type" checked> Select/Deselect All</label>
             <br>
             <label><input type="checkbox" name="no_type" value="true" {% if filters['no_type'] == 'true' %} checked {% endif %}> No Type</label>
             <input type="hidden" name="no_type" value="false">
-            <label for="divisional"><input type="checkbox" class="type-options" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}> Divisional Game</label>
-            <input type="hidden" name="divisional" value="false">
-            <label for="non_divisional"><input type="checkbox" class="type-options" name="non_divisional" value="true" {% if filters['non_divisional'] == 'true' %} checked {% endif %}> Non-Divisional Game</label>
-            <input type="hidden" name="non_divisional" value="false">
-            <script>
-                const typeCheckboxes = document.querySelectorAll('.type-options');
-                const toggleAllTypeCheckbox = document.getElementById('toggle-all-type');
-
-                function toggleAllTypes() {
-                    const allChecked = toggleAllTypeCheckbox.checked;
-                    typeCheckboxes.forEach(checkbox => {
-                        checkbox.checked = allChecked;
-                    });
-                }
-
-                toggleAllTypeCheckbox.addEventListener('change', toggleAllTypes);
-
-                const noTypeCheckbox = document.querySelector('input[name="no_type"]')
-            
-                function updateTypeCheckboxes() {
-                    let anyChecked = false;
-                    typeCheckboxes.forEach(checkbox => {
-                        if (checkbox.checked) {
-                            anyChecked = true;
-                        }
-                    });
-                    if (!anyChecked) {
-                        document.querySelector('input[name="no_type"]').checked = true;
-                    }
-                }
-            
-                noTypeCheckbox.addEventListener('change', updateTypeCheckboxes)
-                typeCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', updateTypeCheckboxes);
-                });
-
-                updateTypeCheckboxes();
-            </script>
+            <!-- Weekly Config Game Types -->
+            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                {% for type in configs.weekly_config.DIVISIONALS %}
+                    {% if type == True %}
+                        <label><input type="checkbox" class="type-options" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}> Divisional Games</label>
+                        <input type="hidden" name="divisional" value="false">
+                    {% endif %}
+                    {% if type == False %}
+                        <label><input type="checkbox" class="type-options" name="non_divisional" value="true" {% if filters['non_divisional'] == 'true' %} checked {% endif %}> Non Divisional Games</label>
+                        <input type="hidden" name="non_divisional" value="false">
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <!-- Weekly Config Days -->
+            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                {% for type in configs.all_time_config.DIVISIONALS %}
+                    {% if type == True %}
+                        <label><input type="checkbox" class="type-options" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}> Divisional Games</label>
+                        <input type="hidden" name="divisional" value="false">
+                    {% endif %}
+                    {% if type == False %}
+                        <label><input type="checkbox" class="type-options" name="non_divisional" value="true" {% if filters['non_divisional'] == 'true' %} checked {% endif %}> Non Divisional Games</label>
+                        <input type="hidden" name="non_divisional" value="false">
+                    {% endif %}
+                {% endfor %}
+            </div>
             <br>
-            <!-- Spread -->
+            <br>
+            
+            <!-- 
+                Spread Filters 
+            -->
             <strong><label for="spread">Spread</label></strong>
             <label><input type="checkbox" id="toggle-all-spread" checked> Select/Deselect All</label>
             <br>
-            <!-- Spread Options -->
             <label><input type="checkbox" name="no_spread" value="true" {% if filters['no_spread'] == 'true' %} checked {% endif %}> No Spread</label>
             <input type="hidden" name="no_spread" value="false">
             <br>
-            <!-- Individual Spread Options -->
-            {% for i in range(1, 15) %}
-                {% set exact_str = 'spread ' ~ i ~ '.0' %}
-                {% set half_str = 'spread ' ~ i ~ '.5' %}
-                <label><input type="checkbox" class="spread-options" name="{{ exact_str }}" value="true" {% if filters[exact_str] == 'true' %} checked {% endif %}> {{i}}.0</label>
-                <input type="hidden" name="{{ exact_str }}" value="false">
-                <label><input type="checkbox" class="spread-options" name="{{ half_str }}" value="true" {% if filters[half_str] == 'true' %} checked {% endif %}> {{i}}.5</label>
-                <input type="hidden" name="{{ half_str }}" value="false">
-            {% endfor %}
+            <!-- Weekly Config Spreads -->
+            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                {% set ns = namespace(first_more=true, first_less=true) %}
+                {% for spread in configs.weekly_config.SPREADS %}
+                    {% set spread_str = 'spread ' ~ spread %}
+                    {% if 'more' in spread %}
+                        {% if ns.first_more %}
+                            <br>
+                            {% set ns.first_more = false %}
+                        {% endif %}
+                    {% endif %}
+                    {% if 'less' in spread %}
+                        {% if ns.first_less %}
+                            <br>
+                            {% set ns.first_less = false %}
+                        {% endif %}
+                    {% endif %}
+                    <label><input type="checkbox" class="spread-options" name="{{ spread_str }}" value="true" {% if filters[spread_str] == 'true' %} checked {% endif %}> {{ spread }}</label>
+                    <input type="hidden" name="{{ spread_str }}" value="false">
+                {% endfor %}
+            </div>
+            <!-- All Time Config Spreads -->
+            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                {% set ns = namespace(first_more=true, first_less=true) %}
+                {% for spread in configs.all_time_config.SPREADS %}
+                    {% set spread_str = 'spread ' ~ spread %}
+                    {% if 'more' in spread %}
+                        {% if ns.first_more %}
+                            <br>
+                            {% set ns.first_more = false %}
+                        {% endif %}
+                    {% endif %}
+                    {% if 'less' in spread %}
+                        {% if ns.first_less %}
+                            <br>
+                            {% set ns.first_less = false %}
+                        {% endif %}
+                    {% endif %}
+                    <label><input type="checkbox" class="spread-options" name="{{ spread_str }}" value="true" {% if filters[spread_str] == 'true' %} checked {% endif %}> {{ spread }}</label>
+                    <input type="hidden" name="{{ spread_str }}" value="false">
+                {% endfor %}
+            </div>
             <br>
-            <!-- Spread Ranges -->
-            {% for i in range(1, 15) %}
-                {% set more_str = 'spread ' ~ i ~ ' or more' %}
-                <label><input type="checkbox" class="spread-options" name="{{ more_str }}" value="true" {% if filters[more_str] == 'true' %} checked {% endif %}> {{i}} or more</label>
-                <input type="hidden" name="{{ more_str }}" value="false">
-            {% endfor %}
-            <br>
-            {% for i in range(1, 15) %}
-                {% set less_str = 'spread ' ~ i ~ ' or less' %}
-                <label><input type="checkbox" class="spread-options" name="{{ less_str }}" value="true" {% if filters[less_str] == 'true' %} checked {% endif %}> {{i}} or less</label>
-                <input type="hidden" name="{{ less_str }}" value="false">                
-            {% endfor %}
-            <!-- Script that ensures at least the "No Spread" option will be checked, select/deselect all -->
-            <script>
-                const spreadCheckboxes = document.querySelectorAll('.spread-options');
-                const toggleAllSpreadCheckbox = document.getElementById('toggle-all-spread');
-
-                function toggleAllSpreads() {
-                    const allChecked = toggleAllSpreadCheckbox.checked;
-                    spreadCheckboxes.forEach(checkbox => {
-                        checkbox.checked = allChecked;
-                    });
-                }
-
-                toggleAllSpreadCheckbox.addEventListener('change', toggleAllSpreads);
-
-                const noSpreadCheckbox = document.querySelector('input[name="no_spread"]')
             
-                function updateSpreadCheckboxes() {
-                    let anyChecked = false;
-                    spreadCheckboxes.forEach(checkbox => {
-                        if (checkbox.checked) {
-                            anyChecked = true;
-                        }
-                    });
-                    if (!anyChecked) {
-                        document.querySelector('input[name="no_spread"]').checked = true;
-                    }
-                }
-            
-                noSpreadCheckbox.addEventListener('change', updateSpreadCheckboxes)
-                spreadCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', updateSpreadCheckboxes);
-                });
-
-                updateSpreadCheckboxes();
-            </script>
-            <br>
-            <!-- Total -->
+            <!-- 
+                Total Filters 
+            -->
             <strong><label for="total">Total</label></strong>
             <label><input type="checkbox" id="toggle-all-total" checked> Select/Deselect All</label>
             <br>
-            <!-- Total Options -->
             <label><input type="checkbox" name="no_total" value="true" {% if filters['no_total'] == 'true' %} checked {% endif %}> No Total</label>
             <input type="hidden" name="no_total" value="false">
             <br>
-            {% for i in range(30, 61, 5) %}
-                {% set more_str = 'total ' ~ i ~ ' or more' %}
-                <label><input type="checkbox" class="total-options" name="{{ more_str }}" value="true" {% if filters[more_str] == 'true' %} checked {% endif %}> {{i}} or more</label>
-                <input type="hidden" name="{{ more_str }}" value="false">
-            {% endfor %}
+            <!-- Weekly Config Totals -->
+            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                {% set ns = namespace(first_less=true) %}
+                {% for total in configs.weekly_config.TOTALS %}
+                    {% set total_str = 'total ' ~ total %}
+                    {% if 'less' in total %}
+                        {% if ns.first_less %}
+                            <br>
+                            {% set ns.first_less = false %}
+                        {% endif %}
+                    {% endif %}
+                    <label><input type="checkbox" class="total-options" name="{{ total_str }}" value="true" {% if filters[total_str] == 'true' %} checked {% endif %}> {{ total }}</label>
+                    <input type="hidden" name="{{ total_str }}" value="false">
+                {% endfor %}
+            </div>
+            <!-- All Time Config Totals -->
+            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                {% set ns = namespace(first_less=true) %}
+                {% for total in configs.all_time_config.TOTALS %}
+                    {% set total_str = 'total ' ~ total %}
+                    {% if 'less' in total %}
+                        {% if ns.first_less %}
+                            <br>
+                            {% set ns.first_less = false %}
+                        {% endif %}
+                    {% endif %}
+                    <label><input type="checkbox" class="total-options" name="{{ total_str }}" value="true" {% if filters[total_str] == 'true' %} checked {% endif %}> {{ total }}</label>
+                    <input type="hidden" name="{{ total_str }}" value="false">
+                {% endfor %}
+            </div>
             <br>
-            {% for i in range(30, 61, 5) %}
-                {% set less_str = 'total ' ~ i ~ ' or less' %}
-                <label><input type="checkbox" class="total-options" name="{{ less_str }}" value="true" {% if filters[less_str] == 'true' %} checked {% endif %}> {{i}} or less</label>
-                <input type="hidden" name="{{ less_str }}" value="false">                
-            {% endfor %}
-            <!-- Script that ensures at least the "No Total" option will be checked, select/deselect all -->
-            <script>
-                const totalCheckboxes = document.querySelectorAll('.total-options');
-                const toggleAllTotalCheckbox = document.getElementById('toggle-all-total');
-
-                function toggleAllTotals() {
-                    const allChecked = toggleAllTotalCheckbox.checked;
-                    totalCheckboxes.forEach(checkbox => {
-                        checkbox.checked = allChecked;
-                    });
-                }
-
-                toggleAllTotalCheckbox.addEventListener('change', toggleAllTotals);
-
-                const nospreadCheckbox = document.querySelector('input[name="no_total"]')
-            
-                function updatespreadCheckboxes() {
-                    let anyChecked = false;
-                    totalCheckboxes.forEach(checkbox => {
-                        if (checkbox.checked) {
-                            anyChecked = true;
-                        }
-                    });
-                    if (!anyChecked) {
-                        document.querySelector('input[name="no_total"]').checked = true;
-                    }
-                }
-            
-                nospreadCheckbox.addEventListener('change', updatespreadCheckboxes)
-                totalCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', updatespreadCheckboxes);
-                });
-
-                updatespreadCheckboxes();
-            </script>
             <br>
-            <!-- Seasons Included -->
-            </strong><label for="seasons">Seasons Included</label></strong>
+            
+            <!-- 
+                Season Filters
+            -->
+            </strong><label for="seasons">Include</label></strong>
+            <select name="season_type">
+                <option value="seasons_after" {% if filters['season_type'] == 'seasons_after' %} selected {% endif %}>seasons after</option>
+                <option value="seasons_before" {% if filters['season_type'] == 'seasons_before' %} selected {% endif %}>seasons before</option>
+                <option value="only_season" {% if filters['season_type'] == 'only_season' %} selected {% endif %}>only</option>
+            </select>
             <select name="seasons">
                 {% for i in range(2006, 2024) %}
                     {% set season_str = 'since ' ~ i ~ '-' ~ (i + 1) %}
-                    <option value="since {{ i }}-{{ i + 1 }}" {% if filters['seasons'] == season_str %} selected {% endif %}>since {{ i }}-{{ i + 1 }}</option>
+                    <option value="since {{ i }}-{{ i + 1 }}" {% if filters['seasons'] == season_str %} selected {% endif %}>{{ i }}-{{ i + 1 }}</option>
                 {% endfor %}
             </select>
-            <input type="radio" name="season_type" id="all_seasons" value="all_seasons" {% if filters['season_type'] == 'all_seasons' %} checked {% endif %}>
-            <label for="all_seasons">Include all seasons</label>
-            <input type="radio" name="season_type" id="selected_season" value="selected_season" {% if filters['season_type'] == 'selected_season' %} checked {% endif %}>
-            <label for="selected_season">Include just selected season</label>
             <br>
-            <!-- Total Games -->
+
+
+            <!-- 
+                Total Games Filters
+            -->
             Total Games
             <select name="gle-total-games">
                 <option value="gt" {% if filters['gle_total_games'] == 'gt' %} selected {% endif %}>></option>
@@ -406,7 +347,10 @@
             </select>    
             <input type="text" name="total-games" value="{{ filters['total_games'] }}"">
             <br>
-            <!-- Win % -->
+
+            <!-- 
+                Win Percentage Filters
+            -->
             Win %
             <select name="gle-win-pct">
                 <option value="gt" {% if filters['gle_win_pct'] == 'gt' %} selected {% endif %}>></option>
@@ -417,7 +361,10 @@
             </select>    
             <input type="text" name="win-pct" value="{{ filters['win_pct'] }}">
             <br>
-            <!-- Sort Criteria -->
+
+            <!-- 
+                Sorting Criteria Filters
+            -->
             <label for="first-sort-category">First Sort By</label>
             <select name="first-sort-category">
                 <option value="win_percentage" {% if filters['first_sort_category'] == 'win_percentage' %} selected {% endif %}>Win %</option> 
@@ -438,12 +385,17 @@
                 <option value="asc" {% if filters['second_sort_order'] == 'asc' %} selected {% endif %}>Low to High</option>                
             </select>
             <br>
-            <!-- Maximum Results -->
+
+            <!-- 
+                Maximum Result Filters
+            -->
             Maximum Results:<input type="text" name="max_results" value="{{ filters['max_results'] }}"><input type="submit" value="Filter">
         </form>
     </div>
 
-    <!-- Trends Table -->
+    <!----------------------------------------------->
+    <!--------------- Begin: TRENDS ----------------->
+    <!----------------------------------------------->
     <div class="trends">
         Results: {{ trends | length }}
         <table>
@@ -452,18 +404,241 @@
                 <th>Total Games</th>
                 <th>Record</th>
                 <th>Win %</th>
+                {% if filters['config'] == 'weekly' %}
+                <th>Games</th>
+                {% endif %}
             </tr>
-            <!-- Trend Data -->
             {% for i in range(trends | length) %}
-                <tr>
-                    <td>{{ trends_descriptions[i] }}</td>
-                    <td>{{ trends[i].total_games }}</td>
-                    <td>{{ trends[i].wins }}-{{ trends[i].losses }}-{{ trends[i].pushes }}</td>
-                    <td>{{ trends[i].win_pct }}</td>
-                </tr>
+            <tr>
+                <td>{{ trends_descriptions[i] }}</td>
+                <td>{{ trends[i].total_games }}</td>
+                <td>{{ trends[i].wins }}-{{ trends[i].losses }}-{{ trends[i].pushes }}</td>
+                <td>{{ trends[i].win_pct }}</td>
+                {% if filters['config'] == 'weekly' %}
+                <td>{{ trends[i].applicable_games }}</td>
+                {% endif %}
+            </tr>
             {% endfor %}
         </table>
     </div>
 </div>
+<script>
+    // Function to toggle all month checkboxes
+    const monthCheckboxes = document.querySelectorAll('.month-options');
+    const toggleAllMonthCheckbox = document.getElementById('toggle-all-month');
+    
+    function toggleAllMonths() {
+        const allChecked = toggleAllMonthCheckbox.checked;
+        monthCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+    
+    toggleAllMonthCheckbox.addEventListener('change', toggleAllMonths);
+    
+    // Function to update month checkboxes
+    const noMonthCheckbox = document.querySelector('input[name="no_month"]')
+    
+    function updateMonthCheckboxes() {
+        let anyChecked = false;
+        monthCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                anyChecked = true;
+            }
+        });
+        if (!anyChecked) {
+            document.querySelector('input[name="no_month"]').checked = true;
+        }
+    }
+    
+    noMonthCheckbox.addEventListener('change', updateMonthCheckboxes)
+    monthCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateMonthCheckboxes);
+    });
+    
+    updateMonthCheckboxes();
+    
+    // Function to toggle all day checkboxes
+    const dayCheckboxes = document.querySelectorAll('.day-options');
+    const toggleAllDayCheckbox = document.getElementById('toggle-all-day');
+    
+    function toggleAllDays() {
+        const allChecked = toggleAllDayCheckbox.checked;
+        dayCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+    
+    toggleAllDayCheckbox.addEventListener('change', toggleAllDays);
+    
+    // Function to update day checkboxes
+    const noDayCheckbox = document.querySelector('input[name="no_day"]')
+    
+    function updateDayCheckboxes() {
+        let anyChecked = false;
+        dayCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                anyChecked = true;
+            }
+        });
+        if (!anyChecked) {
+            document.querySelector('input[name="no_day"]').checked = true;
+        }
+    }
+    
+    noDayCheckbox.addEventListener('change', updateDayCheckboxes)
+    dayCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateDayCheckboxes);
+    });
+    
+    updateDayCheckboxes();
+    
+    // Function to toggle all type checkboxes
+    const typeCheckboxes = document.querySelectorAll('.type-options');
+    const toggleAllTypeCheckbox = document.getElementById('toggle-all-type');
+    
+    function toggleAllTypes() {
+        const allChecked = toggleAllTypeCheckbox.checked;
+        typeCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+    
+    toggleAllTypeCheckbox.addEventListener('change', toggleAllTypes);
+    
+    // Function to update type checkboxes
+    const noTypeCheckbox = document.querySelector('input[name="no_type"]')
+    
+    function updateTypeCheckboxes() {
+        let anyChecked = false;
+        typeCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                anyChecked = true;
+            }
+        });
+        if (!anyChecked) {
+            document.querySelector('input[name="no_type"]').checked = true;
+        }
+    }
+    
+    noTypeCheckbox.addEventListener('change', updateTypeCheckboxes)
+    typeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateTypeCheckboxes);
+    });
+    
+    updateTypeCheckboxes();
+    
+    // Function to toggle all spread checkboxes
+    const spreadCheckboxes = document.querySelectorAll('.spread-options');
+    const toggleAllSpreadCheckbox = document.getElementById('toggle-all-spread');
+    
+    function toggleAllSpreads() {
+        const allChecked = toggleAllSpreadCheckbox.checked;
+        spreadCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+    
+    toggleAllSpreadCheckbox.addEventListener('change', toggleAllSpreads);
+    
+    // Function to update spread checkboxes
+    const noSpreadCheckbox = document.querySelector('input[name="no_spread"]')
+    
+    function updateSpreadCheckboxes() {
+        let anyChecked = false;
+        spreadCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                anyChecked = true;
+            }
+        });
+        if (!anyChecked) {
+            document.querySelector('input[name="no_spread"]').checked = true;
+        }
+    }
+    
+    noSpreadCheckbox.addEventListener('change', updateSpreadCheckboxes)
+    spreadCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSpreadCheckboxes);
+    });
+    
+    updateSpreadCheckboxes();
+    
+    // Function to toggle all total checkboxes
+    const totalCheckboxes = document.querySelectorAll('.total-options');
+    const toggleAllTotalCheckbox = document.getElementById('toggle-all-total');
+    
+    function toggleAllTotals() {
+        const allChecked = toggleAllTotalCheckbox.checked;
+        totalCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+    
+    toggleAllTotalCheckbox.addEventListener('change', toggleAllTotals);
+    
+    // Function to update total checkboxes
+    const noTotalCheckbox = document.querySelector('input[name="no_total"]')
+    
+    function updateTotalCheckboxes() {
+        let anyChecked = false;
+        totalCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                anyChecked = true;
+            }
+        });
+        if (!anyChecked) {
+            document.querySelector('input[name="no_total"]').checked = true;
+        }
+    }
+    
+    noTotalCheckbox.addEventListener('change', updateTotalCheckboxes)
+    totalCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateTotalCheckboxes);
+    });
+    
+    updateTotalCheckboxes();
+    
+    // Function to handle radio button change event for weekly configuration
+    document.getElementById('weekly_radio').addEventListener('change', function() {
+        if (this.checked) {
+            var weeklyConfigs = document.getElementsByClassName('weekly_configs');
+            for (var i = 0; i < weeklyConfigs.length; i++) {
+                weeklyConfigs[i].style.display = 'inline';
+            }
+            var allTimeConfigs = document.getElementsByClassName('all_time_configs');
+            for (var i = 0; i < allTimeConfigs.length; i++) {
+                allTimeConfigs[i].style.display = 'none';
+            }
+        }
+    });
+    
+    // Function to handle radio button change event for all time configuration
+    document.getElementById('all_time_radio').addEventListener('change', function() {
+        if (this.checked) {
+            var weeklyConfigs = document.getElementsByClassName('weekly_configs');
+            for (var i = 0; i < weeklyConfigs.length; i++) {
+                weeklyConfigs[i].style.display = 'none';
+            }
+            var allTimeConfigs = document.getElementsByClassName('all_time_configs');
+            for (var i = 0; i < allTimeConfigs.length; i++) {
+                allTimeConfigs[i].style.display = 'inline';
+            }
+        }
+    });
+
+    // Function to disable inputs from inactive divs on form submit
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const divs = document.querySelectorAll('.weekly_configs, .all_time_configs');
+
+        divs.forEach(function(div) {
+            if (!div.style.display || div.style.display === 'none') {
+                const inputs = div.querySelectorAll('input');
+                inputs.forEach(function(input) {
+                    input.disabled = true;
+                });
+            }
+        });
+    });
+</script>
 
 {% endblock %}

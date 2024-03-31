@@ -46,6 +46,31 @@ a:hover {
     color: blue;
 }
 
+.tabs-container {
+    display: flex;
+}
+
+  /* Hide the radio buttons */
+.tab input[type="radio"] {
+    display: none;
+}
+  
+  /* Style for label */
+.tab label {
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+}
+
+.tab label:hover {
+    background-color: #e0e0e0;
+}
+
+.tab input[type="radio"]:checked + label {
+    background-color: #ccc;
+}
+
 /* single_game_page.css */
 .filters {
     padding: 8px;
