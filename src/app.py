@@ -436,7 +436,7 @@ def get_spread_query(filters, req):
     # Extract spread categories and add them to SQL query
     filters['no_spread'] = req.form.get('no_spread', 'true')
     spreads = []
-    for i in range(0, 21):
+    for i in range(0, 28):
         spreads.append(f'spread {i}.0')
         spreads.append(f'spread {i}.5')
         if i < 15:

@@ -74,139 +74,148 @@
             <!--
                 Trend Category Filters
             -->
-            <strong>Specific Trend Categories</strong><br>
-            <!-- Home/Away -->
-            <label><input type="checkbox" name="home" value="true" {% if filters['home'] == 'true' %} checked {% endif %}> Home</label>
-            <input type="hidden" name="home" value="false">
-            <label><input type="checkbox" name="away" value="true" {% if filters['away'] == 'true' %} checked {% endif %}> Away</label>
-            <input type="hidden" name="away" value="false">
-            <!-- Favorite/Underdog -->
-            {% if game.spread != 0 %}
-            <label><input type="checkbox" name="favorite" value="true" {% if filters['favorite'] == 'true' %} checked {% endif %}> Favorite</label>
-            <input type="hidden" name="favorite" value="false">
-            <label><input type="checkbox" name="underdog" value="true" {% if filters['underdog'] == 'true' %} checked {% endif %}> Underdog</label>
-            <input type="hidden" name="underdog" value="false">
-            <!-- Home/Away Favorite/Underdog -->
-            {% if game.home_spread < 0 %}
-            <label><input type="checkbox" name="home_favorite" value="true" {% if filters['home favorite'] == 'true' %} checked {% endif %}> Home Favorite</label>
-            <input type="hidden" name="home_favorite" value="false">
-            <label><input type="checkbox" name="away_underdog" value="true" {% if filters['away underdog'] == 'true' %} checked {% endif %}> Away Underdog</label>
-            <input type="hidden" name="away_underdog" value="false">
-            {% else %}
-            <label><input type="checkbox" name="away_favorite" value="true" {% if filters['away favorite'] == 'true' %} checked {% endif %}> Away Favorite</label>
-            <input type="hidden" name="away_favorite" value="false">
-            <label><input type="checkbox" name="home_underdog" value="true" {% if filters['home underdog'] == 'true' %} checked {% endif %}> Home Underdog</label>
-            <input type="hidden" name="home_underdog" value="false">
-            {% endif %}
-            {% endif %}
-            <!-- Over/Under -->
-            <label><input type="checkbox" name="over" value="true" {% if filters['over'] == 'true' %} checked {% endif %}> Over</label>
-            <input type="hidden" name="over" value="false">
-            <label><input type="checkbox" name="under" value="true" {% if filters['under'] == 'true' %} checked {% endif %}> Under</label>
-            <input type="hidden" name="under" value="false">
-            <br>
+            <details>
+                <summary><strong>Specific Trend Categories</strong><br></summary>
+                <label><input type="checkbox" id="toggle-all-trend-category" checked> Select/Deselect All</label><br>
+                <!-- Home/Away -->
+                <label><input type="checkbox" class="trend-category-options" name="home" value="true" {% if filters['home'] == 'true' %} checked {% endif %}> Home</label>
+                <input type="hidden" name="home" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="away" value="true" {% if filters['away'] == 'true' %} checked {% endif %}> Away</label>
+                <input type="hidden" name="away" value="false">
+                <!-- Favorite/Underdog -->
+                {% if game.spread != 0 %}
+                <label><input type="checkbox" class="trend-category-options" name="favorite" value="true" {% if filters['favorite'] == 'true' %} checked {% endif %}> Favorite</label>
+                <input type="hidden" name="favorite" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="underdog" value="true" {% if filters['underdog'] == 'true' %} checked {% endif %}> Underdog</label>
+                <input type="hidden" name="underdog" value="false">
+                <!-- Home/Away Favorite/Underdog -->
+                {% if game.home_spread < 0 %}
+                <label><input type="checkbox" class="trend-category-options" name="home_favorite" value="true" {% if filters['home favorite'] == 'true' %} checked {% endif %}> Home Favorite</label>
+                <input type="hidden" name="home_favorite" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="away_underdog" value="true" {% if filters['away underdog'] == 'true' %} checked {% endif %}> Away Underdog</label>
+                <input type="hidden" name="away_underdog" value="false">
+                {% else %}
+                <label><input type="checkbox" class="trend-category-options" name="away_favorite" value="true" {% if filters['away favorite'] == 'true' %} checked {% endif %}> Away Favorite</label>
+                <input type="hidden" name="away_favorite" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="home_underdog" value="true" {% if filters['home underdog'] == 'true' %} checked {% endif %}> Home Underdog</label>
+                <input type="hidden" name="home_underdog" value="false">
+                {% endif %}
+                {% endif %}
+                <!-- Over/Under -->
+                <label><input type="checkbox" class="trend-category-options" name="over" value="true" {% if filters['over'] == 'true' %} checked {% endif %}> Over</label>
+                <input type="hidden" name="over" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="under" value="true" {% if filters['under'] == 'true' %} checked {% endif %}> Under</label>
+                <input type="hidden" name="under" value="false">
+            </details>
 
             <!--
                 Betting Category Filters
             -->
-            <strong>Specific Betting Categories</strong><br>
-            <label><input type="checkbox" name="ats" value="true" {% if filters['ats'] == 'true' %} checked {% endif %}> Against the Spread</label>
-            <input type="hidden" name="ats" value="false">
-            <label><input type="checkbox" name="outright" value="true" {% if filters['outright'] == 'true' %} checked {% endif %}> Outright</label>
-            <input type="hidden" name="outright" value="false">
-            <br><br>
+            <details>
+                <summary><strong>Specific Betting Categories</strong><br></summary>
+                <label><input type="checkbox" id="toggle-all-betting-category" checked> Select/Deselect All</label><br>
+                <label><input type="checkbox" class="betting-category-options" name="ats" value="true" {% if filters['ats'] == 'true' %} checked {% endif %}> Against the Spread</label>
+                <input type="hidden" name="ats" value="false">
+                <label><input type="checkbox" class="betting-category-options" name="outright" value="true" {% if filters['outright'] == 'true' %} checked {% endif %}> Outright</label>
+                <input type="hidden" name="outright" value="false">
+            </details>
             
             <!-- 
                 Month Filters
             -->
-            <strong>Month<br></strong>
-            <label><input type="checkbox" name="no_month" value="true" {% if filters['no_month'] == 'true' %} checked {% endif %}> No Month</label>
-            <input type="hidden" name="no_month" value="false">
-            <label><input type="checkbox" name="{{ game.month.lower() }}" value="true" {% if filters[game.month.lower()] == 'true' %} checked {% endif %}> Games in {{ game.month }}</label>
-            <input type="hidden" name="{{ game.month.lower() }}" value="false">
-            <br>
+            <details>
+                <summary><strong>Month<br></strong></summary>
+                <label><input type="checkbox" name="no_month" value="true" {% if filters['no_month'] == 'true' %} checked {% endif %}> No Month</label>
+                <input type="hidden" name="no_month" value="false">
+                <label><input type="checkbox" name="{{ game.month.lower() }}" value="true" {% if filters[game.month.lower()] == 'true' %} checked {% endif %}> {{ game.month }}</label>
+                <input type="hidden" name="{{ game.month.lower() }}" value="false">
+            </details>
             
             <!-- 
                 Day Filters
             -->
-            <strong>Day<br></strong>
-            <label><input type="checkbox" name="no_day" value="true" {% if filters['no_day'] == 'true' %} checked {% endif %}> No Day</label>
-            <input type="hidden" name="no_day" value="false">
-            <label><input type="checkbox" name="{{ game.day_of_week.lower() }}" value="true" {% if filters[game.day_of_week.lower()] == 'true' %} checked {% endif %}> Games on {{ game.day_of_week }}s</label>
-            <input type="hidden" name="{{ game.day_of_week.lower() }}" value="false">
-            <br>
+            <details>
+                <summary><strong>Day<br></strong></summary>
+                <label><input type="checkbox" name="no_day" value="true" {% if filters['no_day'] == 'true' %} checked {% endif %}> No Day</label>
+                <input type="hidden" name="no_day" value="false">
+                <label><input type="checkbox" name="{{ game.day_of_week.lower() }}" value="true" {% if filters[game.day_of_week.lower()] == 'true' %} checked {% endif %}> {{ game.day_of_week }}</label>
+                <input type="hidden" name="{{ game.day_of_week.lower() }}" value="false">
+            </details>
             
             <!-- 
                 Game Type Filters 
             -->
-            <strong>Game Type<br></strong>
-            <label><input type="checkbox" class="type-options" name="no_type" value="true" {% if filters['no_type'] == 'true' %} checked {% endif %}> No Type</label>
-            <input type="hidden" name="no_type" value="false">
-            {% set divisional_str = 'divisional' if game.divisional else 'non_divisional' %}
-            <input type="checkbox" class="type-options" name="{{ divisional_str }}" value="true" {% if filters[divisional_str] == 'true' %} checked {% endif %}>
-            <label for="{{ divisional_str }}">Only
-                {% if game.divisional == False %}
-                Non
-                {% endif %}
-                Divisional Games
-            </label>
-            <input type="hidden" name="{{ divisional_str }}" value="false">
-            <br>
+            <details>
+                <summary><strong>Game Type<br></strong></summary>
+                <label><input type="checkbox" class="type-options" name="no_type" value="true" {% if filters['no_type'] == 'true' %} checked {% endif %}> No Type</label>
+                <input type="hidden" name="no_type" value="false">
+                {% set divisional_str = 'divisional' if game.divisional else 'non_divisional' %}
+                <input type="checkbox" class="type-options" name="{{ divisional_str }}" value="true" {% if filters[divisional_str] == 'true' %} checked {% endif %}>
+                <label for="{{ divisional_str }}">
+                    {% if game.divisional == False %}
+                    Non
+                    {% endif %}
+                    Divisional Games
+                </label>
+                <input type="hidden" name="{{ divisional_str }}" value="false">
+            </details>
             
             <!-- 
                 Spread Filters 
             -->
-            <strong><label for="spread">Spread</label></strong>
-            <label><input type="checkbox" id="toggle-all-spread" checked> Select/Deselect All</label>
-            <br>
-            <!-- Spread Options -->
-            <label><input type="checkbox" name="no_spread" value="true" {% if filters['no_spread'] == 'true' %} checked {% endif %}> No Spread</label>
-            <input type="hidden" name="no_spread" value="false">
-            {% set spread_integer = game.spread|int %}
-            <!-- Individual Spread Options -->
-            <label><input type="checkbox" class="spread-options" name="spread {{ game.spread }}" value="true" {% if filters['spread ' ~ game.spread|string] == 'true' %} checked {% endif %}> {{ game.spread }}</label>
-            <input type="hidden" name="spread {{ game.spread }}" value="false">
-            <br>
-            <!-- Spread Ranges -->
-            {% set ceiling_spread = spread_integer if spread_integer == game.spread else spread_integer + 1 %}
-            {% set floor_spread = spread_integer %}
-            {% for i in range(1, floor_spread + 1) %}
-            {% set more_str = 'spread ' ~ i ~ ' or more' %}
-            <label><input type="checkbox" class="spread-options" name="{{ more_str }}" value="true" {% if filters[more_str] == 'true' %} checked {% endif %}> {{i}} or more</label>
-            <input type="hidden" name="{{ more_str }}" value="false">
-            {% endfor %}
-            <br>
-            {% for i in range(ceiling_spread, 15) %}
-            {% set less_str = 'spread ' ~ i ~ ' or less' %}
-            <label><input type="checkbox" class="spread-options" name="{{ less_str }}" value="true" {% if filters[less_str] == 'true' %} checked {% endif %}> {{i}} or less</label>
-            <input type="hidden" name="{{ less_str }}" value="false">                
-            {% endfor %}
-            <br>
+            <details>
+                <summary><strong><label for="spread">Spread</label></strong></summary>
+                <label><input type="checkbox" id="toggle-all-spread" checked> Select/Deselect All</label>
+                <br>
+                <!-- Spread Options -->
+                <label><input type="checkbox" name="no_spread" value="true" {% if filters['no_spread'] == 'true' %} checked {% endif %}> No Spread</label>
+                <input type="hidden" name="no_spread" value="false">
+                {% set spread_integer = game.spread|int %}
+                <!-- Individual Spread Options -->
+                <label><input type="checkbox" class="spread-options" name="spread {{ game.spread }}" value="true" {% if filters['spread ' ~ game.spread|string] == 'true' %} checked {% endif %}> {{ game.spread }}</label>
+                <input type="hidden" name="spread {{ game.spread }}" value="false">
+                <br>
+                <!-- Spread Ranges -->
+                {% set ceiling_spread = spread_integer if spread_integer == game.spread else spread_integer + 1 %}
+                {% set floor_spread = spread_integer %}
+                {% for i in range(1, floor_spread + 1) %}
+                {% set more_str = 'spread ' ~ i ~ ' or more' %}
+                <label><input type="checkbox" class="spread-options" name="{{ more_str }}" value="true" {% if filters[more_str] == 'true' %} checked {% endif %}> {{i}} or more</label>
+                <input type="hidden" name="{{ more_str }}" value="false">
+                {% endfor %}
+                <br>
+                {% for i in range(ceiling_spread, 15) %}
+                {% set less_str = 'spread ' ~ i ~ ' or less' %}
+                <label><input type="checkbox" class="spread-options" name="{{ less_str }}" value="true" {% if filters[less_str] == 'true' %} checked {% endif %}> {{i}} or less</label>
+                <input type="hidden" name="{{ less_str }}" value="false">                
+                {% endfor %}
+            </details>
             
             <!-- 
                 Total Filters 
             -->
-            <strong><label for="total">Total</label></strong>
-            <label><input type="checkbox" id="toggle-all-total" checked> Select/Deselect All</label>
-            <br>
-            <!-- Total Options -->
-            <label><input type="checkbox" name="no_total" value="true" {% if filters['no_total'] == 'true' %} checked {% endif %}> No Total</label>
-            <input type="hidden" name="no_total" value="false">
-            {% set total_integer = game.total|int %}
-            {% set floor_total = (total_integer // 5) * 5 %}
-            {% set ceiling_total = ((total_integer + 4) // 5) * 5 %}
-            {% for i in range(30, floor_total + 1, 5) %}
-            {% set more_str = 'total ' ~ i ~ ' or more' %}
-            <label><input type="checkbox" class="total-options" name="{{ more_str }}" value="true" {% if filters[more_str] == 'true' %} checked {% endif %}> {{i}} or more</label>
-            <input type="hidden" name="{{ more_str }}" value="false">
-            {% endfor %}
-            <br>
-            {% for i in range(ceiling_total, 61, 5) %}
-            {% set less_str = 'total ' ~ i ~ ' or less' %}
-            <label><input type="checkbox" class="total-options" name="{{ less_str }}" value="true" {% if filters[less_str] == 'true' %} checked {% endif %}> {{i}} or less</label>
-            <input type="hidden" name="{{ less_str }}" value="false">                
-            {% endfor %}
-            <br>
+            <details>
+                <summary><strong><label for="total">Total</label></strong></summary>
+                <label><input type="checkbox" id="toggle-all-total" checked> Select/Deselect All</label>
+                <br>
+                <!-- Total Options -->
+                <label><input type="checkbox" name="no_total" value="true" {% if filters['no_total'] == 'true' %} checked {% endif %}> No Total</label>
+                <input type="hidden" name="no_total" value="false">
+                {% set total_integer = game.total|int %}
+                {% set floor_total = (total_integer // 5) * 5 %}
+                {% set ceiling_total = ((total_integer + 4) // 5) * 5 %}
+                {% for i in range(30, floor_total + 1, 5) %}
+                {% set more_str = 'total ' ~ i ~ ' or more' %}
+                <label><input type="checkbox" class="total-options" name="{{ more_str }}" value="true" {% if filters[more_str] == 'true' %} checked {% endif %}> {{i}} or more</label>
+                <input type="hidden" name="{{ more_str }}" value="false">
+                {% endfor %}
+                <br>
+                {% for i in range(ceiling_total, 61, 5) %}
+                {% set less_str = 'total ' ~ i ~ ' or less' %}
+                <label><input type="checkbox" class="total-options" name="{{ less_str }}" value="true" {% if filters[less_str] == 'true' %} checked {% endif %}> {{i}} or less</label>
+                <input type="hidden" name="{{ less_str }}" value="false">                
+                {% endfor %}
+            </details>
             
             <!-- 
                 Season Filters
@@ -250,7 +259,7 @@
                 <option value="lte" {% if filters['gle_win_pct'] == 'lte' %} selected {% endif %}><=</option>
                 <option value="lt" {% if filters['gle_win_pct'] == 'lt' %} selected {% endif %}><</option>
             </select>    
-            <input type="text" name="win-pct" value="{{ filters['win_pct'] }}">
+            <input type="text" name="win-pct" value="{{ filters['win_pct'] }}">%
             <br>
             
             <!-- 
@@ -308,6 +317,32 @@
     </div>
 </div>
 <script>
+    // Function to toggle all trend category checkboxes
+    const trendCategoryCheckboxes = document.querySelectorAll('.trend-category-options');
+    const toggleAllTrendCategoryCheckbox = document.getElementById('toggle-all-trend-category');
+    
+    function toggleAllTrendCategories() {
+        const allChecked = toggleAllTrendCategoryCheckbox.checked;
+        trendCategoryCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+    
+    toggleAllTrendCategoryCheckbox.addEventListener('change', toggleAllTrendCategories);
+
+    // Function to toggle all betting category checkboxes
+    const bettingCategoryCheckboxes = document.querySelectorAll('.betting-category-options');
+    const toggleAllBettingCategoryCheckbox = document.getElementById('toggle-all-betting-category');
+    
+    function toggleAllBettingCategories() {
+        const allChecked = toggleAllBettingCategoryCheckbox.checked;
+        bettingCategoryCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+
+    toggleAllBettingCategoryCheckbox.addEventListener('change', toggleAllBettingCategories);
+
     // Function to update month checkboxes
     const noMonthCheckbox = document.querySelector('input[name="no_month"]');
     const gameMonthCheckbox = document.querySelector('input[name="{{ game.month.lower() }}"]');

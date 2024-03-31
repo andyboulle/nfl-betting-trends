@@ -85,7 +85,7 @@
             <div class="tabs-container">
                 <div class="tab">
                   <input type="radio" id="weekly_radio" name="config" value="weekly" {% if filters['config'] == 'weekly' %} checked {% endif %}>
-                  <label for="weekly_radio">Weekly</label>
+                  <label for="weekly_radio">This Week</label>
                 </div>
                 <div class="tab">
                   <input type="radio" id="all_time_radio" name="config" value="all_time" {% if filters['config'] == 'all_time' %} checked {% endif %}>
@@ -98,238 +98,244 @@
             <!--
                 Trend Category Filters
             -->
-            <strong>Specific Trend Categories</strong><br>
-            <!-- Home/Away -->
-            <label><input type="checkbox" name="home" value="true" {% if filters['home'] == 'true' %} checked {% endif %}> Home</label>
-            <input type="hidden" name="home" value="false">
-            <label><input type="checkbox" name="away" value="true" {% if filters['away'] == 'true' %} checked {% endif %}> Away</label>
-            <input type="hidden" name="away" value="false">
-            <!-- Favorite/Underdog -->
-            <label><input type="checkbox" name="favorite" value="true" {% if filters['favorite'] == 'true' %} checked {% endif %}> Favorite</label>
-            <input type="hidden" name="favorite" value="false">
-            <label><input type="checkbox" name="underdog" value="true" {% if filters['underdog'] == 'true' %} checked {% endif %}> Underdog</label>
-            <input type="hidden" name="underdog" value="false">
-            <!-- Home/Away Favorite/Underdog -->
-            <label><input type="checkbox" name="home_favorite" value="true" {% if filters['home favorite'] == 'true' %} checked {% endif %}> Home Favorite</label>
-            <input type="hidden" name="home_favorite" value="false">
-            <label><input type="checkbox" name="away_underdog" value="true" {% if filters['away underdog'] == 'true' %} checked {% endif %}> Away Underdog</label>
-            <input type="hidden" name="away_underdog" value="false">
-            <label><input type="checkbox" name="away_favorite" value="true" {% if filters['away favorite'] == 'true' %} checked {% endif %}> Away Favorite</label>
-            <input type="hidden" name="away_favorite" value="false">
-            <label><input type="checkbox" name="home_underdog" value="true" {% if filters['home underdog'] == 'true' %} checked {% endif %}> Home Underdog</label>
-            <input type="hidden" name="home_underdog" value="false">
-            <!-- Over/Under -->
-            <label><input type="checkbox" name="over" value="true" {% if filters['over'] == 'true' %} checked {% endif %}> Over</label>
-            <input type="hidden" name="over" value="false">
-            <label><input type="checkbox" name="under" value="true" {% if filters['under'] == 'true' %} checked {% endif %}> Under</label>
-            <input type="hidden" name="under" value="false">
-            <br>
+            <details>
+                <summary><strong>Trend Categories</strong><br></summary>
+                <label><input type="checkbox" id="toggle-all-trend-category" checked> Select/Deselect All</label><br>
+                <!-- Home/Away -->
+                <label><input type="checkbox" class="trend-category-options" name="home" value="true" {% if filters['home'] == 'true' %} checked {% endif %}> Home</label>
+                <input type="hidden" name="home" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="away" value="true" {% if filters['away'] == 'true' %} checked {% endif %}> Away</label>
+                <input type="hidden" name="away" value="false">
+                <!-- Favorite/Underdog -->
+                <label><input type="checkbox" class="trend-category-options" name="favorite" value="true" {% if filters['favorite'] == 'true' %} checked {% endif %}> Favorite</label>
+                <input type="hidden" name="favorite" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="underdog" value="true" {% if filters['underdog'] == 'true' %} checked {% endif %}> Underdog</label>
+                <input type="hidden" name="underdog" value="false">
+                <!-- Home/Away Favorite/Underdog -->
+                <label><input type="checkbox" class="trend-category-options" name="home_favorite" value="true" {% if filters['home favorite'] == 'true' %} checked {% endif %}> Home Favorite</label>
+                <input type="hidden" name="home_favorite" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="away_underdog" value="true" {% if filters['away underdog'] == 'true' %} checked {% endif %}> Away Underdog</label>
+                <input type="hidden" name="away_underdog" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="away_favorite" value="true" {% if filters['away favorite'] == 'true' %} checked {% endif %}> Away Favorite</label>
+                <input type="hidden" name="away_favorite" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="home_underdog" value="true" {% if filters['home underdog'] == 'true' %} checked {% endif %}> Home Underdog</label>
+                <input type="hidden" name="home_underdog" value="false">
+                <!-- Over/Under -->
+                <label><input type="checkbox" class="trend-category-options" name="over" value="true" {% if filters['over'] == 'true' %} checked {% endif %}> Over</label>
+                <input type="hidden" name="over" value="false">
+                <label><input type="checkbox" class="trend-category-options" name="under" value="true" {% if filters['under'] == 'true' %} checked {% endif %}> Under</label>
+                <input type="hidden" name="under" value="false">
+            </details>
             
             <!--
                 Betting Category Filters
             -->
-            <strong>Specific Betting Categories</strong><br>
-            <label><input type="checkbox" name="ats" value="true" {% if filters['ats'] == 'true' %} checked {% endif %}> Against the Spread</label>
-            <input type="hidden" name="ats" value="false">
-            <label><input type="checkbox" name="outright" value="true" {% if filters['outright'] == 'true' %} checked {% endif %}> Outright</label>
-            <input type="hidden" name="outright" value="false">
-            <br>
-            <br>
+            <details>
+                <summary><strong>Betting Categories</strong></summary>
+                <label><input type="checkbox" id="toggle-all-betting-category" checked> Select/Deselect All</label><br>
+                <label><input type="checkbox" class="betting-category-options" name="ats" value="true" {% if filters['ats'] == 'true' %} checked {% endif %}> Against the Spread</label>
+                <input type="hidden" name="ats" value="false">
+                <label><input type="checkbox" class="betting-category-options" name="outright" value="true" {% if filters['outright'] == 'true' %} checked {% endif %}> Outright</label>
+                <input type="hidden" name="outright" value="false">
+            </details>
             
             <!-- 
                 Month Filters
             -->
-            <strong>Month</strong>
-            <label><input type="checkbox" id="toggle-all-month" checked> Select/Deselect All</label>
-            <br>
-            <label><input type="checkbox" name="no_month" value="true" {% if filters['no_month'] == 'true' %} checked {% endif %}> No Month</label>
-            <input type="hidden" name="no_month" value="false">
-            <!-- Weekly Config Months -->
-            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
-                {% for month in configs.weekly_config.MONTHS %}
-                    <label><input type="checkbox" class="month-options" name="{{ month.lower() }}" value="true" {% if filters[month.lower()] == 'true' %} checked {% endif %}> {{ month }}</label>
-                    <input type="hidden" name="{{ month.lower() }}" value="false">
-                {% endfor %}
-            </div>
-            <!-- All Time Config Months -->
-            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
-                {% for month in configs.all_time_config.MONTHS %}
-                    <label><input type="checkbox" class="month-options" name="{{ month.lower() }}" value="true" {% if filters[month.lower()] == 'true' %} checked {% endif %}> {{ month }}</label>
-                    <input type="hidden" name="{{ month.lower() }}" value="false">
-                {% endfor %}
-            </div>
-            <br>
+            <details>
+                <summary><strong>Month</strong></summary>
+                <label><input type="checkbox" id="toggle-all-month" checked> Select/Deselect All</label>
+                <br>
+                <label><input type="checkbox" name="no_month" value="true" {% if filters['no_month'] == 'true' %} checked {% endif %}> No Month</label>
+                <input type="hidden" name="no_month" value="false">
+                <!-- Weekly Config Months -->
+                <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                    {% for month in configs.weekly_config.MONTHS %}
+                        <label><input type="checkbox" class="month-options" name="{{ month.lower() }}" value="true" {% if filters[month.lower()] == 'true' %} checked {% endif %}> {{ month }}</label>
+                        <input type="hidden" name="{{ month.lower() }}" value="false">
+                    {% endfor %}
+                </div>
+                <!-- All Time Config Months -->
+                <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                    {% for month in configs.all_time_config.MONTHS %}
+                        <label><input type="checkbox" class="month-options" name="{{ month.lower() }}" value="true" {% if filters[month.lower()] == 'true' %} checked {% endif %}> {{ month }}</label>
+                        <input type="hidden" name="{{ month.lower() }}" value="false">
+                    {% endfor %}
+                </div>
+            </details>
             
             <!-- 
                 Day Filters
             -->
-            <strong>Day</strong>
-            <label><input type="checkbox" id="toggle-all-day" checked> Select/Deselect All</label>
-            <br>
-            <label><input type="checkbox" name="no_day" value="true" {% if filters['no_day'] == 'true' %} checked {% endif %}> No Day</label>
-            <input type="hidden" name="no_day" value="false">
-            <!-- Weekly Config Days -->
-            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
-                {% for day in configs.weekly_config.DAY_OF_WEEKS %}
-                    <label><input type="checkbox" class="day-options" name="{{ day.lower() }}" value="true" {% if filters[day.lower()] == 'true' %} checked {% endif %}> {{ day }}</label>
-                    <input type="hidden" name="{{ day.lower() }}" value="false">
-                {% endfor %}
-            </div>
-            <!-- All Time Config Days -->
-            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
-                {% for day in configs.all_time_config.DAY_OF_WEEKS %}
-                    <label><input type="checkbox" class="day-options" name="{{ day.lower() }}" value="true" {% if filters[day.lower()] == 'true' %} checked {% endif %}> {{ day }}</label>
-                    <input type="hidden" name="{{ day.lower() }}" value="false">
-                {% endfor %}
-            </div>
-            <br>
+            <details>
+                <summary><strong>Day</strong></summary>
+                <label><input type="checkbox" id="toggle-all-day" checked> Select/Deselect All</label>
+                <br>
+                <label><input type="checkbox" name="no_day" value="true" {% if filters['no_day'] == 'true' %} checked {% endif %}> No Day</label>
+                <input type="hidden" name="no_day" value="false">
+                <!-- Weekly Config Days -->
+                <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                    {% for day in configs.weekly_config.DAY_OF_WEEKS %}
+                        <label><input type="checkbox" class="day-options" name="{{ day.lower() }}" value="true" {% if filters[day.lower()] == 'true' %} checked {% endif %}> {{ day }}</label>
+                        <input type="hidden" name="{{ day.lower() }}" value="false">
+                    {% endfor %}
+                </div>
+                <!-- All Time Config Days -->
+                <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                    {% for day in configs.all_time_config.DAY_OF_WEEKS %}
+                        <label><input type="checkbox" class="day-options" name="{{ day.lower() }}" value="true" {% if filters[day.lower()] == 'true' %} checked {% endif %}> {{ day }}</label>
+                        <input type="hidden" name="{{ day.lower() }}" value="false">
+                    {% endfor %}
+                </div>
+            </details>
             
             <!-- 
                 Game Type Filters 
             -->
-            <strong>Game Type</strong>
-            <label><input type="checkbox" id="toggle-all-type" checked> Select/Deselect All</label>
-            <br>
-            <label><input type="checkbox" name="no_type" value="true" {% if filters['no_type'] == 'true' %} checked {% endif %}> No Type</label>
-            <input type="hidden" name="no_type" value="false">
-            <!-- Weekly Config Game Types -->
-            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
-                {% for type in configs.weekly_config.DIVISIONALS %}
-                    {% if type == True %}
-                        <label><input type="checkbox" class="type-options" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}> Divisional Games</label>
-                        <input type="hidden" name="divisional" value="false">
-                    {% endif %}
-                    {% if type == False %}
-                        <label><input type="checkbox" class="type-options" name="non_divisional" value="true" {% if filters['non_divisional'] == 'true' %} checked {% endif %}> Non Divisional Games</label>
-                        <input type="hidden" name="non_divisional" value="false">
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <!-- Weekly Config Days -->
-            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
-                {% for type in configs.all_time_config.DIVISIONALS %}
-                    {% if type == True %}
-                        <label><input type="checkbox" class="type-options" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}> Divisional Games</label>
-                        <input type="hidden" name="divisional" value="false">
-                    {% endif %}
-                    {% if type == False %}
-                        <label><input type="checkbox" class="type-options" name="non_divisional" value="true" {% if filters['non_divisional'] == 'true' %} checked {% endif %}> Non Divisional Games</label>
-                        <input type="hidden" name="non_divisional" value="false">
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <br>
-            <br>
+            <details>
+                <summary><strong>Game Type</strong></summary>
+                <label><input type="checkbox" id="toggle-all-type" checked> Select/Deselect All</label><br>
+                <label><input type="checkbox" name="no_type" value="true" {% if filters['no_type'] == 'true' %} checked {% endif %}> No Type</label>
+                <input type="hidden" name="no_type" value="false">
+                <!-- Weekly Config Game Types -->
+                <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                    {% for type in configs.weekly_config.DIVISIONALS %}
+                        {% if type == True %}
+                            <label><input type="checkbox" class="type-options" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}> Divisional Games</label>
+                            <input type="hidden" name="divisional" value="false">
+                        {% endif %}
+                        {% if type == False %}
+                            <label><input type="checkbox" class="type-options" name="non_divisional" value="true" {% if filters['non_divisional'] == 'true' %} checked {% endif %}> Non Divisional Games</label>
+                            <input type="hidden" name="non_divisional" value="false">
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <!-- Weekly Config Days -->
+                <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                    {% for type in configs.all_time_config.DIVISIONALS %}
+                        {% if type == True %}
+                            <label><input type="checkbox" class="type-options" name="divisional" value="true" {% if filters['divisional'] == 'true' %} checked {% endif %}> Divisional Games</label>
+                            <input type="hidden" name="divisional" value="false">
+                        {% endif %}
+                        {% if type == False %}
+                            <label><input type="checkbox" class="type-options" name="non_divisional" value="true" {% if filters['non_divisional'] == 'true' %} checked {% endif %}> Non Divisional Games</label>
+                            <input type="hidden" name="non_divisional" value="false">
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </details>
             
             <!-- 
                 Spread Filters 
             -->
-            <strong><label for="spread">Spread</label></strong>
-            <label><input type="checkbox" id="toggle-all-spread" checked> Select/Deselect All</label>
-            <br>
-            <label><input type="checkbox" name="no_spread" value="true" {% if filters['no_spread'] == 'true' %} checked {% endif %}> No Spread</label>
-            <input type="hidden" name="no_spread" value="false">
-            <br>
-            <!-- Weekly Config Spreads -->
-            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
-                {% set ns = namespace(first_more=true, first_less=true) %}
-                {% for spread in configs.weekly_config.SPREADS %}
-                    {% set spread_str = 'spread ' ~ spread %}
-                    {% if 'more' in spread %}
-                        {% if ns.first_more %}
-                            <br>
-                            {% set ns.first_more = false %}
+            <details>
+                <summary><strong><label for="spread">Spread</label></strong></summary>
+                <label><input type="checkbox" id="toggle-all-spread" checked> Select/Deselect All</label>
+                <br>
+                <label><input type="checkbox" name="no_spread" value="true" {% if filters['no_spread'] == 'true' %} checked {% endif %}> No Spread</label>
+                <input type="hidden" name="no_spread" value="false">
+                <br>
+                <!-- Weekly Config Spreads -->
+                <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                    {% set ns = namespace(first_more=true, first_less=true) %}
+                    {% for spread in configs.weekly_config.SPREADS %}
+                        {% set spread_str = 'spread ' ~ spread %}
+                        {% if 'more' in spread %}
+                            {% if ns.first_more %}
+                                <br>
+                                {% set ns.first_more = false %}
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                    {% if 'less' in spread %}
-                        {% if ns.first_less %}
-                            <br>
-                            {% set ns.first_less = false %}
+                        {% if 'less' in spread %}
+                            {% if ns.first_less %}
+                                <br>
+                                {% set ns.first_less = false %}
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                    <label><input type="checkbox" class="spread-options" name="{{ spread_str }}" value="true" {% if filters[spread_str] == 'true' %} checked {% endif %}> {{ spread }}</label>
-                    <input type="hidden" name="{{ spread_str }}" value="false">
-                {% endfor %}
-            </div>
-            <!-- All Time Config Spreads -->
-            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
-                {% set ns = namespace(first_more=true, first_less=true) %}
-                {% for spread in configs.all_time_config.SPREADS %}
-                    {% set spread_str = 'spread ' ~ spread %}
-                    {% if 'more' in spread %}
-                        {% if ns.first_more %}
-                            <br>
-                            {% set ns.first_more = false %}
+                        <label><input type="checkbox" class="spread-options" name="{{ spread_str }}" value="true" {% if filters[spread_str] == 'true' %} checked {% endif %}> {{ spread }}</label>
+                        <input type="hidden" name="{{ spread_str }}" value="false">
+                    {% endfor %}
+                </div>
+                <!-- All Time Config Spreads -->
+                <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                    {% set ns = namespace(first_more=true, first_less=true) %}
+                    {% for spread in configs.all_time_config.SPREADS %}
+                        {% set spread_str = 'spread ' ~ spread %}
+                        {% if 'more' in spread %}
+                            {% if ns.first_more %}
+                                <br>
+                                {% set ns.first_more = false %}
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                    {% if 'less' in spread %}
-                        {% if ns.first_less %}
-                            <br>
-                            {% set ns.first_less = false %}
+                        {% if 'less' in spread %}
+                            {% if ns.first_less %}
+                                <br>
+                                {% set ns.first_less = false %}
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                    <label><input type="checkbox" class="spread-options" name="{{ spread_str }}" value="true" {% if filters[spread_str] == 'true' %} checked {% endif %}> {{ spread }}</label>
-                    <input type="hidden" name="{{ spread_str }}" value="false">
-                {% endfor %}
-            </div>
-            <br>
+                        <label><input type="checkbox" class="spread-options" name="{{ spread_str }}" value="true" {% if filters[spread_str] == 'true' %} checked {% endif %}> {{ spread }}</label>
+                        <input type="hidden" name="{{ spread_str }}" value="false">
+                    {% endfor %}
+                </div>
+            </details>
             
             <!-- 
                 Total Filters 
             -->
-            <strong><label for="total">Total</label></strong>
-            <label><input type="checkbox" id="toggle-all-total" checked> Select/Deselect All</label>
-            <br>
-            <label><input type="checkbox" name="no_total" value="true" {% if filters['no_total'] == 'true' %} checked {% endif %}> No Total</label>
-            <input type="hidden" name="no_total" value="false">
-            <br>
-            <!-- Weekly Config Totals -->
-            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
-                {% set ns = namespace(first_less=true) %}
-                {% for total in configs.weekly_config.TOTALS %}
-                    {% set total_str = 'total ' ~ total %}
-                    {% if 'less' in total %}
-                        {% if ns.first_less %}
-                            <br>
-                            {% set ns.first_less = false %}
+            <details>
+                <summary><strong><label for="total">Total</label></strong></summary>
+                <label><input type="checkbox" id="toggle-all-total" checked> Select/Deselect All</label>
+                <br>
+                <label><input type="checkbox" name="no_total" value="true" {% if filters['no_total'] == 'true' %} checked {% endif %}> No Total</label>
+                <input type="hidden" name="no_total" value="false">
+                <br>
+                <!-- Weekly Config Totals -->
+                <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                    {% set ns = namespace(first_less=true) %}
+                    {% for total in configs.weekly_config.TOTALS %}
+                        {% set total_str = 'total ' ~ total %}
+                        {% if 'less' in total %}
+                            {% if ns.first_less %}
+                                <br>
+                                {% set ns.first_less = false %}
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                    <label><input type="checkbox" class="total-options" name="{{ total_str }}" value="true" {% if filters[total_str] == 'true' %} checked {% endif %}> {{ total }}</label>
-                    <input type="hidden" name="{{ total_str }}" value="false">
-                {% endfor %}
-            </div>
-            <!-- All Time Config Totals -->
-            <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
-                {% set ns = namespace(first_less=true) %}
-                {% for total in configs.all_time_config.TOTALS %}
-                    {% set total_str = 'total ' ~ total %}
-                    {% if 'less' in total %}
-                        {% if ns.first_less %}
-                            <br>
-                            {% set ns.first_less = false %}
+                        <label><input type="checkbox" class="total-options" name="{{ total_str }}" value="true" {% if filters[total_str] == 'true' %} checked {% endif %}> {{ total }}</label>
+                        <input type="hidden" name="{{ total_str }}" value="false">
+                    {% endfor %}
+                </div>
+                <!-- All Time Config Totals -->
+                <div class="all_time_configs" style="display: {% if filters['config'] == 'all_time' %}inline{% else %}none{% endif %};">
+                    {% set ns = namespace(first_less=true) %}
+                    {% for total in configs.all_time_config.TOTALS %}
+                        {% set total_str = 'total ' ~ total %}
+                        {% if 'less' in total %}
+                            {% if ns.first_less %}
+                                <br>
+                                {% set ns.first_less = false %}
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                    <label><input type="checkbox" class="total-options" name="{{ total_str }}" value="true" {% if filters[total_str] == 'true' %} checked {% endif %}> {{ total }}</label>
-                    <input type="hidden" name="{{ total_str }}" value="false">
-                {% endfor %}
-            </div>
-            <br>
+                        <label><input type="checkbox" class="total-options" name="{{ total_str }}" value="true" {% if filters[total_str] == 'true' %} checked {% endif %}> {{ total }}</label>
+                        <input type="hidden" name="{{ total_str }}" value="false">
+                    {% endfor %}
+                </div>
+            </details>
 
             <!--
                 Games to Include Filters
             -->
             <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
-                <strong>Games to Include</strong>
-                <label><input type="checkbox" id="toggle-all-games" checked> Select/Deselect All</label>
-                <br>
-                {% for id, game in games.items() %}
-                    {% set game_str = game.home_abbreviation ~ 'vs' ~ game.away_abbreviation %}
-                    <label><input type="checkbox" class="game-options" name="include_{{ game_str }}" value="true" {% if filters['include_' ~ game_str] == 'true' %} checked {% endif %}> {{ game_str }}</label>
-                    <input type="hidden" name="include_{{ game_str }}" value="false">
-                {% endfor %}
+                <details>
+                    <summary><strong>Games to Include</strong></summary>
+                    <label><input type="checkbox" id="toggle-all-games" checked> Select/Deselect All</label>
+                    <br>
+                    {% for id, game in games.items() %}
+                        {% set game_str = game.home_abbreviation ~ 'vs' ~ game.away_abbreviation %}
+                        <label><input type="checkbox" class="game-options" name="include_{{ game_str }}" value="true" {% if filters['include_' ~ game_str] == 'true' %} checked {% endif %}> {{ game_str }}</label>
+                        <input type="hidden" name="include_{{ game_str }}" value="false">
+                    {% endfor %}
+                </details>
             </div>
-            <br>
-            <br>
             
             <!-- 
                 Season Filters
@@ -373,7 +379,7 @@
                 <option value="lte" {% if filters['gle_win_pct'] == 'lte' %} selected {% endif %}><=</option>
                 <option value="lt" {% if filters['gle_win_pct'] == 'lt' %} selected {% endif %}><</option>
             </select>    
-            <input type="text" name="win-pct" value="{{ filters['win_pct'] }}">
+            <input type="text" name="win-pct" value="{{ filters['win_pct'] }}">%
             <br>
 
             <!-- 
@@ -437,6 +443,32 @@
     </div>
 </div>
 <script>
+    // Function to toggle all trend category checkboxes
+    const trendCategoryCheckboxes = document.querySelectorAll('.trend-category-options');
+    const toggleAllTrendCategoryCheckbox = document.getElementById('toggle-all-trend-category');
+    
+    function toggleAllTrendCategories() {
+        const allChecked = toggleAllTrendCategoryCheckbox.checked;
+        trendCategoryCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+    
+    toggleAllTrendCategoryCheckbox.addEventListener('change', toggleAllTrendCategories);
+
+    // Function to toggle all betting category checkboxes
+    const bettingCategoryCheckboxes = document.querySelectorAll('.betting-category-options');
+    const toggleAllBettingCategoryCheckbox = document.getElementById('toggle-all-betting-category');
+    
+    function toggleAllBettingCategories() {
+        const allChecked = toggleAllBettingCategoryCheckbox.checked;
+        bettingCategoryCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+    
+    toggleAllBettingCategoryCheckbox.addEventListener('change', toggleAllBettingCategories);
+
     // Function to toggle all month checkboxes
     const monthCheckboxes = document.querySelectorAll('.month-options');
     const toggleAllMonthCheckbox = document.getElementById('toggle-all-month');
