@@ -11,7 +11,7 @@ DB_HOST = 'postgres'
 DB_PORT = "5432"
 DB_NAME = 'postgres'
 DB_USER = 'postgres'
-DB_PASSWORD = 'bangarang19'
+DB_PASSWORD = 'pass'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
