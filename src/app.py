@@ -27,7 +27,7 @@ def index():
     }
 
     if request.method == 'GET':
-        filters = get_default_filters()
+        filters = get_default_filters(games)
     table = 'trends' if filters['config'] == 'all_time' else 'weekly_trends'
     sql_query = get_sql_query(table, filters, request)
 
@@ -135,14 +135,14 @@ def get_sql_query(table, filters, req):
     sql_query += get_total_query(filters, req)
     sql_query += get_season_query(filters, req)
     sql_query += get_total_games_query(filters, req)
+    sql_query += get_games_to_include_query(filters, req)
     sql_query += get_win_pct_query(filters, req)
     sql_query += get_sort_query(filters, req)
     sql_query += get_max_results_query(filters, req)
-    print(sql_query)
 
     return sql_query
 
-def get_default_filters():
+def get_default_filters(games=None):
     """
     Generate default filter options.
 
@@ -196,6 +196,10 @@ def get_default_filters():
     for i in range(30, 61, 5):
         filters[f'total {i} or more'] = 'true'
         filters[f'total {i} or less'] = 'true'
+
+    if games is not None:
+        for game in games.values():
+            filters[f'include_{game.home_abbreviation}vs{game.away_abbreviation}'] = 'true'
 
     filters['seasons'] = 'since 2006-2007'
     filters['season_type'] = 'seasons_after'
@@ -500,6 +504,26 @@ def get_total_query(filters, req):
 
     return sql_query
 
+def get_games_to_include_query(filters, req):
+    sql_query = ''
+
+    # Get the games that are not checked and add them to the SQL query
+    # It will get all games not like the ones that are unchecked
+    games_to_exclude = []
+    included_values = {key: value for key, value in req.form.items() if 'include' in key}
+    for key, value in included_values.items():
+        filters[key] = req.form.get(key, 'true')
+        if filters[key] == 'false':
+            games_to_exclude.append(key[8:])
+
+    if len(games_to_exclude) > 0:
+        sql_query += ' AND ('
+        for game in games_to_exclude:
+            sql_query += f" games_applicable NOT LIKE '%{game}%' AND"
+        sql_query += ' TRUE)'
+
+    return sql_query        
+
 def get_season_query(filters, req):
     """
     Construct the SQL query for season filtering.
@@ -529,8 +553,6 @@ def get_season_query(filters, req):
             for i in range(2006, int(season_selected[:4]) + 1):
                 seasons_included.append(f"'since {i}-{i + 1}'")
     sql_query += f" AND seasons IN ({','.join(seasons_included)})"
-
-    print(sql_query)
 
     return sql_query
 
@@ -635,7 +657,6 @@ def get_max_results_query(filters, req):
 
     # Extract max results and add it to SQL query
     filters['max_results'] = req.form.get('max_results', '50')
-    print(filters['max_results'])
 
     return f" LIMIT {filters['max_results']}"
 

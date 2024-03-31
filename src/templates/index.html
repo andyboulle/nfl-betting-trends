@@ -314,6 +314,21 @@
                 {% endfor %}
             </div>
             <br>
+
+            <!--
+                Games to Include Filters
+            -->
+            <div class="weekly_configs" style="display: {% if filters['config'] == 'weekly' %}inline{% else %}none{% endif %};">
+                <strong>Games to Include</strong>
+                <label><input type="checkbox" id="toggle-all-games" checked> Select/Deselect All</label>
+                <br>
+                {% for id, game in games.items() %}
+                    {% set game_str = game.home_abbreviation ~ 'vs' ~ game.away_abbreviation %}
+                    <label><input type="checkbox" class="game-options" name="include_{{ game_str }}" value="true" {% if filters['include_' ~ game_str] == 'true' %} checked {% endif %}> {{ game_str }}</label>
+                    <input type="hidden" name="include_{{ game_str }}" value="false">
+                {% endfor %}
+            </div>
+            <br>
             <br>
             
             <!-- 
@@ -332,7 +347,6 @@
                 {% endfor %}
             </select>
             <br>
-
 
             <!-- 
                 Total Games Filters
@@ -597,6 +611,19 @@
     });
     
     updateTotalCheckboxes();
+
+    // Function to toggle all games to include checkboxes
+    const gameCheckboxes = document.querySelectorAll('.game-options');
+    const toggleAllGameCheckbox = document.getElementById('toggle-all-games');
+    
+    function toggleAllGames() {
+        const allChecked = toggleAllGameCheckbox.checked;
+        gameCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+    }
+    
+    toggleAllGameCheckbox.addEventListener('change', toggleAllGames);
     
     // Function to handle radio button change event for weekly configuration
     document.getElementById('weekly_radio').addEventListener('change', function() {
@@ -610,6 +637,11 @@
                 allTimeConfigs[i].style.display = 'none';
             }
         }
+
+        var checkboxes = document.querySelectorAll('input[type=checkbox]');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = true;
+        });
     });
     
     // Function to handle radio button change event for all time configuration
@@ -624,6 +656,11 @@
                 allTimeConfigs[i].style.display = 'inline';
             }
         }
+
+        var checkboxes = document.querySelectorAll('input[type=checkbox]');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = true;
+        });
     });
 
     // Function to disable inputs from inactive divs on form submit
