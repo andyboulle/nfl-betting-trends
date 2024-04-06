@@ -81,16 +81,6 @@ def single_game(game_id_string):
                             trends_descriptions=trends_descriptions, filters=filters)
 
 def get_upcoming_games(cur):
-    """
-    Get all upcoming games from the database.
-
-    Args:
-        cur: The cursor object for the database connection.
-
-    Returns:
-        dict: A dictionary containing all upcoming games.
-    """
-
     games = {}
     cur.execute("SELECT * FROM upcoming_games")
     rows = cur.fetchall()
@@ -112,18 +102,6 @@ def get_selected_game(cur, game_id_string):
     return game
 
 def get_sql_query(table, filters, req):
-    """
-    Construct the SQL query based on the provided filters and request data.
-
-    Args:
-        start_query (str): The initial part of the SQL query.
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query.
-    """
-
     sql_query = f'SELECT * FROM {table} WHERE id IS NOT NULL'
     sql_query += get_trend_category_query(filters, req)
     sql_query += get_betting_category_query(filters, req)
@@ -143,13 +121,6 @@ def get_sql_query(table, filters, req):
     return sql_query
 
 def get_default_filters(games=None):
-    """
-    Generate default filter options.
-
-    Returns:
-        dict: A dictionary containing default filter options.
-    """
-
     filters = {}
 
     filters['config'] = 'weekly'
@@ -219,16 +190,6 @@ def get_default_filters(games=None):
     return filters
 
 def get_trend_category_query(filters, req):
-    """
-    Construct the SQL query for trend category filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for trend category filtering.
-    """
     sql_query = ''
 
     # Extract trend categories from POST form
@@ -255,17 +216,6 @@ def get_trend_category_query(filters, req):
     return sql_query
 
 def get_betting_category_query(filters, req):
-    """
-    Construct the SQL query for betting category filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for betting category filtering.
-    """
-
     sql_query = ''
 
     # Extract betting categories from POST form
@@ -282,17 +232,6 @@ def get_betting_category_query(filters, req):
     return sql_query
 
 def get_over_under_query(filters, req):
-    """
-    Construct the SQL query for over/under category filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for over/under category filtering.
-    """
-
     sql_query = ''
 
     # Extract over/under categories from POST form
@@ -310,17 +249,6 @@ def get_over_under_query(filters, req):
     return sql_query
 
 def get_month_query(filters, req):
-    """
-    Construct the SQL query for month filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for month filtering.
-    """
-
     sql_query = ''
 
     # Extract month categories and add them to SQL query
@@ -348,17 +276,6 @@ def get_month_query(filters, req):
     return sql_query
 
 def get_day_query(filters, req):
-    """
-    Construct the SQL query for day filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for day filtering.
-    """
-
     sql_query = ''
 
     # Extract day categories and add them to SQL query
@@ -385,17 +302,6 @@ def get_day_query(filters, req):
     return sql_query
 
 def get_type_query(filters, req):
-    """
-    Construct the SQL query for type filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for type filtering.
-    """
-
     sql_query = ''
 
     # Extract type categories and add them to SQL query
@@ -420,17 +326,6 @@ def get_type_query(filters, req):
     return sql_query
 
 def get_spread_query(filters, req):
-    """
-    Construct the SQL query for spread filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for spread filtering.
-    """
-
     sql_query = ''
 
     # Extract spread categories and add them to SQL query
@@ -464,17 +359,6 @@ def get_spread_query(filters, req):
     return sql_query
 
 def get_total_query(filters, req):
-    """
-    Construct the SQL query for total filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for total filtering.
-    """
-
     sql_query = ''
 
     # Extract total categories and add them to SQL query
@@ -525,17 +409,6 @@ def get_games_to_include_query(filters, req):
     return sql_query        
 
 def get_season_query(filters, req):
-    """
-    Construct the SQL query for season filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for season filtering.
-    """
-
     sql_query = ''
 
     # Extract seasons and add them to SQL query
@@ -557,17 +430,6 @@ def get_season_query(filters, req):
     return sql_query
 
 def get_total_games_query(filters, req):
-    """
-    Construct the SQL query for total games filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for total games filtering.
-    """
-
     sql_query = ''
 
     # Extract total games filtering method and add it to SQL query
@@ -589,17 +451,6 @@ def get_total_games_query(filters, req):
     return sql_query
 
 def get_win_pct_query(filters, req):
-    """
-    Construct the SQL query for win percentage filtering.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for win percentage filtering.
-    """
-
     sql_query = ''
 
     # Extract win pct filtering method and add it to SQL query
@@ -621,17 +472,6 @@ def get_win_pct_query(filters, req):
     return sql_query
 
 def get_sort_query(filters, req):
-    """
-    Construct the SQL query for sorting.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for sorting.
-    """
-
     # Extract sorting category and order and add them to SQL query
     filters['first_sort_category'] = req.form.get('first-sort-category', 'win_percentage')
     filters['first_sort_order'] = req.form.get('first-sort-order', 'desc')
@@ -644,17 +484,6 @@ def get_sort_query(filters, req):
                     {filters['second_sort_order']}"
 
 def get_max_results_query(filters, req):
-    """
-    Construct the SQL query for limiting maximum results.
-
-    Args:
-        filters (dict): A dictionary containing the filter options.
-        req: The request object containing form data.
-
-    Returns:
-        str: The constructed SQL query for limiting maximum results.
-    """
-
     # Extract max results and add it to SQL query
     filters['max_results'] = req.form.get('max_results', '50')
 

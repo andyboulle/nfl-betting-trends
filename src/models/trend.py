@@ -23,6 +23,7 @@ Attributes:
 - pushes: Number of pushes for the trend.
 - total_games: Total number of games for the trend.
 - win_pct: Win percentage for the trend.
+- applicable_games: Games to which the trend applies.
 
 Methods:
 - __init__: Initializes a Trend object with the given attributes.
@@ -56,6 +57,7 @@ class Trend:
     - pushes (int): Number of pushes for the trend.
     - total_games (int): Total number of games for the trend.
     - win_pct (float): Win percentage for the trend.
+    - applicable_games (list): Games to which the trend applies.
 
     Methods:
     - __init__: Initializes a Trend object with the given attributes.
@@ -105,6 +107,7 @@ class Trend:
         - pushes (int): Number of pushes for the trend (default: 0).
         - total_games (int): Total number of games for the trend (default: 0).
         - win_pct (float): Win percentage for the trend (default: 0).
+        - applicable_games (list): Games to which the trend applies (default: None).
         """
 
         self.category = category
