@@ -1,7 +1,3 @@
-"""
-This module contains configuration settings for the application.
-"""
-
 OLDEST_SEASON = '2006-2007'
 CURRENT_SEASON = '2024-2025'
 
