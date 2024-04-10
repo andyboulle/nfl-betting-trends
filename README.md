@@ -1,4 +1,4 @@
-# NFL Trends Analyzer
+# NFL Betting Trends Web Application
 
 ## Introduction
 Welcome to the NFL Betting Trends web application! This application provides users with valuable insights into NFL betting trends, allowing them to make informed decisions when placing bets on upcoming games. Whether you're a seasoned bettor or just getting started, our platform offers a wealth of data and features to enhance your betting experience.
