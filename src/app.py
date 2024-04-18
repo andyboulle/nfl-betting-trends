@@ -18,7 +18,7 @@ def index():
     conn = psycopg2.connect(database=DB_NAME,
                             user=DB_USER,
                             password=DB_PASSWORD,
-                            host="localhost", port=DB_PORT)
+                            host=DB_HOST, port=DB_PORT)
     cur = conn.cursor()
 
     games = get_upcoming_games(cur)
