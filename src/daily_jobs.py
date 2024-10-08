@@ -7,6 +7,11 @@
 import psycopg2
 from models.upcoming_game import UpcomingGame
 import time
+import requests
+import json
+import pytz
+from datetime import datetime
+import config.all_time_config as all_time_config
 
 total_start_time = time.time()
 print('Starting...')
@@ -118,25 +123,62 @@ def update_weekly_tables(cur):
         cur.execute(create_table_query)
         conn.commit()
 
-    # This is where new lines will be pulled in from the API
-    # For now, we will just use some dummy data
-    game1 = UpcomingGame('2024-09-05', 'Kansas City Chiefs', 'Miami Dolphins', -4.5, -110, -110, -220, 190, 47, -110, -110, True)
-    game2 = UpcomingGame('2024-09-06', 'Philadelphia Eagles', 'Pittsburgh Steelers', -3.0, -110, -110, -200, 174, 42, -110, -110, True)
-    game3 = UpcomingGame('2024-09-08', 'Baltimore Ravens', 'Washington Commanders', -8.5, -110, -110, -370, 250, 45.5, -110, -110, True)
-    game4 = UpcomingGame('2024-09-08', 'Seattle Seahawks', 'Chicago Bears', -1.5, -110, -110, -123, 108, 43.5, -110, -110, True)
-    game5 = UpcomingGame('2024-09-08', 'Denver Broncos', 'Arizona Cardinals', 0.0, -110, -110, -104, -104, 42, -110, -110, True)
-    game6 = UpcomingGame('2024-09-08', 'Green Bay Packers', 'Dallas Cowboys', 2.5, -110, -110, 140, -155, 52.5, -110, -110, True)
-    game7 = UpcomingGame('2024-09-08', 'Carolina Panthers', 'New York Giants', 3.5, -110, -110, 165, -190, 38.5, -110, -110, True)
-    game8 = UpcomingGame('2024-09-08', 'San Francisco 49ers', 'New Orleans Saints', -10.5, -110, -110, -430, 365, 49.5, -110, -110, True)
-    game9 = UpcomingGame('2024-09-08', 'Indianapolis Colts', 'Cincinnati Bengals', 3.0, -110, -110, 148, -165, 47, -110, -110, True)
-    game10 = UpcomingGame('2024-09-08', 'New York Jets', 'Los Angeles Chargers', -1.5, -110, -110, -131, 115, 42.5, -110, -110, True)
-    game11 = UpcomingGame('2024-09-08', 'Los Angeles Rams', 'Tampa Bay Buccaneers', -3.5, -110, -110, -200, 183, 44.5, -110, -110, True)
-    game12 = UpcomingGame('2024-09-08', 'Cleveland Browns', 'Jacksonville Jaguars', 1.0, -110, -110, 106, -110, 39.5, -110, -110, True)
-    game13 = UpcomingGame('2024-09-08', 'Tennessee Titans', 'Minnesota Vikings', 2.5, -110, -110, 140, -168, 34.5, -110, -110, True)
-    game14 = UpcomingGame('2024-09-08', 'Atlanta Falcons', 'Houston Texans', 4.0, -110, -110, 185, -205, 46, -110, -110, True)
-    game15 = UpcomingGame('2024-09-09', 'Detroit Lions', 'Buffalo Bills', 0.0, -110, -110, -109, -111, 55.5, -110, -110, True)
-    game16 = UpcomingGame('2024-09-09', 'Las Vegas Raiders', 'New England Patriots', -2.0, -110, -110, -130, 115, 33.5, -110, -110, True)
-    games = [game1, game2, game3, game4, game5, game6, game7, game8, game9, game10, game11, game12, game13, game14, game15, game16]
+    # Make a call to odds API to get the upcoming games
+    url = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?"
+    body = {
+        "apiKey": "APIKEY",
+        "regions": "us",
+        "markets": "h2h,spreads,totals",
+        "dateFormat": "iso",
+        "oddsFormat": "american",
+        "bookmakers": "fanduel",
+        "commenceTimeFrom": all_time_config.WEEK_START,
+        "commenceTimeTo": all_time_config.WEEK_END,
+    }
+
+    for key, value in body.items():
+        url += f"{key}={value}&"
+
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        print(json.dumps(data, indent=4))
+    else:
+        print("Error: Failed to access the API")
+
+    games = []
+    us_tz = pytz.timezone('US/Eastern')
+    for game in data:
+        # Odds API is 4 hours ahead, adjust dates accordingly
+        utc_time = datetime.strptime(game['commence_time'], "%Y-%m-%dT%H:%M:%SZ")
+        local_time = utc_time.replace(tzinfo=pytz.utc).astimezone(us_tz)
+        date = local_time.strftime("%Y-%m-%d")
+
+        home_team = game['home_team']
+        away_team = game['away_team']
+        if game['bookmakers'][0]['markets'][1]['outcomes'][0]['name'] == game['home_team']:
+            home_spread = game['bookmakers'][0]['markets'][1]['outcomes'][0]['point']
+            home_spread_odds = game['bookmakers'][0]['markets'][1]['outcomes'][0]['price']
+            away_spread_odds = game['bookmakers'][0]['markets'][1]['outcomes'][1]['price']
+        else:
+            home_spread = game['bookmakers'][0]['markets'][1]['outcomes'][1]['point']
+            home_spread_odds = game['bookmakers'][0]['markets'][1]['outcomes'][1]['price']
+            away_spread_odds = game['bookmakers'][0]['markets'][1]['outcomes'][0]['price']
+        if game['bookmakers'][0]['markets'][0]['outcomes'][0]['name'] == game['home_team']:
+            home_moneyline_odds = game['bookmakers'][0]['markets'][0]['outcomes'][0]['price']
+            away_moneyline_odds = game['bookmakers'][0]['markets'][0]['outcomes'][1]['price']
+        else:
+            home_moneyline_odds = game['bookmakers'][0]['markets'][0]['outcomes'][1]['price']
+            away_moneyline_odds = game['bookmakers'][0]['markets'][0]['outcomes'][0]['price']
+        total = game['bookmakers'][0]['markets'][2]['outcomes'][0]['point']
+        over_odds = game['bookmakers'][0]['markets'][2]['outcomes'][0]['price']
+        under_odds = game['bookmakers'][0]['markets'][2]['outcomes'][1]['price']
+
+        print(f'DATETIME OF GAME {home_team} vs {away_team}: {date}')
+        
+        game = UpcomingGame(date, home_team, away_team, home_spread, home_spread_odds, away_spread_odds, home_moneyline_odds, away_moneyline_odds, total, over_odds, under_odds, True)
+        games.append(game)
 
     total_games_start_time = time.time()
     weekly_trends = {}
