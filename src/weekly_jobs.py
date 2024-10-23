@@ -16,13 +16,7 @@ from datetime import datetime, timedelta, timezone
 import config.all_time_config as all_time_config
 import config.db_config as db_config
 from models.game import Game
-import psutil  # Importing psutil for memory tracking
-
-# Function to track memory usage
-def print_memory_usage(step):
-    process = psutil.Process()
-    mem_info = process.memory_info()
-    print(f"{step} - Memory used: {mem_info.rss / (1024 ** 2):.2f} MB")  # Memory in MB
+import psutil
 
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(
@@ -33,6 +27,12 @@ conn = psycopg2.connect(
     password=db_config.DB_PASSWORD
 )
 cur = conn.cursor()
+
+# Function to track memory usage
+def print_memory_usage(step):
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    print(f"{step} - Memory used: {mem_info.rss / (1024 ** 2):.2f} MB")  # Memory in MB
 
 print_memory_usage("After database connection")  # Check memory after DB connection
 

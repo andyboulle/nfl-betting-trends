@@ -15,16 +15,6 @@ import config.all_time_config as all_time_config
 import config.db_config as db_config
 from models.upcoming_game import UpcomingGame
 
-# Function to print memory usage
-def log_memory_usage(stage):
-    process = psutil.Process()
-    mem_info = process.memory_info()
-    print(f"[{stage}] Memory usage: {mem_info.rss / (1024 ** 2):.2f} MB")
-
-total_start_time = time.time()
-print('Starting...')
-log_memory_usage("Start")  # Log memory at the start
-
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(
     host=db_config.DB_HOST,
@@ -34,6 +24,15 @@ conn = psycopg2.connect(
     password=db_config.DB_PASSWORD
 )
 cur = conn.cursor()
+
+# Function to print memory usage
+def log_memory_usage(stage):
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    print(f"[{stage}] Memory usage: {mem_info.rss / (1024 ** 2):.2f} MB")
+
+total_start_time = time.time()
+print('Starting...')
 
 def update_weekly_tables(cur):
     log_memory_usage("Before updating tables")  # Log memory before updating tables
@@ -219,6 +218,7 @@ def update_weekly_tables(cur):
         log_memory_usage(f"After processing game {game.id_string}")  # Log memory after processing each game
 
         # Check if table exists
+        print(f'Checking if table {game.id_string.lower()} exists...')
         check_table_query = f'''
             SELECT EXISTS (
                 SELECT 1
@@ -229,7 +229,10 @@ def update_weekly_tables(cur):
         cur.execute(check_table_query)
         table_exists = cur.fetchone()[0]
 
+        print(f'Executed checking if table {game.id_string.lower()} exists')
+
         if table_exists:
+            print('It does exist')
             # Truncate table if it exists
             truncate_table_query = f'''
                 TRUNCATE TABLE {game.id_string.lower()}
@@ -237,6 +240,7 @@ def update_weekly_tables(cur):
             cur.execute(truncate_table_query)
             conn.commit()
         else:
+            print('It does not exist')
             # Create table if it does not exist
             create_table_query = f'''
                 CREATE TABLE {game.id_string.lower()} (
@@ -259,16 +263,31 @@ def update_weekly_tables(cur):
             cur.execute(create_table_query)
             conn.commit()
 
+        print(f'Created/Truncated table {game.id_string.lower()}')
+
         # Insert trends into individual game trends table
+        print(f'Inserting trends into {game.id_string.lower()}...')
         insert_query = f'''
             INSERT INTO {game.id_string.lower()}
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         '''
+        print('Calculating trend tuples')
         trend_tuples = [trend.to_tuple() for trend in game.trends]
-        cur.executemany(insert_query, trend_tuples)
-        conn.commit()
+        print('Calculated trend tuples')
+        # Reduce batch size
+        batch_size = 100
+        for i in range(0, len(trend_tuples), batch_size):
+            batch = trend_tuples[i:i + batch_size]
+            try:
+                cur.executemany(insert_query, batch)
+                conn.commit()
+                print(f'Inserted batch {i // batch_size + 1}/{len(trend_tuples) // 100} of trends into {game.id_string.lower()}')
+            except Exception as e:
+                print(f"Error inserting batch {i // batch_size + 1}/{len(trend_tuples) // 100} of trends into {game.id_string.lower()}: {e}")
+        print(f'Inserted trends into {game.id_string.lower()}')
 
         # Update individual game trends records to match records in trends table
+        print(f'Updating {game.id_string.lower()} to match records in trends table...')
         update_query = f'''
             UPDATE {game.id_string.lower()}
             SET 
@@ -282,8 +301,10 @@ def update_weekly_tables(cur):
         '''
         cur.execute(update_query)
         conn.commit()
+        print(f'Updated {game.id_string.lower()}')
 
         # Insert trends into weekly_trends dictionary with updated applicable games
+        print(f'Inserting trends into weekly_trends dictionary...')
         for trend in game.trends:
             weekly_game_string = f'{game.home_abbreviation}vs{game.away_abbreviation}'
             if trend.trend_id in weekly_trends:
@@ -291,6 +312,7 @@ def update_weekly_tables(cur):
             else:
                 trend.applicable_games = weekly_game_string
                 weekly_trends[trend.trend_id] = trend
+        print(f'Inserted trends into weekly_trends dictionary')
 
         game_end_time = time.time()
         print(f'Game processing took {game_end_time - game_start_time}')
