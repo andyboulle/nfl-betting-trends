@@ -5,28 +5,39 @@
 # Update the weekly_config file with updated unique values
 
 import psycopg2
-from models.upcoming_game import UpcomingGame
 import time
 import requests
 import json
 import pytz
+import psutil
 from datetime import datetime
 import config.all_time_config as all_time_config
+import config.db_config as db_config
+from models.upcoming_game import UpcomingGame
+
+# Function to print memory usage
+def log_memory_usage(stage):
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    print(f"[{stage}] Memory usage: {mem_info.rss / (1024 ** 2):.2f} MB")
 
 total_start_time = time.time()
 print('Starting...')
+log_memory_usage("Start")  # Log memory at the start
 
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(
-    host="localhost",
-    port="5432",
-    database="postgres",
-    user="postgres",
-    password="pass"
+    host=db_config.DB_HOST,
+    port=db_config.DB_PORT,
+    database=db_config.DB_NAME,
+    user=db_config.DB_USER,
+    password=db_config.DB_PASSWORD
 )
 cur = conn.cursor()
 
 def update_weekly_tables(cur):
+    log_memory_usage("Before updating tables")  # Log memory before updating tables
+
     # Check if the table 'upcoming_games' exists
     check_table_query = '''
         SELECT EXISTS (
@@ -81,6 +92,8 @@ def update_weekly_tables(cur):
         cur.execute(create_table_query)
         conn.commit()
 
+        log_memory_usage("After creating/updating upcoming_games table")  # Log memory after creating/updating table
+
     # Check if the table 'weekly_trends' exists
     check_table_query = '''
         SELECT EXISTS (
@@ -122,6 +135,8 @@ def update_weekly_tables(cur):
         '''
         cur.execute(create_table_query)
         conn.commit()
+
+        log_memory_usage("After creating/updating weekly_trends table")  # Log memory after creating/updating table
 
     # Make a call to odds API to get the upcoming games
     url = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?"
@@ -180,6 +195,8 @@ def update_weekly_tables(cur):
         game = UpcomingGame(date, home_team, away_team, home_spread, home_spread_odds, away_spread_odds, home_moneyline_odds, away_moneyline_odds, total, over_odds, under_odds, True)
         games.append(game)
 
+        log_memory_usage("After processing games from API")  # Log memory after processing games
+
     total_games_start_time = time.time()
     weekly_trends = {}
     for game in games:
@@ -198,6 +215,8 @@ def update_weekly_tables(cur):
         '''
         cur.execute(insert_query, game.to_tuple())
         conn.commit()
+
+        log_memory_usage(f"After processing game {game.id_string}")  # Log memory after processing each game
 
         # Check if table exists
         check_table_query = f'''
@@ -279,6 +298,8 @@ def update_weekly_tables(cur):
     total_games_end_time = time.time()
     print(f'Total games processing took {total_games_end_time - total_games_start_time}')
 
+    log_memory_usage("After processing all games")  # Log memory after processing all games
+
     weekly_trends_start_time = time.time()
     print('Inserting weekly trends...')
     insert_query = '''
@@ -290,6 +311,8 @@ def update_weekly_tables(cur):
     conn.commit()
     weekly_trends_end_time = time.time()
     print(f'Inserting weekly trends took {weekly_trends_end_time - weekly_trends_start_time}')
+
+    log_memory_usage("After inserting weekly trends")  # Log memory after inserting weekly trends
 
     updating_trends_start_time = time.time()
     print('Updating weekly trends...')
@@ -308,6 +331,8 @@ def update_weekly_tables(cur):
     conn.commit()
     updating_trends_end_time = time.time()
     print(f'Updating weekly trends took {updating_trends_end_time - updating_trends_start_time}')
+
+    log_memory_usage("After updating weekly trends")  # Log memory after updating weekly trends
 
 def update_weekly_config(cur):
     table = 'weekly_trends'

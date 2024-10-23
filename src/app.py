@@ -2,16 +2,18 @@ from flask import Flask, render_template, request
 import psycopg2
 from models.upcoming_game import UpcomingGame
 from models.trend import Trend
+import config.config as config
 import config.weekly_config as weekly_config
 import config.all_time_config as all_time_config
+import config.db_config as db_config
 
 app = Flask(__name__)
 
-DB_HOST = 'postgres'
-DB_PORT = "5432"
-DB_NAME = 'postgres'
-DB_USER = 'postgres'
-DB_PASSWORD = 'pass'
+DB_HOST = db_config.DB_HOST
+DB_PORT = db_config.DB_PORT
+DB_NAME = db_config.DB_NAME
+DB_USER = db_config.DB_USER
+DB_PASSWORD = db_config.DB_PASSWORD
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -48,14 +50,14 @@ def index():
     return render_template('index.html',
                             games=games, trends=trends,
                             trends_descriptions=trends_descriptions,
-                            filters=filters, configs=configs)
+                            filters=filters, configs=configs, current_season_end_year=config.CURRENT_SEASON[5:])
 
 @app.route('/<game_id_string>', methods=['GET', 'POST'])
 def single_game(game_id_string):
     conn = psycopg2.connect(database=DB_NAME,
                             user=DB_USER,
                             password=DB_PASSWORD,
-                            host="localhost", port=DB_PORT)
+                            host=DB_HOST, port=DB_PORT)
     cur = conn.cursor()
     
     game = get_selected_game(cur, game_id_string)
@@ -78,7 +80,7 @@ def single_game(game_id_string):
     conn.close()
 
     return render_template('single_game_page.html', game=game, trends=trends,
-                            trends_descriptions=trends_descriptions, filters=filters)
+                            trends_descriptions=trends_descriptions, filters=filters, current_season_end_year=config.CURRENT_SEASON[5:])
 
 def get_upcoming_games(cur):
     games = {}
@@ -416,11 +418,12 @@ def get_season_query(filters, req):
     filters['season_type'] = req.form.get('season_type', 'seasons_after')
     seasons_included = []
     season_selected = filters['seasons'][6:]
+    print(season_selected)
     if filters['season_type'] == 'only_season':
         seasons_included.append(f"'{filters['seasons']}'")
     else:
         if filters['season_type'] == 'seasons_after':
-            for i in range(int(season_selected[:4]), 2024):
+            for i in range(int(season_selected[:4]), int(config.CURRENT_SEASON[5:])):
                 seasons_included.append(f"'since {i}-{i + 1}'")
         elif filters['season_type'] == 'seasons_before':
             for i in range(2006, int(season_selected[:4]) + 1):

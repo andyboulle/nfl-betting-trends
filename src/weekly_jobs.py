@@ -14,17 +14,27 @@ import requests
 import pandas as pd
 from datetime import datetime, timedelta, timezone
 import config.all_time_config as all_time_config
+import config.db_config as db_config
 from models.game import Game
+import psutil  # Importing psutil for memory tracking
+
+# Function to track memory usage
+def print_memory_usage(step):
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    print(f"{step} - Memory used: {mem_info.rss / (1024 ** 2):.2f} MB")  # Memory in MB
 
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(
-    host="localhost",
-    port="5432",
-    database="postgres",
-    user="postgres",
-    password="pass"
+    host=db_config.DB_HOST,
+    port=db_config.DB_PORT,
+    database=db_config.DB_NAME,
+    user=db_config.DB_USER,
+    password=db_config.DB_PASSWORD
 )
 cur = conn.cursor()
+
+print_memory_usage("After database connection")  # Check memory after DB connection
 
 def download_updated_data():
     url = 'https://www.aussportsbetting.com/historical_data/nfl.xlsx'
@@ -39,6 +49,8 @@ def download_updated_data():
     else:
         print('Failed to download file')
 
+    print_memory_usage("After downloading data")  # Memory after file download
+
 def get_last_weeks_games():
     data = pd.read_excel('datafiles/nfl.xlsx')
 
@@ -49,6 +61,7 @@ def get_last_weeks_games():
 
     last_weeks_games = data[(data['Date'] >= week_start_date) & (data['Date'] < week_end_date)]
 
+    print_memory_usage("After loading last week's games")  # Memory after loading games
     return last_weeks_games
 
 def format_dataframe(dataframe):
@@ -59,36 +72,22 @@ def format_dataframe(dataframe):
     dataframe = dataframe.iloc[::-1].reset_index(drop=True)
 
     # If 'Home Line Close' and 'Away Line Close' are empty, replace them
-    # with 'Home Line Open' and 'Home Line Open * -1'
     dataframe['Home Line Close'].fillna(dataframe['Home Line Open'], inplace=True)
     dataframe['Total Score Close'].fillna(dataframe['Total Score Open'], inplace=True)
 
     # Delete unnecessary columns
     dataframe.drop(columns=[
-        # Don't need any moneyline odds columns
         'Home Odds Open', 'Home Odds Min', 'Home Odds Max', 'Home Odds Close',
         'Away Odds Open', 'Away Odds Min', 'Away Odds Max', 'Away Odds Close',
-
-        # Don't need spread columns besides closing home lines
         'Home Line Open', 'Home Line Min', 'Home Line Max',
         'Away Line Open', 'Away Line Min', 'Away Line Max', 'Away Line Close',
-
-        # Don't need any spread odds columns
         'Home Line Odds Open', 'Home Line Odds Min', 'Home Line Odds Max', 'Home Line Odds Close',
         'Away Line Odds Open', 'Away Line Odds Min', 'Away Line Odds Max', 'Away Line Odds Close',
-
-        # Don't need any total columns besides closing total
         'Total Score Open', 'Total Score Min', 'Total Score Max',
-
-        # Don't need any total score odds columns
-        'Total Score Over Open', 'Total Score Over Min',
-        'Total Score Over Max', 'Total Score Over Close',
-        'Total Score Under Open', 'Total Score Under Min',
-        'Total Score Under Max', 'Total Score Under Close',
-
-        # Don't need overtime, neutral venue, or notes
+        'Total Score Over Open', 'Total Score Over Min', 'Total Score Over Max', 'Total Score Over Close',
+        'Total Score Under Open', 'Total Score Under Min', 'Total Score Under Max', 'Total Score Under Close',
         'Overtime?', 'Neutral Venue?', 'Playoff Game?', 'Notes'
-    ], inplace = True)
+    ], inplace=True)
 
     # Replace
     dataframe.rename(columns={
@@ -115,6 +114,7 @@ def format_dataframe(dataframe):
         dataframe.loc[home_mask, 'Home Team'] = value
         dataframe.loc[away_mask, 'Away Team'] = value
 
+    print_memory_usage("After formatting dataframe")  # Memory after formatting
     return dataframe
 
 def process_game_trends(game_trends, trends_dict, game):
@@ -125,9 +125,13 @@ def process_game_trends(game_trends, trends_dict, game):
             trend_to_update = trends_dict[trend.trend_id]
         trend_to_update.update_record(game)
 
+    print_memory_usage("After processing game trends")  # Memory after processing trends
+
 def process_game_rows(cur, conn, dataframe):
     trends = {}
     games = []
+
+    print_memory_usage("Start of process_game_rows")  # Memory at the start of the function
 
     for _, row in dataframe.iterrows():
         game = Game(
@@ -140,12 +144,18 @@ def process_game_rows(cur, conn, dataframe):
 
         print(f'Processing game: {game.id_string}')
         start_time = time.time()
-        process_game_trends(game.trends, trends, game)
-        games.append(game.to_dict())
+        
+        process_game_trends(game.trends, trends, game)  # Process game trends
+        games.append(game.to_dict())  # Add game to the list
+        
         end_time = time.time()
         print(f'Game processed in {end_time - start_time} seconds')
 
+        print_memory_usage(f"After processing game {game.id_string}")  # Memory after each game processing
+
     trends_arr = [trend.to_tuple() for trend in trends.values()]
+
+    print_memory_usage("Before adding games to database")  # Memory before inserting into DB
 
     # Add games to database
     print('Adding games to database...')
@@ -165,10 +175,13 @@ def process_game_rows(cur, conn, dataframe):
             %(home_underdog_cover)s, %(over_hit)s, %(under_hit)s
         )
     '''
-    cur.executemany(sql_games_insert, games)
+    cur.executemany(sql_games_insert, games)  # Insert games into the DB
     conn.commit()
+    
     end_time = time.time()
     print(f'Games added to database in {end_time - start_time} seconds')
+
+    print_memory_usage("After adding games to database")  # Memory after inserting games
 
     return trends_arr
 
@@ -176,6 +189,8 @@ def update_trends_in_db(cur, conn, trends_arr):
     print(f'Updating {len(trends_arr)} trends in the database...')
     batch_size = 1000
     total_start_time = time.time()
+
+    print_memory_usage("Start of update_trends_in_db")  # Memory at the start
 
     # Process trends in batches
     for i in range(0, len(trends_arr), batch_size):
@@ -204,15 +219,19 @@ def update_trends_in_db(cur, conn, trends_arr):
                     (trends.wins + EXCLUDED.wins + trends.losses + EXCLUDED.losses + (trends.pushes + EXCLUDED.pushes) / 2.0) * 100, 2)
         """
         batch_start_time = time.time()
-        execute_values(cur, query, upsert_data)
+        execute_values(cur, query, upsert_data)  # Execute the upsert query
         batch_end_time = time.time()
         print(f'Processed batch {i // batch_size + 1} in {batch_end_time - batch_start_time:.2f} seconds')
+
+        print_memory_usage(f"After processing batch {i // batch_size + 1}")  # Memory after processing each batch
 
     # Commit the transaction
     conn.commit()
 
     total_end_time = time.time()
     print(f'Updated all trends in {total_end_time - total_start_time:.2f} seconds')
+
+    print_memory_usage("After updating trends in database")  # Memory after updating trends
 
 def update_all_time_config(cur):
     table = 'trends'

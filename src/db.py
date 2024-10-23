@@ -48,6 +48,7 @@ Example:
 import time
 import psycopg2
 import pandas as pd
+import config.db_config as db_config
 from models.game import Game
 
 #########################
@@ -322,11 +323,11 @@ data = format_dataframe(data)
 
 # Connect to sql database
 connection = psycopg2.connect(
-    host = 'localhost',
-    dbname = 'postgres',
-    user = 'postgres',
-    password = 'pass',
-    port = 5432
+    host = db_config.DB_HOST,
+    dbname = db_config.DB_NAME,
+    user = db_config.DB_USER,
+    password = db_config.DB_PASSWORD,
+    port = db_config.DB_PORT
 )
 cursor = connection.cursor()
 
