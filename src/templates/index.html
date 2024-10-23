@@ -347,7 +347,7 @@
                 <option value="only_season" {% if filters['season_type'] == 'only_season' %} selected {% endif %}>only</option>
             </select>
             <select name="seasons">
-                {% for i in range(2006, 2024) %}
+                {% for i in range(2006, current_season_end_year|int) %}
                     {% set season_str = 'since ' ~ i ~ '-' ~ (i + 1) %}
                     <option value="since {{ i }}-{{ i + 1 }}" {% if filters['seasons'] == season_str %} selected {% endif %}>{{ i }}-{{ i + 1 }}</option>
                 {% endfor %}
