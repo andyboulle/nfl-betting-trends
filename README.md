@@ -40,16 +40,48 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5. Set up the database schema by executing (takes a long time. ~12 hours):
+5. Adjust the settings for your postgres database in `config/db_config.py`
+```python
+DB_HOST = 'HOST'
+DB_PORT = "PORT"
+DB_NAME = 'DATABASE'
+DB_USER = 'USERNAME'
+DB_PASSWORD = 'PASSWORD'
+```
+
+6. Set up the database schema by executing (takes a long time. ~12 hours):
 ```bash
 python src/db.py
 ```
 
-6. Launch the Flask application:
+7. Enter your API Key for "The Odds API" (https://the-odds-api.com/) on line 144 of `daily_jobs.py`
+```python
+body = {
+        "apiKey": "APIKEY", <-- This Line
+        "regions": "us",
+        "markets": "h2h,spreads,totals",
+        "dateFormat": "iso",
+        "oddsFormat": "american",
+        "bookmakers": "fanduel",
+        "commenceTimeFrom": all_time_config.WEEK_START,
+        "commenceTimeTo": all_time_config.WEEK_END,
+    }
+```
+
+8. Run `daily_jobs.py` to get the updated lines for this week's games and add the games to the database
+```bash
+python src/daily_jobs.py
+```
+
+9. Launch the Flask application:
 ```bash
 python src/app.py
 ```
 Access the web application through your preferred web browser at http://localhost:5000.
+
+10. Continuously update the database using `weekly_jobs.py` and `daily_jobs.py`
+  - Run `daily_jobs.py` every day to get updated lines
+  - Run `weekly_jobs.py` every Tuesday/Wednesday to add the last weeks trends to the database
 
 ## Usage
 Upon accessing the NFL Betting Trends web application, users will encounter the following key features:
